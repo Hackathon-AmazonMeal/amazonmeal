@@ -1,0 +1,202 @@
+[
+  {
+    "productId": "prod-001",
+    "name": "Organic Quinoa",
+    "description": "Premium organic quinoa, perfect for healthy meals",
+    "price": 8.99,
+    "imageUrl": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200",
+    "category": "PANTRY",
+    "subcategory": "Grains",
+    "unit": "lb",
+    "size": 2,
+    "inStock": true,
+    "tags": ["ORGANIC", "GLUTEN_FREE", "HIGH_PROTEIN"],
+    "nutritionInfo": {
+      "calories": 222,
+      "protein": 8,
+      "carbs": 39,
+      "fat": 4
+    },
+    "alternativeProducts": ["prod-020", "prod-021"]
+  },
+  {
+    "productId": "prod-002",
+    "name": "Cherry Tomatoes",
+    "description": "Sweet and juicy cherry tomatoes, perfect for salads",
+    "price": 3.49,
+    "imageUrl": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=200",
+    "category": "PRODUCE",
+    "subcategory": "Vegetables",
+    "unit": "container",
+    "size": 1,
+    "inStock": true,
+    "tags": ["FRESH", "ORGANIC"],
+    "nutritionInfo": {
+      "calories": 18,
+      "protein": 1,
+      "carbs": 4,
+      "fat": 0
+    },
+    "alternativeProducts": ["prod-022", "prod-023"]
+  },
+  {
+    "productId": "prod-003",
+    "name": "English Cucumber",
+    "description": "Crisp and refreshing English cucumber",
+    "price": 1.99,
+    "imageUrl": "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=200",
+    "category": "PRODUCE",
+    "subcategory": "Vegetables",
+    "unit": "each",
+    "size": 1,
+    "inStock": true,
+    "tags": ["FRESH", "LOW_CALORIE"],
+    "nutritionInfo": {
+      "calories": 16,
+      "protein": 1,
+      "carbs": 4,
+      "fat": 0
+    },
+    "alternativeProducts": ["prod-024"]
+  },
+  {
+    "productId": "prod-004",
+    "name": "Red Onion",
+    "description": "Fresh red onion, adds great flavor to any dish",
+    "price": 1.29,
+    "imageUrl": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=200",
+    "category": "PRODUCE",
+    "subcategory": "Vegetables",
+    "unit": "each",
+    "size": 1,
+    "inStock": true,
+    "tags": ["FRESH"],
+    "nutritionInfo": {
+      "calories": 40,
+      "protein": 1,
+      "carbs": 9,
+      "fat": 0
+    },
+    "alternativeProducts": ["prod-025", "prod-026"]
+  },
+  {
+    "productId": "prod-005",
+    "name": "Feta Cheese",
+    "description": "Authentic Greek feta cheese, creamy and tangy",
+    "price": 5.99,
+    "imageUrl": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=200",
+    "category": "DAIRY",
+    "subcategory": "Cheese",
+    "unit": "container",
+    "size": 8,
+    "inStock": true,
+    "tags": ["VEGETARIAN"],
+    "nutritionInfo": {
+      "calories": 75,
+      "protein": 4,
+      "carbs": 1,
+      "fat": 6
+    },
+    "alternativeProducts": ["prod-027", "prod-028"]
+  },
+  {
+    "productId": "prod-006",
+    "name": "Extra Virgin Olive Oil",
+    "description": "Premium extra virgin olive oil from Italy",
+    "price": 12.99,
+    "imageUrl": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=200",
+    "category": "PANTRY",
+    "subcategory": "Oils",
+    "unit": "bottle",
+    "size": 16.9,
+    "inStock": true,
+    "tags": ["ORGANIC", "MEDITERRANEAN"],
+    "nutritionInfo": {
+      "calories": 120,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 14
+    },
+    "alternativeProducts": ["prod-029"]
+  },
+  {
+    "productId": "prod-007",
+    "name": "Fresh Lemon Juice",
+    "description": "100% pure fresh lemon juice, no preservatives",
+    "price": 2.99,
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200",
+    "category": "PRODUCE",
+    "subcategory": "Citrus",
+    "unit": "bottle",
+    "size": 15,
+    "inStock": true,
+    "tags": ["FRESH", "NATURAL"],
+    "nutritionInfo": {
+      "calories": 7,
+      "protein": 0,
+      "carbs": 2,
+      "fat": 0
+    },
+    "alternativeProducts": ["prod-030"]
+  },
+  {
+    "productId": "prod-008",
+    "name": "Organic Chicken Breast",
+    "description": "Fresh organic chicken breast, boneless and skinless",
+    "price": 9.99,
+    "imageUrl": "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=200",
+    "category": "MEAT",
+    "subcategory": "Poultry",
+    "unit": "lb",
+    "size": 1,
+    "inStock": true,
+    "tags": ["ORGANIC", "HIGH_PROTEIN", "LEAN"],
+    "nutritionInfo": {
+      "calories": 165,
+      "protein": 31,
+      "carbs": 0,
+      "fat": 4
+    },
+    "alternativeProducts": ["prod-031", "prod-032"]
+  },
+  {
+    "productId": "prod-009",
+    "name": "Fresh Broccoli",
+    "description": "Fresh broccoli crowns, rich in vitamins",
+    "price": 2.49,
+    "imageUrl": "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=200",
+    "category": "PRODUCE",
+    "subcategory": "Vegetables",
+    "unit": "bunch",
+    "size": 1,
+    "inStock": true,
+    "tags": ["FRESH", "SUPERFOOD", "HIGH_FIBER"],
+    "nutritionInfo": {
+      "calories": 25,
+      "protein": 3,
+      "carbs": 5,
+      "fat": 0
+    },
+    "alternativeProducts": ["prod-033"]
+  },
+  {
+    "productId": "prod-010",
+    "name": "Mixed Bell Peppers",
+    "description": "Colorful mix of red, yellow, and green bell peppers",
+    "price": 4.99,
+    "imageUrl": "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=200",
+    "category": "PRODUCE",
+    "subcategory": "Vegetables",
+    "unit": "bag",
+    "size": 3,
+    "inStock": true,
+    "tags": ["FRESH", "COLORFUL", "VITAMIN_C"],
+    "nutritionInfo": {
+      "calories": 20,
+      "protein": 1,
+      "carbs": 5,
+      "fat": 0
+    },
+    "alternativeProducts": ["prod-034", "prod-035"]
+  }
+]

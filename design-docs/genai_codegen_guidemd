@@ -1,0 +1,433 @@
+# AmazonMeal: GenAI Coding Guide
+
+This guide provides strategies for leveraging AI-powered coding tools during your 3-day hackathon to accelerate development of the AmazonMeal project.
+
+## 1. Introduction to GenAI for Hackathons
+
+AI-powered code generation tools can dramatically increase development speed during time-constrained hackathons. These tools are particularly effective for:
+
+- Generating boilerplate code
+- Creating repetitive patterns
+- Developing UI components
+- Writing unit tests
+- Producing documentation
+
+## 2. Recommended AI Tools for the Hackathon
+
+For your AmazonMeal project, consider using:
+
+1. **GitHub Copilot** - Available in VS Code, provides real-time code suggestions
+2. **Amazon CodeWhisperer** - Integrated with AWS services, helpful for Lambda functions
+3. **ChatGPT / GPT-4** - Versatile for code generation, debugging, and architecture discussions
+4. **Anthropic Claude** - Strong at understanding context and generating complex code blocks
+
+## 3. Development Workflow with GenAI
+
+### 3.1 Project Setup Phase
+
+Use AI tools to accelerate your initial setup:
+
+```
+Prompt: "Generate a React application structure for a meal planning app with the following components: user profile, recipe browser, meal planner, and shopping cart."
+```
+
+```
+Prompt: "Create AWS CDK code to set up the following resources for my AmazonMeal project: Lambda functions for user profile, recipes, recommendations, shopping service, and DynamoDB tables for users, recipes, products, meal plans, and shopping lists."
+```
+
+### 3.2 Frontend Development
+
+For your React components:
+
+```
+Prompt: "Create a React component for a recipe card that displays: image, title, cooking time, difficulty level, and dietary tags. Use Material UI components and make it responsive."
+```
+
+```
+Prompt: "Generate a React hook for managing user preferences with the following fields: dietary restrictions, allergies, disliked ingredients, cooking time preference, cuisine preferences, and skill level."
+```
+
+### 3.3 Backend Development
+
+For your AWS Lambda functions:
+
+```
+Prompt: "Write an AWS Lambda function in JavaScript that queries DynamoDB for recipes matching user preferences. The user preferences include dietary restrictions, cuisines, and maximum cooking time."
+```
+
+```
+Prompt: "Create a function that converts a meal plan (array of recipes) into a shopping list by extracting and consolidating all required ingredients."
+```
+
+### 3.4 AI/ML Development
+
+For recommendation engine implementation:
+
+```
+Prompt: "Write a function that ranks recipes based on user preferences with the following scoring logic: +3 points for matching cuisine, -5 points for containing disliked ingredients, +2 points for matching difficulty level to user skill."
+```
+
+```
+Prompt: "Create a simple recommendation algorithm that filters recipes based on dietary restrictions first, then sorts by user preference score."
+```
+
+## 4. Component-Specific Strategies
+
+### 4.1 User Profile Service
+
+```
+Prompt: "Generate a Lambda function that handles creating and updating user profiles in DynamoDB. The profile schema includes: userId, username, email, and a preferences object with dietary restrictions, allergies, and cuisine preferences."
+```
+
+### 4.2 Recipe Service
+
+```
+Prompt: "Write code to seed a DynamoDB table with 20 different recipes. Each recipe should have a unique ID, name, cuisine type, ingredients list, instructions, preparation time, and dietary tags."
+```
+
+### 4.3 Recommendation Service
+
+```
+Prompt: "Create a function that takes a user's preferences and dietary restrictions and returns a 7-day meal plan with breakfast, lunch, and dinner for each day, ensuring variety in cuisines and meal types."
+```
+
+### 4.4 Shopping Service
+
+```
+Prompt: "Write a function that takes a list of ingredients from selected recipes and groups them by category (produce, dairy, meat, pantry, etc.) for display in a shopping list."
+```
+
+### 4.5 Voice Processing
+
+```
+Prompt: "Create a simple voice command processor that can handle the following intents: search recipes, add to shopping list, read recipe steps, and get nutrition information."
+```
+
+## 5. Testing and Quality Assurance
+
+```
+Prompt: "Generate unit tests for the meal recommendation function that tests edge cases like: user with multiple dietary restrictions, no cuisine preferences specified, and empty recipe database."
+```
+
+```
+Prompt: "Create integration test scenarios for the flow from meal plan generation to shopping list creation."
+```
+
+## 6. Best Practices for Using GenAI
+
+1. **Be Specific in Prompts**
+   - Include detailed requirements and constraints
+   - Specify exact technologies and dependencies
+   - Reference implementation details from your architecture
+
+2. **Iterative Refinement**
+   - Start with high-level code generation
+   - Ask for specific improvements or optimizations
+   - Request explanations for complex sections
+
+3. **Combine Human and AI Strengths**
+   - Use AI for repetitive coding tasks
+   - Reserve complex architecture decisions for human team members
+   - Always review and understand generated code
+
+4. **Code Quality Verification**
+   - Ask AI to identify potential bugs or edge cases
+   - Request performance optimization suggestions
+   - Have AI generate test cases for critical functions
+
+## 7. Example Workflows
+
+### 7.1 Building the Recipe Browser Component
+
+1. First prompt:
+   ```
+   Generate a React component structure for a recipe browser with filter controls for dietary restrictions, cuisine type, and maximum cooking time.
+   ```
+
+2. Refinement prompt:
+   ```
+   Enhance the recipe browser by adding pagination and a grid/list view toggle. Use Material UI components.
+   ```
+
+3. Integration prompt:
+   ```
+   Show how to connect this recipe browser component to our API service using React hooks with proper loading, error, and empty states.
+   ```
+
+### 7.2 Implementing the Recommendation Engine
+
+1. First prompt:
+   ```
+   Create a basic recommendation algorithm that filters recipes based on user dietary restrictions and preferences.
+   ```
+
+2. Refinement prompt:
+   ```
+   Improve the recommendation algorithm to consider nutritional balance across a week's meal plan.
+   ```
+
+3. Integration prompt:
+   ```
+   Show how to integrate this recommendation engine with Amazon Bedrock for enhanced personalization.
+   ```
+
+## 8. Hackathon-Specific Tips
+
+1. **Time Management**
+   - Use AI for the most time-consuming, repetitive tasks first
+   - Prioritize functional code over perfect code during early stages
+   - Let AI handle documentation while you focus on core functionality
+
+2. **Demo Preparation**
+   - Ask AI to generate test data that will showcase your features effectively
+   - Use AI to help create compelling demo scripts
+   - Have AI generate presentation slides highlighting technical innovations
+
+3. **Collaborative Development**
+   - Share effective prompts with team members
+   - Use AI to help resolve merge conflicts
+   - Ask AI to review and comment on teammates' code
+
+## 9. Troubleshooting Common Issues
+
+1. **For unclear or incorrect code generation:**
+   ```
+   The code you generated has [specific issue]. Please fix it by considering [constraints or requirements].
+   ```
+
+2. **For integration problems:**
+   ```
+   I'm getting [error] when trying to connect [component A] with [component B]. Here's my current implementation: [code]. How should I fix it?
+   ```
+
+3. **For performance issues:**
+   ```
+   This function is running too slowly with larger datasets. How can I optimize it while maintaining the same functionality?
+   ```
+
+## 10. Code Snippets for Key Functions
+
+### User Authentication (Frontend)
+
+```javascript
+// auth-context.js
+import React, { createContext, useState, useContext, useEffect } from 'react';
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Mock authentication for hackathon
+  const login = async (email, password) => {
+    // Simulate API call
+    setLoading(true);
+    try {
+      // For hackathon, hardcode a successful login with mock data
+      const mockUser = {
+        userId: 'user-123',
+        username: 'demo_user',
+        email: email,
+        preferences: {
+          dietaryRestrictions: ['VEGETARIAN'],
+          allergies: ['NUTS'],
+          cuisinePreferences: ['ITALIAN', 'MEXICAN']
+        }
+      };
+      
+      setCurrentUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      return mockUser;
+    } catch (error) {
+      throw new Error('Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('user');
+  };
+  
+  useEffect(() => {
+    // Check for saved user on load
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
+  }, []);
+  
+  return (
+    <AuthContext.Provider value={{ currentUser, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
+```
+
+### Recommendation Lambda Function
+
+```javascript
+// recommendationService.js - AWS Lambda function
+const AWS = require('aws-sdk');
+const dynamodb = new AWS.DynamoDB.DocumentClient();
+
+exports.handler = async (event) => {
+  try {
+    // Extract user ID and parameters from the request
+    const userId = event.pathParameters.userId;
+    const mealCount = event.queryStringParameters?.mealCount || 7;
+    
+    // Get user preferences
+    const userParams = {
+      TableName: 'AmazonMeal-Users',
+      Key: {
+        userId: userId
+      }
+    };
+    
+    const userResponse = await dynamodb.get(userParams).promise();
+    const user = userResponse.Item;
+    
+    if (!user) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ 
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'User profile not found'
+          }
+        })
+      };
+    }
+    
+    // Query recipes based on user preferences
+    const { dietaryRestrictions, cuisinePreferences } = user.preferences;
+    
+    // Build filter expression for dietary restrictions
+    let filterExpression = '';
+    const expressionAttributeValues = {};
+    
+    if (dietaryRestrictions && dietaryRestrictions.length > 0) {
+      // Create a complex filter that checks if all dietary restrictions are met
+      dietaryRestrictions.forEach((restriction, index) => {
+        const attrName = `:diet${index}`;
+        if (filterExpression) {
+          filterExpression += ' AND ';
+        }
+        filterExpression += `contains(dietaryTags, ${attrName})`;
+        expressionAttributeValues[attrName] = restriction;
+      });
+    }
+    
+    const recipesParams = {
+      TableName: 'AmazonMeal-Recipes',
+      FilterExpression: filterExpression || undefined,
+      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? 
+        expressionAttributeValues : undefined
+    };
+    
+    const recipesResponse = await dynamodb.scan(recipesParams).promise();
+    let recipes = recipesResponse.Items || [];
+    
+    // Score and rank recipes based on user preferences
+    recipes = recipes.map(recipe => {
+      let score = 0;
+      
+      // Score based on cuisine match
+      if (cuisinePreferences && cuisinePreferences.includes(recipe.cuisine)) {
+        score += 3;
+      }
+      
+      // Score based on cooking time preference
+      if (user.preferences.cookingTime === 'QUICK' && recipe.prepTime + recipe.cookTime < 30) {
+        score += 2;
+      }
+      
+      // Penalize for disliked ingredients
+      if (user.preferences.dislikedIngredients) {
+        recipe.ingredients.forEach(ingredient => {
+          if (user.preferences.dislikedIngredients.some(disliked => 
+              ingredient.name.toLowerCase().includes(disliked.toLowerCase()))) {
+            score -= 5;
+          }
+        });
+      }
+      
+      return {
+        ...recipe,
+        score
+      };
+    });
+    
+    // Sort by score and select top meals
+    recipes.sort((a, b) => b.score - a.score);
+    const selectedRecipes = recipes.slice(0, mealCount);
+    
+    // Create a meal plan
+    const mealPlan = {
+      userId,
+      name: 'Weekly Meal Plan',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      meals: selectedRecipes.map((recipe, index) => ({
+        day: Math.floor(index / 3) + 1,
+        mealType: ['BREAKFAST', 'LUNCH', 'DINNER'][index % 3],
+        recipeId: recipe.recipeId,
+        servings: 2  // Default value
+      })),
+      createdAt: Date.now()
+    };
+    
+    // Save meal plan to database
+    const mealPlanParams = {
+      TableName: 'AmazonMeal-MealPlans',
+      Item: {
+        mealPlanId: `mp-${userId}-${Date.now()}`,
+        ...mealPlan
+      }
+    };
+    
+    await dynamodb.put(mealPlanParams).promise();
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        data: {
+          mealPlan: mealPlanParams.Item,
+          recipes: selectedRecipes.map(r => ({
+            recipeId: r.recipeId,
+            title: r.title,
+            imageUrl: r.imageUrl,
+            prepTime: r.prepTime,
+            cookTime: r.cookTime,
+            mealType: r.mealType,
+            score: r.score
+          }))
+        }
+      })
+    };
+  } catch (error) {
+    console.error('Error generating meal plan:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to generate meal plan'
+        }
+      })
+    };
+  }
+};
+```
+
+Remember that these AI-generated code snippets are starting points - they will need to be integrated into your overall architecture and customized to your specific requirements. During the hackathon, focus on getting the core functionality working first, then iterate to improve and polish your solution.

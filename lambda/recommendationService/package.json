@@ -1,0 +1,25 @@
+{
+  "name": "amazonmeal-recommendation-service",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for AmazonMeal recommendation service",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1490.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "scripts": {
+    "test": "jest",
+    "package": "zip -r recommendation-service.zip . -x '*.zip' 'node_modules/.cache/*' 'tests/*'"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "meal-planning",
+    "recommendations",
+    "ai"
+  ],
+  "author": "Amazon Hackathon Team",
+  "license": "MIT"
+}

@@ -1,0 +1,250 @@
+{
+  "tables": [
+    {
+      "TableName": "AmazonMeal-Users",
+      "KeySchema": [
+        {
+          "AttributeName": "userId",
+          "KeyType": "HASH"
+        }
+      ],
+      "AttributeDefinitions": [
+        {
+          "AttributeName": "userId",
+          "AttributeType": "S"
+        }
+      ],
+      "BillingMode": "PAY_PER_REQUEST",
+      "Tags": [
+        {
+          "Key": "Project",
+          "Value": "AmazonMeal"
+        },
+        {
+          "Key": "Environment",
+          "Value": "Hackathon"
+        }
+      ]
+    },
+    {
+      "TableName": "AmazonMeal-Recipes",
+      "KeySchema": [
+        {
+          "AttributeName": "recipeId",
+          "KeyType": "HASH"
+        }
+      ],
+      "AttributeDefinitions": [
+        {
+          "AttributeName": "recipeId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "cuisine",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "mealType",
+          "AttributeType": "S"
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "cuisine-index",
+          "KeySchema": [
+            {
+              "AttributeName": "cuisine",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "recipeId",
+              "KeyType": "RANGE"
+            }
+          ],
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        },
+        {
+          "IndexName": "mealType-index",
+          "KeySchema": [
+            {
+              "AttributeName": "mealType",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "recipeId",
+              "KeyType": "RANGE"
+            }
+          ],
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        }
+      ],
+      "BillingMode": "PAY_PER_REQUEST",
+      "Tags": [
+        {
+          "Key": "Project",
+          "Value": "AmazonMeal"
+        },
+        {
+          "Key": "Environment",
+          "Value": "Hackathon"
+        }
+      ]
+    },
+    {
+      "TableName": "AmazonMeal-Products",
+      "KeySchema": [
+        {
+          "AttributeName": "productId",
+          "KeyType": "HASH"
+        }
+      ],
+      "AttributeDefinitions": [
+        {
+          "AttributeName": "productId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "category",
+          "AttributeType": "S"
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "category-index",
+          "KeySchema": [
+            {
+              "AttributeName": "category",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "productId",
+              "KeyType": "RANGE"
+            }
+          ],
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        }
+      ],
+      "BillingMode": "PAY_PER_REQUEST",
+      "Tags": [
+        {
+          "Key": "Project",
+          "Value": "AmazonMeal"
+        },
+        {
+          "Key": "Environment",
+          "Value": "Hackathon"
+        }
+      ]
+    },
+    {
+      "TableName": "AmazonMeal-MealPlans",
+      "KeySchema": [
+        {
+          "AttributeName": "mealPlanId",
+          "KeyType": "HASH"
+        }
+      ],
+      "AttributeDefinitions": [
+        {
+          "AttributeName": "mealPlanId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "createdAt",
+          "AttributeType": "N"
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "user-index",
+          "KeySchema": [
+            {
+              "AttributeName": "userId",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "createdAt",
+              "KeyType": "RANGE"
+            }
+          ],
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        }
+      ],
+      "BillingMode": "PAY_PER_REQUEST",
+      "Tags": [
+        {
+          "Key": "Project",
+          "Value": "AmazonMeal"
+        },
+        {
+          "Key": "Environment",
+          "Value": "Hackathon"
+        }
+      ]
+    },
+    {
+      "TableName": "AmazonMeal-ShoppingLists",
+      "KeySchema": [
+        {
+          "AttributeName": "shoppingListId",
+          "KeyType": "HASH"
+        }
+      ],
+      "AttributeDefinitions": [
+        {
+          "AttributeName": "shoppingListId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "createdAt",
+          "AttributeType": "N"
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "user-index",
+          "KeySchema": [
+            {
+              "AttributeName": "userId",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "createdAt",
+              "KeyType": "RANGE"
+            }
+          ],
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        }
+      ],
+      "BillingMode": "PAY_PER_REQUEST",
+      "Tags": [
+        {
+          "Key": "Project",
+          "Value": "AmazonMeal"
+        },
+        {
+          "Key": "Environment",
+          "Value": "Hackathon"
+        }
+      ]
+    }
+  ]
+}

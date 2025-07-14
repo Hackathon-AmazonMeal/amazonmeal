@@ -1,0 +1,1082 @@
+# AmazonMeal: Low-Level Design
+
+This document provides detailed design specifications for implementing the AmazonMeal application during your 3-day hackathon. It includes database schema details, component interactions, and specific implementation guidelines for key features.
+
+## 1. Database Schema Design
+
+### 1.1 DynamoDB Tables
+
+#### Users Table
+```
+Table Name: AmazonMeal-Users
+Primary Key: userId (String)
+Attributes:
+  - username (String)
+  - email (String)
+  - preferences (Map)
+    - dietaryRestrictions (List<String>)
+    - allergies (List<String>)
+    - dislikedIngredients (List<String>)
+    - cookingTime (String)
+    - cuisinePreferences (List<String>)
+    - skillLevel (String)
+  - createdAt (Number - timestamp)
+  - lastUpdated (Number - timestamp)
+```
+
+#### Recipes Table
+```
+Table Name: AmazonMeal-Recipes
+Primary Key: recipeId (String)
+GSI1: cuisine-index
+  - PK: cuisine (String)
+  - SK: recipeId (String)
+GSI2: mealType-index
+  - PK: mealType (String)
+  - SK: recipeId (String)
+Attributes:
+  - title (String)
+  - description (String)
+  - imageUrl (String)
+  - prepTime (Number)
+  - cookTime (Number)
+  - servings (Number)
+  - difficulty (String)
+  - cuisine (String)
+  - mealType (String)
+  - dietaryTags (List<String>)
+  - ingredients (List<Map>)
+    - name (String)
+    - quantity (Number)
+    - unit (String)
+    - productId (String)
+  - instructions (List<Map>)
+    - stepNumber (Number)
+    - description (String)
+  - nutritionInfo (Map)
+    - calories (Number)
+    - protein (Number)
+    - carbs (Number)
+    - fat (Number)
+    - fiber (Number)
+```
+
+#### Products Table
+```
+Table Name: AmazonMeal-Products
+Primary Key: productId (String)
+GSI1: category-index
+  - PK: category (String)
+  - SK: productId (String)
+Attributes:
+  - name (String)
+  - description (String)
+  - price (Number)
+  - imageUrl (String)
+  - category (String)
+  - subcategory (String)
+  - nutritionInfo (Map)
+    - calories (Number)
+    - protein (Number)
+    - carbs (Number)
+    - fat (Number)
+  - inStock (Boolean)
+  - unit (String)
+  - size (Number)
+  - alternativeProducts (List<String>) - list of alternative productIds
+```
+
+#### MealPlans Table
+```
+Table Name: AmazonMeal-MealPlans
+Primary Key: mealPlanId (String)
+GSI1: user-index
+  - PK: userId (String)
+  - SK: createdAt (Number)
+Attributes:
+  - userId (String)
+  - name (String)
+  - startDate (String - ISO format)
+  - endDate (String - ISO format)
+  - meals (List<Map>)
+    - day (String)
+    - mealType (String)
+    - recipeId (String)
+    - servings (Number)
+  - createdAt (Number - timestamp)
+  - lastUpdated (Number - timestamp)
+  - nutritionSummary (Map)
+    - totalCalories (Number)
+    - totalProtein (Number)
+    - totalCarbs (Number)
+    - totalFat (Number)
+```
+
+#### ShoppingLists Table
+```
+Table Name: AmazonMeal-ShoppingLists
+Primary Key: shoppingListId (String)
+GSI1: user-index
+  - PK: userId (String)
+  - SK: createdAt (Number)
+Attributes:
+  - userId (String)
+  - mealPlanId (String) - optional, if derived from meal plan
+  - name (String)
+  - items (List<Map>)
+    - productId (String)
+    - name (String)
+    - quantity (Number)
+    - unit (String)
+    - inCart (Boolean)
+    - category (String) - for grouping in UI
+  - createdAt (Number - timestamp)
+  - lastUpdated (Number - timestamp)
+```
+
+## 2. Component Implementation Details
+
+### 2.1 User Authentication Component
+
+For the hackathon, implement a simplified mock authentication system:
+
+```javascript
+// auth.js - Authentication utility
+import { useState, useContext, createContext } from 'react';
+
+// Mock users for demo
+const MOCK_USERS = [
+  {
+    userId: 'user-1',
+    username: 'healthyeater',
+    email: 'demo@example.com',
+    preferences: {
+      dietaryRestrictions: ['VEGETARIAN'],
+      allergies: ['PEANUTS'],
+      dislikedIngredients: ['cilantro', 'olives'],
+      cookingTime: 'QUICK',
+      cuisinePreferences: ['ITALIAN', 'MEXICAN', 'ASIAN'],
+      skillLevel: 'BEGINNER'
+    }
+  },
+  // Add 2-3 more mock users with different preferences
+];
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('authToken'));
+
+  // Mock sign in - in real app would call API
+  const signIn = (email, password) => {
+    // Find mock user by email (for demo)
+    const user = MOCK_USERS.find(u => u.email === email);
+    if (user) {
+      setCurrentUser(user);
+      // Generate mock JWT token
+      const mockToken = `mock-jwt-${Date.now()}`;
+      setToken(mockToken);
+      localStorage.setItem('authToken', mockToken);
+      return user;
+    }
+    return null;
+  };
+
+  const signOut = () => {
+    setCurrentUser(null);
+    setToken(null);
+    localStorage.removeItem('authToken');
+  };
+  
+  return (
+    <AuthContext.Provider value={{ currentUser, signIn, signOut, token }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
+```
+
+### 2.2 Recommendation Engine Implementation
+
+The meal recommendation service should leverage Amazon Bedrock for AI capabilities combined with rule-based filtering:
+
+```javascript
+// Lambda function for recommendations
+const AWS = require('aws-sdk');
+const bedrock = new AWS.Bedrock();
+const dynamodb = new AWS.DynamoDB.DocumentClient();
+
+exports.handler = async (event) => {
+  try {
+    const { userId } = event.pathParameters;
+    const { mealTypes, dayCount } = event.queryStringParameters || {};
+    
+    // Step 1: Retrieve user preferences
+    const userResponse = await dynamodb.get({
+      TableName: 'AmazonMeal-Users',
+      Key: { userId }
+    }).promise();
+    
+    if (!userResponse.Item) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } })
+      };
+    }
+    
+    const user = userResponse.Item;
+    
+    // Step 2: Rule-based filtering to get candidate recipes
+    const recipeFilterParams = {
+      TableName: 'AmazonMeal-Recipes',
+      FilterExpression: 'size(#dietaryTags) > :zero',
+      ExpressionAttributeNames: {
+        '#dietaryTags': 'dietaryTags'
+      },
+      ExpressionAttributeValues: {
+        ':zero': 0
+      }
+    };
+    
+    // Add dietary restrictions if present
+    if (user.preferences.dietaryRestrictions && user.preferences.dietaryRestrictions.length > 0) {
+      // Convert to complex FilterExpression to match any dietary tag
+      // This is simplified - in production would use more complex query patterns
+    }
+    
+    const recipesResponse = await dynamodb.scan(recipeFilterParams).promise();
+    const candidateRecipes = recipesResponse.Items;
+    
+    // Step 3: Use Bedrock for personalized ranking of candidate recipes
+    // Prepare input for Amazon Bedrock
+    const bedrockInput = {
+      userPreferences: user.preferences,
+      candidateRecipes: candidateRecipes.map(r => ({ 
+        recipeId: r.recipeId,
+        title: r.title,
+        cuisine: r.cuisine,
+        mealType: r.mealType,
+        dietaryTags: r.dietaryTags,
+        difficulty: r.difficulty
+      })),
+      count: dayCount * mealTypes.split(',').length // Number of recipes needed
+    };
+    
+    // Call Amazon Bedrock
+    // Note: For hackathon, you can simulate this response for faster development
+    const bedrockResponse = await bedrock.invokeModel({
+      modelId: 'amazon.titan-text-express-v1',
+      contentType: 'application/json',
+      accept: 'application/json',
+      body: JSON.stringify({
+        inputText: `Generate personalized meal recommendations based on these preferences and candidate recipes: ${JSON.stringify(bedrockInput)}`,
+        textGenerationConfig: {
+          maxTokenCount: 1024,
+          temperature: 0.7,
+          topP: 0.9
+        }
+      })
+    }).promise();
+    
+    // Parse Bedrock response and extract recommended recipe IDs
+    const bedrockOutput = JSON.parse(Buffer.from(bedrockResponse.body).toString());
+    
+    // For hackathon: Parse the text response to extract recipe recommendations
+    // In production: Use a more structured prompt and response format
+    
+    // Step 4: Fetch full recipe details for recommended recipes
+    // ... code to fetch full recipe details by IDs ...
+    
+    // Create meal plan structure
+    const mealPlan = {
+      userId,
+      mealPlanId: `plan-${Date.now()}`,
+      name: 'Weekly Meal Plan',
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + (dayCount * 24 * 60 * 60 * 1000)).toISOString(),
+      meals: [], // Populate with structured meal plan
+      createdAt: Date.now(),
+      lastUpdated: Date.now()
+    };
+    
+    // Return response
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        data: {
+          mealPlan
+        }
+      })
+    };
+  } catch (error) {
+    console.error('Error generating recommendations:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Error generating recommendations' }
+      })
+    };
+  }
+};
+```
+
+### 2.3 Shopping List Generation Algorithm
+
+```javascript
+// Lambda function for shopping list generation
+exports.handler = async (event) => {
+  try {
+    const { mealPlanId } = event.pathParameters;
+    const { userId } = event.queryStringParameters || {};
+    
+    // Step 1: Retrieve the meal plan
+    const mealPlanResponse = await dynamodb.get({
+      TableName: 'AmazonMeal-MealPlans',
+      Key: { mealPlanId }
+    }).promise();
+    
+    if (!mealPlanResponse.Item) {
+      return { statusCode: 404, body: JSON.stringify({ success: false, error: { code: 'NOT_FOUND', message: 'Meal plan not found' } }) };
+    }
+    
+    const mealPlan = mealPlanResponse.Item;
+    
+    // Verify user has access to this meal plan
+    if (mealPlan.userId !== userId) {
+      return { statusCode: 403, body: JSON.stringify({ success: false, error: { code: 'FORBIDDEN', message: 'Access denied' } }) };
+    }
+    
+    // Step 2: Get all recipes in the meal plan
+    const recipeIds = [...new Set(mealPlan.meals.map(meal => meal.recipeId))];
+    const recipePromises = recipeIds.map(recipeId => 
+      dynamodb.get({
+        TableName: 'AmazonMeal-Recipes',
+        Key: { recipeId }
+      }).promise()
+    );
+    
+    const recipeResponses = await Promise.all(recipePromises);
+    const recipes = recipeResponses.map(response => response.Item);
+    
+    // Step 3: Compile shopping list by aggregating ingredients
+    const shoppingItems = {};
+    
+    mealPlan.meals.forEach(meal => {
+      const recipe = recipes.find(r => r.recipeId === meal.recipeId);
+      if (!recipe) return;
+      
+      // Calculate quantity multiplier based on servings
+      const multiplier = meal.servings / recipe.servings;
+      
+      recipe.ingredients.forEach(ingredient => {
+        const key = ingredient.productId;
+        if (!shoppingItems[key]) {
+          shoppingItems[key] = {
+            productId: ingredient.productId,
+            name: ingredient.name,
+            quantity: 0,
+            unit: ingredient.unit,
+            inCart: false,
+            category: 'UNCATEGORIZED' // Would be populated from product data
+          };
+        }
+        
+        // Add quantity, considering the meal's servings
+        shoppingItems[key].quantity += ingredient.quantity * multiplier;
+      });
+    });
+    
+    // Convert to array
+    const items = Object.values(shoppingItems);
+    
+    // Step 4: Categorize items (simplified for hackathon)
+    // In production: Look up each product to get proper category
+    
+    // Step 5: Create shopping list
+    const shoppingList = {
+      shoppingListId: `sl-${Date.now()}`,
+      userId,
+      mealPlanId,
+      name: `Shopping List for ${mealPlan.name}`,
+      items,
+      createdAt: Date.now(),
+      lastUpdated: Date.now()
+    };
+    
+    // Save to database
+    await dynamodb.put({
+      TableName: 'AmazonMeal-ShoppingLists',
+      Item: shoppingList
+    }).promise();
+    
+    // Return response
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        data: {
+          shoppingList
+        }
+      })
+    };
+  } catch (error) {
+    console.error('Error generating shopping list:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Error generating shopping list' }
+      })
+    };
+  }
+};
+```
+
+### 2.4 Voice Interface Implementation
+
+For the hackathon demo, implement a simplified voice interface using the Web Speech API:
+
+```javascript
+// VoiceInterface.js React component
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../auth';
+import { useMealPlans } from '../hooks/useMealPlans';
+import { useShoppingList } from '../hooks/useShoppingList';
+
+const VoiceInterface = () => {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [response, setResponse] = useState('');
+  const { currentUser } = useAuth();
+  const { mealPlans, generateMealPlan } = useMealPlans();
+  const { shoppingList, addToShoppingList } = useShoppingList();
+  
+  // Initialize speech recognition (browser API)
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  
+  // Set up recognition event handlers
+  useEffect(() => {
+    recognition.onresult = (event) => {
+      const command = event.results[0][0].transcript.toLowerCase();
+      setTranscript(command);
+      processCommand(command);
+    };
+    
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event.error);
+      setIsListening(false);
+    };
+    
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+    
+    return () => {
+      recognition.stop();
+    };
+  }, []);
+  
+  const startListening = () => {
+    setTranscript('');
+    setResponse('');
+    setIsListening(true);
+    recognition.start();
+  };
+  
+  const processCommand = async (command) => {
+    // Simple command processing for demo
+    if (command.includes('create meal plan')) {
+      setResponse('Creating a new meal plan for you...');
+      try {
+        await generateMealPlan(currentUser.userId, ['BREAKFAST', 'DINNER'], 7);
+        setResponse('I\'ve created a new meal plan for the week!');
+      } catch (error) {
+        setResponse('Sorry, I couldn\'t create a meal plan right now.');
+      }
+    }
+    else if (command.includes('what\'s for dinner')) {
+      if (mealPlans && mealPlans.length > 0) {
+        // Find tonight's dinner
+        const today = new Date().toISOString().split('T')[0];
+        const todaysMeals = mealPlans[0].meals.filter(meal => 
+          meal.day.includes(today) && meal.mealType === 'DINNER'
+        );
+        
+        if (todaysMeals.length > 0) {
+          setResponse(`Tonight's dinner is ${todaysMeals[0].recipeName}`);
+        } else {
+          setResponse('I don\'t see any dinner planned for today.');
+        }
+      } else {
+        setResponse('You don\'t have any meal plans yet. Would you like me to create one?');
+      }
+    }
+    else if (command.includes('create shopping list')) {
+      setResponse('Generating your shopping list based on your meal plan...');
+      // Assume we have a function to generate a shopping list from the current meal plan
+      try {
+        // Code to generate shopping list
+        setResponse('Shopping list created successfully!');
+      } catch (error) {
+        setResponse('Sorry, I couldn\'t create a shopping list right now.');
+      }
+    }
+    else {
+      // For hackathon - send command to Bedrock to get a response
+      try {
+        // Call Amazon Bedrock for more complex command processing
+        // This is simplified - in a real app, you'd have more structured handling
+        setResponse('I\'m not sure how to help with that yet.');
+      } catch (error) {
+        setResponse('I\'m having trouble understanding. Could you try again?');
+      }
+    }
+  };
+  
+  return (
+    <div className="voice-interface">
+      <div className="voice-status">
+        {isListening ? <div className="listening-indicator">Listening...</div> : null}
+      </div>
+      
+      <button 
+        onClick={startListening} 
+        disabled={isListening}
+        className="voice-button"
+      >
+        {isListening ? 'Listening...' : 'Ask AmazonMeal'}
+      </button>
+      
+      {transcript ? (
+        <div className="transcript">
+          <p><strong>You said:</strong> {transcript}</p>
+        </div>
+      ) : null}
+      
+      {response ? (
+        <div className="response">
+          <p><strong>AmazonMeal:</strong> {response}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default VoiceInterface;
+```
+
+## 3. Key Frontend Component Structure
+
+### 3.1 Main App Structure
+
+```javascript
+// App.js - Main application component
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { AuthProvider, useAuth } from './auth';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import RecipeBrowser from './pages/RecipeBrowser';
+import RecipeDetail from './pages/RecipeDetail';
+import MealPlanCreator from './pages/MealPlanCreator';
+import ShoppingList from './pages/ShoppingList';
+import AppHeader from './components/AppHeader';
+import AppFooter from './components/AppFooter';
+
+// Private route component
+const PrivateRoute = ({ children, ...rest }) => {
+  const { currentUser } = useAuth();
+  
+  return (
+    <Route
+      {...rest}
+      render={({ location }) => 
+        currentUser ? (
+          children
+        ) : (
+          <Redirect to={{ pathname: '/login', state: { from: location } }} />
+        )
+      }
+    />
+  );
+};
+
+function AppContent() {
+  return (
+    <Router>
+      <div className="app-container">
+        <AppHeader />
+        <main className="main-content">
+          <Switch>
+            <Route exact path="/login">
+              <Login />
+            </Route>
+            <PrivateRoute exact path="/">
+              <Dashboard />
+            </PrivateRoute>
+            <PrivateRoute path="/profile">
+              <Profile />
+            </PrivateRoute>
+            <PrivateRoute path="/recipes">
+              <RecipeBrowser />
+            </PrivateRoute>
+            <PrivateRoute path="/recipe/:recipeId">
+              <RecipeDetail />
+            </PrivateRoute>
+            <PrivateRoute path="/meal-plans">
+              <MealPlanCreator />
+            </PrivateRoute>
+            <PrivateRoute path="/shopping-list">
+              <ShoppingList />
+            </PrivateRoute>
+          </Switch>
+        </main>
+        <AppFooter />
+      </div>
+    </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+export default App;
+```
+
+### 3.2 Dashboard Component
+
+```javascript
+// Dashboard.js - Main dashboard component
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../auth';
+import VoiceInterface from '../components/VoiceInterface';
+import MealPlanSummary from '../components/MealPlanSummary';
+import RecommendedRecipes from '../components/RecommendedRecipes';
+import ShoppingListSummary from '../components/ShoppingListSummary';
+import { fetchUserMealPlans, fetchRecommendedRecipes, fetchUserShoppingLists } from '../api';
+
+const Dashboard = () => {
+  const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [mealPlans, setMealPlans] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [shoppingLists, setShoppingLists] = useState([]);
+  
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch data in parallel
+        const [mealPlansData, recommendationsData, shoppingListsData] = await Promise.all([
+          fetchUserMealPlans(currentUser.userId),
+          fetchRecommendedRecipes(currentUser.userId, 4), // Get 4 recommended recipes
+          fetchUserShoppingLists(currentUser.userId)
+        ]);
+        
+        setMealPlans(mealPlansData);
+        setRecommendations(recommendationsData);
+        setShoppingLists(shoppingListsData);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Handle error state
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadDashboardData();
+  }, [currentUser.userId]);
+  
+  return (
+    <div className="dashboard">
+      <section className="welcome-section">
+        <h1>Welcome back, {currentUser.username}!</h1>
+        <VoiceInterface />
+      </section>
+      
+      {loading ? (
+        <div className="loading-indicator">Loading your personal dashboard...</div>
+      ) : (
+        <>
+          <section className="dashboard-section meal-plan-section">
+            <div className="section-header">
+              <h2>Your Meal Plan</h2>
+              <Link to="/meal-plans" className="action-link">View All</Link>
+            </div>
+            {mealPlans.length > 0 ? (
+              <MealPlanSummary mealPlan={mealPlans[0]} />
+            ) : (
+              <div className="empty-state">
+                <p>You don't have any meal plans yet.</p>
+                <Link to="/meal-plans" className="button primary">Create Meal Plan</Link>
+              </div>
+            )}
+          </section>
+          
+          <section className="dashboard-section recommendations-section">
+            <div className="section-header">
+              <h2>Recommended For You</h2>
+              <Link to="/recipes" className="action-link">Browse All</Link>
+            </div>
+            <RecommendedRecipes recipes={recommendations} />
+          </section>
+          
+          <section className="dashboard-section shopping-section">
+            <div className="section-header">
+              <h2>Shopping List</h2>
+              <Link to="/shopping-list" className="action-link">View Full List</Link>
+            </div>
+            {shoppingLists.length > 0 ? (
+              <ShoppingListSummary shoppingList={shoppingLists[0]} />
+            ) : (
+              <div className="empty-state">
+                <p>You don't have any shopping lists yet.</p>
+                {mealPlans.length > 0 ? (
+                  <Link to="/shopping-list" className="button primary">Create Shopping List</Link>
+                ) : (
+                  <p>Create a meal plan first to generate a shopping list.</p>
+                )}
+              </div>
+            )}
+          </section>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
+```
+
+### 3.3 Meal Plan Component
+
+```javascript
+// MealPlanCreator.js - Component for generating and viewing meal plans
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../auth';
+import MealPlanCalendar from '../components/MealPlanCalendar';
+import MealPlanSettings from '../components/MealPlanSettings';
+import NutritionSummary from '../components/NutritionSummary';
+import ShoppingListButton from '../components/ShoppingListButton';
+import { generateMealPlan, updateMealPlan, fetchUserMealPlans } from '../api';
+
+const MealPlanCreator = () => {
+  const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [mealPlans, setMealPlans] = useState([]);
+  const [activePlan, setActivePlan] = useState(null);
+  const [settings, setSettings] = useState({
+    dayCount: 7,
+    mealTypes: ['BREAKFAST', 'LUNCH', 'DINNER'],
+    servingSize: 2
+  });
+  
+  useEffect(() => {
+    const loadMealPlans = async () => {
+      try {
+        setLoading(true);
+        const userMealPlans = await fetchUserMealPlans(currentUser.userId);
+        setMealPlans(userMealPlans);
+        
+        // Set active plan to the most recent one if available
+        if (userMealPlans.length > 0) {
+          setActivePlan(userMealPlans[0]);
+        }
+      } catch (error) {
+        console.error('Error loading meal plans:', error);
+        // Handle error state
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadMealPlans();
+  }, [currentUser.userId]);
+  
+  const handleCreateMealPlan = async () => {
+    try {
+      setGenerating(true);
+      
+      // Call API to generate a meal plan
+      const newMealPlan = await generateMealPlan(
+        currentUser.userId,
+        settings.mealTypes,
+        settings.dayCount,
+        settings.servingSize
+      );
+      
+      // Update state with new meal plan
+      setMealPlans([newMealPlan, ...mealPlans]);
+      setActivePlan(newMealPlan);
+    } catch (error) {
+      console.error('Error generating meal plan:', error);
+      // Handle error state
+    } finally {
+      setGenerating(false);
+    }
+  };
+  
+  const handleUpdateMeal = async (day, mealType, recipeId) => {
+    try {
+      if (!activePlan) return;
+      
+      // Find and update the specific meal in the plan
+      const updatedMeals = activePlan.meals.map(meal => {
+        if (meal.day === day && meal.mealType === mealType) {
+          return { ...meal, recipeId };
+        }
+        return meal;
+      });
+      
+      const updatedPlan = {
+        ...activePlan,
+        meals: updatedMeals,
+        lastUpdated: Date.now()
+      };
+      
+      // Call API to update the meal plan
+      await updateMealPlan(activePlan.mealPlanId, updatedPlan);
+      
+      // Update local state
+      setActivePlan(updatedPlan);
+      setMealPlans(mealPlans.map(plan => 
+        plan.mealPlanId === activePlan.mealPlanId ? updatedPlan : plan
+      ));
+    } catch (error) {
+      console.error('Error updating meal plan:', error);
+      // Handle error state
+    }
+  };
+  
+  return (
+    <div className="meal-plan-creator">
+      <h1>Meal Planning</h1>
+      
+      <div className="meal-plan-actions">
+        <MealPlanSettings 
+          settings={settings}
+          onSettingsChange={setSettings}
+        />
+        
+        <button 
+          onClick={handleCreateMealPlan} 
+          disabled={generating} 
+          className="button primary"
+        >
+          {generating ? 'Creating Your Plan...' : 'Create New Meal Plan'}
+        </button>
+      </div>
+      
+      {loading ? (
+        <div className="loading-indicator">Loading your meal plans...</div>
+      ) : activePlan ? (
+        <div className="active-meal-plan">
+          <div className="plan-header">
+            <h2>{activePlan.name}</h2>
+            <ShoppingListButton mealPlanId={activePlan.mealPlanId} />
+          </div>
+          
+          <div className="plan-content">
+            <MealPlanCalendar 
+              mealPlan={activePlan}
+              onUpdateMeal={handleUpdateMeal}
+            />
+            
+            <NutritionSummary nutritionData={activePlan.nutritionSummary} />
+          </div>
+        </div>
+      ) : (
+        <div className="empty-state">
+          <p>You don't have any meal plans yet. Create your first plan to get started!</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MealPlanCreator;
+```
+
+## 4. API Client Implementation
+
+Create a centralized API client to interact with backend services:
+
+```javascript
+// api.js - API client for interacting with backend
+import axios from 'axios';
+
+// Create axios instance with base configuration
+const apiClient = axios.create({
+  baseURL: '/api', // Will be configured based on environment
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Request interceptor to add auth token
+apiClient.interceptors.request.use(config => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  response => {
+    // Extract data from standard response format
+    if (response.data && response.data.success) {
+      return response.data.data;
+    }
+    return response.data;
+  },
+  error => {
+    // Handle error responses
+    if (error.response && error.response.data && error.response.data.error) {
+      // Extract structured error from API response
+      return Promise.reject(error.response.data.error);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// User API functions
+export const fetchUserProfile = (userId) => {
+  return apiClient.get(`/users/${userId}`);
+};
+
+export const updateUserPreferences = (userId, preferences) => {
+  return apiClient.patch(`/users/${userId}/preferences`, preferences);
+};
+
+// Recipe API functions
+export const fetchRecipes = (filters = {}) => {
+  return apiClient.get('/recipes', { params: filters });
+};
+
+export const fetchRecipeDetails = (recipeId) => {
+  return apiClient.get(`/recipes/${recipeId}`);
+};
+
+export const rateRecipe = (recipeId, rating, comment) => {
+  return apiClient.post(`/recipes/${recipeId}/ratings`, { rating, comment });
+};
+
+// Recommendation API functions
+export const fetchRecommendedRecipes = (userId, count = 10) => {
+  return apiClient.get(`/recommendations/recipes/${userId}`, { params: { count } });
+};
+
+export const generateMealPlan = (userId, mealTypes, dayCount, servingSize) => {
+  return apiClient.post(`/recommendations/meal-plan/${userId}`, {
+    mealTypes,
+    dayCount,
+    servingSize
+  });
+};
+
+// Meal Plan API functions
+export const fetchUserMealPlans = (userId) => {
+  return apiClient.get(`/meal-plans`, { params: { userId } });
+};
+
+export const fetchMealPlanDetails = (mealPlanId) => {
+  return apiClient.get(`/meal-plans/${mealPlanId}`);
+};
+
+export const updateMealPlan = (mealPlanId, mealPlan) => {
+  return apiClient.put(`/meal-plans/${mealPlanId}`, mealPlan);
+};
+
+// Shopping List API functions
+export const fetchUserShoppingLists = (userId) => {
+  return apiClient.get('/shopping-lists', { params: { userId } });
+};
+
+export const generateShoppingList = (userId, mealPlanId) => {
+  return apiClient.post(`/shopping-lists/generate/${mealPlanId}`, { userId });
+};
+
+export const updateShoppingListItem = (shoppingListId, productId, updates) => {
+  return apiClient.patch(`/shopping-lists/${shoppingListId}/items/${productId}`, updates);
+};
+
+export const addToCart = (shoppingListId, productId) => {
+  return apiClient.post(`/shopping-lists/${shoppingListId}/cart`, { productId });
+};
+
+// Voice API functions
+export const processVoiceCommand = (userId, command) => {
+  return apiClient.post(`/voice/process`, { userId, command });
+};
+
+export default apiClient;
+```
+
+## 5. Implementation Best Practices
+
+For a successful 3-day hackathon implementation, follow these best practices:
+
+### 5.1 Code Organization
+
+- **Feature-based Structure**: Organize code by feature rather than type
+- **Shared Components**: Create reusable components for common UI elements
+- **Custom Hooks**: Extract complex logic into custom React hooks
+- **API Abstraction**: Centralize API calls in a client module
+
+### 5.2 State Management
+
+- **React Context API**: Use Context for global state (auth, preferences)
+- **Local Component State**: Use useState for component-specific state
+- **Data Fetching Patterns**: Use loading/error states consistently
+
+### 5.3 Performance Optimization
+
+- **Memoization**: Use React.memo for expensive components
+- **Virtualization**: For long lists of recipes or shopping items
+- **Lazy Loading**: Implement route-based code splitting
+
+### 5.4 Error Handling
+
+- **Centralized Error Handling**: Consistent approach across the app
+- **User Feedback**: Clear error messages and recovery options
+- **Fallback Content**: Show placeholders when data fails to load
+
+### 5.5 Testing Strategy
+
+For a 3-day hackathon, focus on these testing priorities:
+
+1. **Manual Testing**: Create a testing checklist for core user flows
+2. **Browser Compatibility**: Test in Chrome and one other browser
+3. **Mobile Responsiveness**: Test responsive design on at least one mobile device
+4. **Error Scenarios**: Test common error paths and recovery
+
+## 6. Mockup Navigation Flow
+
+For development reference, here's the core user flow:
+
+1. **Login** → User authentication
+2. **Dashboard** → Overview of meal plans, recommendations
+3. **Profile** → User preferences and settings
+4. **Meal Planning** → Create and manage meal plans
+5. **Recipe Browser** → Discover and view recipes
+6. **Shopping List** → Manage ingredients and cart
+
+This low-level design provides the detailed specifications needed to implement the AmazonMeal system during your 3-day hackathon. The team should refer to this document for specific implementation details while using the high-level architecture document for overall system structure and flow.

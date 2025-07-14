@@ -1,0 +1,137 @@
+# AmazonMeal: Component Diagram
+
+This component diagram illustrates the architecture of the AmazonMeal solution, showing key system components and their interactions.
+
+## System Components and Interactions
+
+```mermaid
+graph TD
+    %% Frontend Components
+    subgraph "Frontend Application"
+        UI[User Interface Layer]
+        UI --> ProfileComp[Profile Component]
+        UI --> MealPlanComp[Meal Plan Component]
+        UI --> RecipeComp[Recipe Browser Component]
+        UI --> ShoppingComp[Shopping List Component]
+        UI --> VoiceComp[Voice Interface Component]
+        StateManager[State Management]
+    end
+
+    %% Backend API Services
+    subgraph "API Services Layer"
+        APIGateway[API Gateway]
+        
+        subgraph "Lambda Functions"
+            UserService[User Profile Service]
+            RecipeService[Recipe Service]
+            RecommendationService[Recommendation Service]
+            ShoppingService[Shopping Service]
+            VoiceService[Voice Processing Service]
+        end
+        
+        APIGateway --> UserService
+        APIGateway --> RecipeService
+        APIGateway --> RecommendationService
+        APIGateway --> ShoppingService
+        APIGateway --> VoiceService
+    end
+    
+    %% AI/ML Layer
+    subgraph "AI/ML Layer"
+        Bedrock[Amazon Bedrock]
+        MealRecommender[Meal Recommendation Engine]
+        SubstitutionEngine[Ingredient Substitution Engine]
+        NutritionAnalyzer[Nutrition Analysis Engine]
+        VoiceProcessor[Voice Command Processor]
+        
+        Bedrock --> MealRecommender
+        Bedrock --> SubstitutionEngine
+        Bedrock --> NutritionAnalyzer
+        Bedrock --> VoiceProcessor
+    end
+    
+    %% Data Storage Layer
+    subgraph "Data Storage Layer"
+        DynamoDB[Amazon DynamoDB]
+        UsersTable[Users Table]
+        RecipesTable[Recipes Table]
+        ProductsTable[Products Table]
+        MealPlansTable[MealPlans Table]
+        ShoppingListsTable[ShoppingLists Table]
+        
+        DynamoDB --> UsersTable
+        DynamoDB --> RecipesTable
+        DynamoDB --> ProductsTable
+        DynamoDB --> MealPlansTable
+        DynamoDB --> ShoppingListsTable
+    end
+    
+    %% External Systems
+    MockAmazonFresh[Mock Amazon Fresh API]
+    
+    %% Frontend to Backend Connections
+    UI --> APIGateway
+    VoiceComp --> APIGateway
+    
+    %% Backend Service to AI/ML Connections
+    RecommendationService --> MealRecommender
+    ShoppingService --> SubstitutionEngine
+    RecipeService --> NutritionAnalyzer
+    VoiceService --> VoiceProcessor
+    
+    %% Backend Service to Data Storage Connections
+    UserService --> UsersTable
+    RecipeService --> RecipesTable
+    ShoppingService --> ProductsTable
+    RecommendationService --> MealPlansTable
+    ShoppingService --> ShoppingListsTable
+    
+    %% Mock Integration Connections
+    ShoppingService --> MockAmazonFresh
+```
+
+## Component Descriptions
+
+### Frontend Application
+- **User Interface Layer**: Main UI container managing overall layout and navigation
+- **Profile Component**: Handles user registration, preferences, and settings
+- **Meal Plan Component**: Displays and manages weekly meal plans
+- **Recipe Browser Component**: Enables recipe discovery and browsing
+- **Shopping List Component**: Manages shopping lists and cart functionality
+- **Voice Interface Component**: Provides voice interaction capabilities
+- **State Management**: Manages application state using React Context API
+
+### API Services Layer
+- **API Gateway**: Entry point for all frontend requests
+- **User Profile Service**: Manages user data and preferences
+- **Recipe Service**: Handles recipe data and filtering
+- **Recommendation Service**: Generates personalized meal recommendations
+- **Shopping Service**: Manages shopping lists and cart operations
+- **Voice Processing Service**: Processes voice commands
+
+### AI/ML Layer
+- **Amazon Bedrock**: Core AI/ML service for natural language processing
+- **Meal Recommendation Engine**: Generates personalized meal suggestions
+- **Ingredient Substitution Engine**: Suggests product alternatives
+- **Nutrition Analysis Engine**: Analyzes nutritional content of meal plans
+- **Voice Command Processor**: Interprets voice commands
+
+### Data Storage Layer
+- **Users Table**: Stores user profiles and preferences
+- **Recipes Table**: Contains recipe data and metadata
+- **Products Table**: Stores mock Amazon Fresh product catalog
+- **MealPlans Table**: Stores generated meal plans
+- **ShoppingLists Table**: Maintains shopping lists and cart items
+
+### External Systems
+- **Mock Amazon Fresh API**: Simulated interface to Amazon Fresh services
+
+## Data Flows
+
+1. User preferences flow from Profile Component through User Service to Users Table
+2. Recipe data flows from Recipe Service to Recipe Browser Component
+3. Recommendation requests flow from Meal Plan Component through Recommendation Service to Meal Recommendation Engine
+4. Shopping lists are generated by Shopping Service based on selected meal plans
+5. Voice commands flow from Voice Interface Component through Voice Processing Service to Voice Command Processor
+
+This component architecture enables the team to work in parallel on different system aspects while maintaining clear integration points.

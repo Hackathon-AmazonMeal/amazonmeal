@@ -1,0 +1,741 @@
+# AmazonMeal: API Specification
+
+This document defines the API interfaces for the AmazonMeal system, providing specifications for all endpoints required to support the meal planning and shopping experience.
+
+## API Overview
+
+The AmazonMeal API follows RESTful principles with the following service domains:
+
+1. **User Service** - Manages user profiles and preferences
+2. **Recipe Service** - Provides recipe browsing, searching and details
+3. **Recommendation Service** - Generates personalized meal plans
+4. **Shopping Service** - Manages shopping lists and cart operations
+5. **Voice Service** - Processes voice commands and queries
+
+All endpoints will be implemented as AWS Lambda functions exposed through Amazon API Gateway.
+
+## Common API Patterns
+
+### Authentication
+
+For the hackathon demo, a simplified authentication mechanism will be used:
+
+```
+Authorization: Bearer {mock-jwt-token}
+```
+
+### Response Format
+
+All API responses follow a standard format:
+
+```json
+{
+  "success": true|false,
+  "data": { ... },  // Response payload when success is true
+  "error": {        // Present when success is false
+    "code": "ERROR_CODE",
+    "message": "Human readable error message"
+  }
+}
+```
+
+### Error Codes
+
+Common error codes:
+
+- `UNAUTHORIZED` - Invalid or missing authentication
+- `VALIDATION_ERROR` - Invalid request parameters
+- `NOT_FOUND` - Requested resource not found
+- `INTERNAL_ERROR` - Server-side error
+
+## 1. User Service API
+
+### 1.1 Create User Profile
+
+Creates a new user profile with preferences.
+
+**Endpoint:** `POST /api/users`
+
+**Request Body:**
+```json
+{
+  "username": "string",
+  "email": "string",
+  "preferences": {
+    "dietaryRestrictions": ["VEGETARIAN", "GLUTEN_FREE", ...],
+    "allergies": ["PEANUTS", "SHELLFISH", ...],
+    "dislikedIngredients": ["string", ...],
+    "cookingTime": "QUICK|MEDIUM|ANY",
+    "cuisinePreferences": ["ITALIAN", "MEXICAN", ...],
+    "skillLevel": "BEGINNER|INTERMEDIATE|ADVANCED"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "string",
+    "username": "string",
+    "profileComplete": true
+  }
+}
+```
+
+### 1.2 Get User Profile
+
+Retrieves user profile and preferences.
+
+**Endpoint:** `GET /api/users/{userId}`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "string",
+    "username": "string",
+    "email": "string",
+    "preferences": {
+      "dietaryRestrictions": ["VEGETARIAN", "GLUTEN_FREE", ...],
+      "allergies": ["PEANUTS", "SHELLFISH", ...],
+      "dislikedIngredients": ["string", ...],
+      "cookingTime": "QUICK|MEDIUM|ANY",
+      "cuisinePreferences": ["ITALIAN", "MEXICAN", ...],
+      "skillLevel": "BEGINNER|INTERMEDIATE|ADVANCED"
+    }
+  }
+}
+```
+
+### 1.3 Update User Preferences
+
+Updates a user's meal preferences.
+
+**Endpoint:** `PATCH /api/users/{userId}/preferences`
+
+**Request Body:**
+```json
+{
+  "dietaryRestrictions": ["VEGETARIAN", "GLUTEN_FREE", ...],
+  "allergies": ["PEANUTS", "SHELLFISH", ...],
+  "dislikedIngredients": ["string", ...],
+  "cookingTime": "QUICK|MEDIUM|ANY",
+  "cuisinePreferences": ["ITALIAN", "MEXICAN", ...],
+  "skillLevel": "BEGINNER|INTERMEDIATE|ADVANCED"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "preferences": {
+      "dietaryRestrictions": ["VEGETARIAN", "GLUTEN_FREE", ...],
+      "allergies": ["PEANUTS", "SHELLFISH", ...],
+      "dislikedIngredients": ["string", ...],
+      "cookingTime": "QUICK|MEDIUM|ANY",
+      "cuisinePreferences": ["ITALIAN", "MEXICAN", ...],
+      "skillLevel": "BEGINNER|INTERMEDIATE|ADVANCED"
+    }
+  }
+}
+```
+
+## 2. Recipe Service API
+
+### 2.1 List Recipes
+
+Lists available recipes with optional filtering.
+
+**Endpoint:** `GET /api/recipes`
+
+**Query Parameters:**
+- `cuisine` (optional) - Filter by cuisine type
+- `mealType` (optional) - Filter by meal type (breakfast, lunch, dinner)
+- `maxPrepTime` (optional) - Maximum preparation time in minutes
+- `dietaryRestrictions` (optional) - Comma-separated list of dietary restrictions
+- `page` (optional) - Page number for pagination, default 1
+- `pageSize` (optional) - Results per page, default 20
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recipes": [
+      {
+        "recipeId": "string",
+        "title": "string",
+        "description": "string",
+        "imageUrl": "string",
+        "prepTime": number,
+        "cookTime": number,
+        "servings": number,
+        "difficulty": "EASY|MEDIUM|HARD",
+        "cuisine": "string",
+        "mealType": "BREAKFAST|LUNCH|DINNER|SNACK",
+        "dietaryTags": ["VEGETARIAN", "GLUTEN_FREE", ...]
+      }
+    ],
+    "pagination": {
+      "page": number,
+      "pageSize": number,
+      "totalItems": number,
+      "totalPages": number
+    }
+  }
+}
+```
+
+### 2.2 Get Recipe Details
+
+Retrieves complete details for a specific recipe.
+
+**Endpoint:** `GET /api/recipes/{recipeId}`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recipeId": "string",
+    "title": "string",
+    "description": "string",
+    "imageUrl": "string",
+    "prepTime": number,
+    "cookTime": number,
+    "servings": number,
+    "difficulty": "EASY|MEDIUM|HARD",
+    "cuisine": "string",
+    "mealType": "BREAKFAST|LUNCH|DINNER|SNACK",
+    "dietaryTags": ["VEGETARIAN", "GLUTEN_FREE", ...],
+    "ingredients": [
+      {
+        "name": "string",
+        "quantity": number,
+        "unit": "string",
+        "productId": "string"  // Mapped Amazon Fresh product
+      }
+    ],
+    "instructions": [
+      {
+        "stepNumber": number,
+        "description": "string"
+      }
+    ],
+    "nutritionInfo": {
+      "calories": number,
+      "protein": number,
+      "carbs": number,
+      "fat": number,
+      "fiber": number
+    }
+  }
+}
+```
+
+### 2.3 Rate Recipe
+
+Allows users to rate recipes they've tried.
+
+**Endpoint:** `POST /api/recipes/{recipeId}/ratings`
+
+**Request Body:**
+```json
+{
+  "userId": "string",
+  "rating": number,  // 1-5
+  "comment": "string"  // Optional
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recipeId": "string",
+    "averageRating": number,
+    "totalRatings": number
+  }
+}
+```
+
+## 3. Recommendation Service API
+
+### 3.1 Generate Meal Plan
+
+Generates a personalized meal plan for a specified duration.
+
+**Endpoint:** `POST /api/meal-plans`
+
+**Request Body:**
+```json
+{
+  "userId": "string",
+  "days": number,  // Number of days to plan for
+  "mealsPerDay": number,  // How many meals per day
+  "startDate": "YYYY-MM-DD",
+  "preferences": {  // Optional - overrides user preferences
+    "cuisinePreferences": ["ITALIAN", "MEXICAN", ...],
+    "mealTypes": ["BREAKFAST", "LUNCH", "DINNER"]
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "mealPlanId": "string",
+    "userId": "string",
+    "startDate": "YYYY-MM-DD",
+    "endDate": "YYYY-MM-DD",
+    "days": [
+      {
+        "date": "YYYY-MM-DD",
+        "meals": [
+          {
+            "mealType": "BREAKFAST|LUNCH|DINNER",
+            "recipe": {
+              "recipeId": "string",
+              "title": "string",
+              "description": "string",
+              "imageUrl": "string",
+              "prepTime": number,
+              "cookTime": number,
+              "servings": number
+            }
+          }
+        ]
+      }
+    ],
+    "nutritionSummary": {
+      "averageDailyCalories": number,
+      "proteinPercentage": number,
+      "carbPercentage": number,
+      "fatPercentage": number
+    }
+  }
+}
+```
+
+### 3.2 Get Meal Plan
+
+Retrieves an existing meal plan.
+
+**Endpoint:** `GET /api/meal-plans/{mealPlanId}`
+
+**Response:** Same as the Generate Meal Plan response.
+
+### 3.3 Update Meal Plan
+
+Modifies a specific meal within a meal plan.
+
+**Endpoint:** `PATCH /api/meal-plans/{mealPlanId}`
+
+**Request Body:**
+```json
+{
+  "updates": [
+    {
+      "date": "YYYY-MM-DD",
+      "mealType": "BREAKFAST|LUNCH|DINNER",
+      "newRecipeId": "string"
+    }
+  ]
+}
+```
+
+**Response:** Same as the Generate Meal Plan response with updated meal information.
+
+### 3.4 Get Recipe Recommendations
+
+Provides personalized recipe recommendations.
+
+**Endpoint:** `GET /api/recommendations/recipes`
+
+**Query Parameters:**
+- `userId` - User ID for personalization
+- `mealType` (optional) - Type of meal to recommend
+- `count` (optional) - Number of recommendations to return, default 5
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recommendations": [
+      {
+        "recipeId": "string",
+        "title": "string",
+        "description": "string",
+        "imageUrl": "string",
+        "prepTime": number,
+        "cookTime": number,
+        "matchScore": number,  // 0-100 indicating recommendation strength
+        "matchReasons": ["PREFERENCE_MATCH", "HIGHLY_RATED", "TRENDING"]
+      }
+    ]
+  }
+}
+```
+
+## 4. Shopping Service API
+
+### 4.1 Generate Shopping List
+
+Creates a shopping list from a meal plan.
+
+**Endpoint:** `POST /api/shopping-lists`
+
+**Request Body:**
+```json
+{
+  "userId": "string",
+  "mealPlanId": "string",
+  "startDate": "YYYY-MM-DD",  // Optional - start date to include
+  "endDate": "YYYY-MM-DD",  // Optional - end date to include
+  "servings": {  // Optional - override servings per meal
+    "BREAKFAST": number,
+    "LUNCH": number,
+    "DINNER": number
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "shoppingListId": "string",
+    "userId": "string",
+    "mealPlanId": "string",
+    "items": [
+      {
+        "productId": "string",
+        "name": "string",
+        "quantity": number,
+        "unit": "string",
+        "category": "PRODUCE|DAIRY|MEAT|PANTRY",
+        "price": number,
+        "imageUrl": "string",
+        "recipes": [  // Which recipes require this ingredient
+          {
+            "recipeId": "string",
+            "title": "string",
+            "requiredQuantity": number
+          }
+        ]
+      }
+    ],
+    "totalEstimatedPrice": number
+  }
+}
+```
+
+### 4.2 Get Shopping List
+
+Retrieves an existing shopping list.
+
+**Endpoint:** `GET /api/shopping-lists/{shoppingListId}`
+
+**Response:** Same as the Generate Shopping List response.
+
+### 4.3 Update Shopping List Item
+
+Modifies a shopping list item (quantity, remove, etc.).
+
+**Endpoint:** `PATCH /api/shopping-lists/{shoppingListId}/items/{productId}`
+
+**Request Body:**
+```json
+{
+  "action": "UPDATE|REMOVE",
+  "quantity": number  // Only for UPDATE action
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "productId": "string",
+    "name": "string",
+    "quantity": number,
+    "unit": "string",
+    "category": "PRODUCE|DAIRY|MEAT|PANTRY",
+    "price": number
+  }
+}
+```
+
+### 4.4 Add Shopping List to Cart
+
+Transfers shopping list items to Amazon Fresh cart (simulated).
+
+**Endpoint:** `POST /api/shopping-lists/{shoppingListId}/checkout`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "cartId": "string",
+    "itemCount": number,
+    "totalPrice": number,
+    "checkoutUrl": "string"  // Simulated Amazon Fresh checkout URL
+  }
+}
+```
+
+### 4.5 Get Product Substitutions
+
+Suggests alternative products when requested items are unavailable.
+
+**Endpoint:** `GET /api/products/{productId}/substitutions`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "originalProduct": {
+      "productId": "string",
+      "name": "string",
+      "price": number,
+      "available": boolean
+    },
+    "substitutions": [
+      {
+        "productId": "string",
+        "name": "string",
+        "price": number,
+        "matchScore": number,  // 0-100 indicating similarity
+        "differences": ["PRICE_HIGHER", "ORGANIC", "DIFFERENT_BRAND"]
+      }
+    ]
+  }
+}
+```
+
+## 5. Voice Service API
+
+### 5.1 Process Voice Command
+
+Handles voice input and returns appropriate actions.
+
+**Endpoint:** `POST /api/voice/commands`
+
+**Request Body:**
+```json
+{
+  "userId": "string",
+  "audioData": "base64-encoded-audio",  // Optional - audio data
+  "transcription": "string"  // Optional - text transcription if audio not provided
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "intent": "ADD_TO_LIST|RECIPE_INSTRUCTIONS|MEAL_RECOMMENDATION",
+    "confidence": number,  // 0-1 indicating confidence in intent detection
+    "entities": {  // Extracted entities from command
+      "recipeName": "string",
+      "ingredient": "string",
+      "mealType": "string",
+      "date": "string"
+    },
+    "response": {
+      "type": "TEXT|AUDIO|ACTION",
+      "content": "string",  // Text response or base64 audio
+      "action": {  // Optional - action to take in UI
+        "type": "NAVIGATE|ADD_ITEM|SHOW_RECIPE",
+        "parameters": { ... }
+      }
+    }
+  }
+}
+```
+
+### 5.2 Get Voice Instructions
+
+Provides voice instructions for a recipe step.
+
+**Endpoint:** `GET /api/voice/recipes/{recipeId}/instructions/{stepNumber}`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recipeId": "string",
+    "recipeTitle": "string",
+    "currentStep": number,
+    "totalSteps": number,
+    "instructionText": "string",
+    "audioInstructions": "base64-encoded-audio",
+    "nextStepAvailable": boolean
+  }
+}
+```
+
+## Data Models
+
+### User Profile
+
+```json
+{
+  "userId": "string",
+  "username": "string",
+  "email": "string",
+  "preferences": {
+    "dietaryRestrictions": ["VEGETARIAN", "GLUTEN_FREE", ...],
+    "allergies": ["PEANUTS", "SHELLFISH", ...],
+    "dislikedIngredients": ["string", ...],
+    "cookingTime": "QUICK|MEDIUM|ANY",
+    "cuisinePreferences": ["ITALIAN", "MEXICAN", ...],
+    "skillLevel": "BEGINNER|INTERMEDIATE|ADVANCED"
+  },
+  "createdAt": "ISO-8601-timestamp",
+  "updatedAt": "ISO-8601-timestamp"
+}
+```
+
+### Recipe
+
+```json
+{
+  "recipeId": "string",
+  "title": "string",
+  "description": "string",
+  "imageUrl": "string",
+  "prepTime": number,  // minutes
+  "cookTime": number,  // minutes
+  "servings": number,
+  "difficulty": "EASY|MEDIUM|HARD",
+  "cuisine": "string",
+  "mealType": "BREAKFAST|LUNCH|DINNER|SNACK",
+  "dietaryTags": ["VEGETARIAN", "GLUTEN_FREE", ...],
+  "ingredients": [
+    {
+      "name": "string",
+      "quantity": number,
+      "unit": "string",
+      "productId": "string"  // Mapped Amazon Fresh product
+    }
+  ],
+  "instructions": [
+    {
+      "stepNumber": number,
+      "description": "string"
+    }
+  ],
+  "nutritionInfo": {
+    "calories": number,
+    "protein": number,
+    "carbs": number,
+    "fat": number,
+    "fiber": number
+  },
+  "ratings": {
+    "average": number,
+    "count": number
+  }
+}
+```
+
+### Meal Plan
+
+```json
+{
+  "mealPlanId": "string",
+  "userId": "string",
+  "startDate": "YYYY-MM-DD",
+  "endDate": "YYYY-MM-DD",
+  "days": [
+    {
+      "date": "YYYY-MM-DD",
+      "meals": [
+        {
+          "mealType": "BREAKFAST|LUNCH|DINNER",
+          "recipeId": "string"
+        }
+      ]
+    }
+  ],
+  "createdAt": "ISO-8601-timestamp",
+  "updatedAt": "ISO-8601-timestamp"
+}
+```
+
+### Product (Mock Amazon Fresh)
+
+```json
+{
+  "productId": "string",
+  "name": "string",
+  "description": "string",
+  "price": number,
+  "salePrice": number,  // Optional
+  "unit": "string",  // e.g., "oz", "lb", "each"
+  "imageUrl": "string",
+  "category": "PRODUCE|DAIRY|MEAT|PANTRY|...",
+  "brand": "string",
+  "tags": ["ORGANIC", "GLUTEN_FREE", ...],
+  "available": boolean,
+  "inventory": number  // For demo purposes
+}
+```
+
+### Shopping List
+
+```json
+{
+  "shoppingListId": "string",
+  "userId": "string",
+  "mealPlanId": "string",  // Optional - associated meal plan
+  "name": "string",
+  "items": [
+    {
+      "productId": "string",
+      "name": "string",
+      "quantity": number,
+      "unit": "string",
+      "price": number,
+      "checked": boolean,  // For UI tracking
+      "added": "ISO-8601-timestamp"
+    }
+  ],
+  "createdAt": "ISO-8601-timestamp",
+  "updatedAt": "ISO-8601-timestamp"
+}
+```
+
+## Implementation Notes
+
+1. For the hackathon implementation, focus on the core endpoints first:
+   - User profile creation (1.1)
+   - Recipe listing and details (2.1, 2.2)
+   - Meal plan generation (3.1)
+   - Shopping list creation (4.1)
+   - Basic voice command processing (5.1)
+
+2. Mock data should be created for:
+   - ~100 recipes with full details
+   - ~1,000 product items across different categories
+   - 3-5 pre-defined user profiles for demo
+
+3. Authentication will be simplified for the hackathon with pre-defined tokens
+
+This API specification provides a foundation for the AmazonMeal system, establishing clear interfaces between frontend and backend components while supporting all required functional requirements.

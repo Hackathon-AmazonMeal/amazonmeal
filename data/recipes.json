@@ -1,0 +1,262 @@
+[
+  {
+    "recipeId": "recipe-001",
+    "title": "Mediterranean Quinoa Bowl",
+    "description": "A healthy and colorful bowl packed with quinoa, fresh vegetables, and Mediterranean flavors",
+    "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400",
+    "prepTime": 15,
+    "cookTime": 20,
+    "servings": 2,
+    "difficulty": "EASY",
+    "cuisine": "MEDITERRANEAN",
+    "mealType": "LUNCH",
+    "dietaryTags": ["VEGETARIAN", "GLUTEN_FREE", "HEALTHY"],
+    "ingredients": [
+      {
+        "name": "Quinoa",
+        "quantity": 1,
+        "unit": "cup",
+        "productId": "prod-001"
+      },
+      {
+        "name": "Cherry Tomatoes",
+        "quantity": 1,
+        "unit": "cup",
+        "productId": "prod-002"
+      },
+      {
+        "name": "Cucumber",
+        "quantity": 1,
+        "unit": "medium",
+        "productId": "prod-003"
+      },
+      {
+        "name": "Red Onion",
+        "quantity": 0.25,
+        "unit": "cup",
+        "productId": "prod-004"
+      },
+      {
+        "name": "Feta Cheese",
+        "quantity": 0.5,
+        "unit": "cup",
+        "productId": "prod-005"
+      },
+      {
+        "name": "Olive Oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "productId": "prod-006"
+      },
+      {
+        "name": "Lemon Juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "productId": "prod-007"
+      }
+    ],
+    "instructions": [
+      {
+        "stepNumber": 1,
+        "description": "Rinse quinoa and cook according to package directions. Let cool."
+      },
+      {
+        "stepNumber": 2,
+        "description": "Dice cucumber and red onion. Halve cherry tomatoes."
+      },
+      {
+        "stepNumber": 3,
+        "description": "Combine quinoa with vegetables and feta cheese."
+      },
+      {
+        "stepNumber": 4,
+        "description": "Whisk olive oil and lemon juice. Drizzle over bowl and toss."
+      }
+    ],
+    "nutritionInfo": {
+      "calories": 420,
+      "protein": 15,
+      "carbs": 45,
+      "fat": 18,
+      "fiber": 6
+    },
+    "ratings": {
+      "average": 4.5,
+      "count": 23
+    }
+  },
+  {
+    "recipeId": "recipe-002",
+    "title": "Chicken Teriyaki Stir Fry",
+    "description": "Quick and delicious stir fry with tender chicken and crisp vegetables in a savory teriyaki sauce",
+    "imageUrl": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400",
+    "prepTime": 10,
+    "cookTime": 15,
+    "servings": 4,
+    "difficulty": "MEDIUM",
+    "cuisine": "ASIAN",
+    "mealType": "DINNER",
+    "dietaryTags": ["HIGH_PROTEIN"],
+    "ingredients": [
+      {
+        "name": "Chicken Breast",
+        "quantity": 1,
+        "unit": "lb",
+        "productId": "prod-008"
+      },
+      {
+        "name": "Broccoli",
+        "quantity": 2,
+        "unit": "cups",
+        "productId": "prod-009"
+      },
+      {
+        "name": "Bell Peppers",
+        "quantity": 2,
+        "unit": "medium",
+        "productId": "prod-010"
+      },
+      {
+        "name": "Teriyaki Sauce",
+        "quantity": 0.25,
+        "unit": "cup",
+        "productId": "prod-011"
+      },
+      {
+        "name": "Vegetable Oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "productId": "prod-012"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "productId": "prod-013"
+      },
+      {
+        "name": "Jasmine Rice",
+        "quantity": 1,
+        "unit": "cup",
+        "productId": "prod-014"
+      }
+    ],
+    "instructions": [
+      {
+        "stepNumber": 1,
+        "description": "Cook rice according to package directions."
+      },
+      {
+        "stepNumber": 2,
+        "description": "Cut chicken into bite-sized pieces. Season with salt and pepper."
+      },
+      {
+        "stepNumber": 3,
+        "description": "Heat oil in large skillet. Cook chicken until golden, about 5-6 minutes."
+      },
+      {
+        "stepNumber": 4,
+        "description": "Add vegetables and garlic. Stir fry for 3-4 minutes."
+      },
+      {
+        "stepNumber": 5,
+        "description": "Add teriyaki sauce and cook until heated through. Serve over rice."
+      }
+    ],
+    "nutritionInfo": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 42,
+      "fat": 8,
+      "fiber": 4
+    },
+    "ratings": {
+      "average": 4.7,
+      "count": 45
+    }
+  },
+  {
+    "recipeId": "recipe-003",
+    "title": "Avocado Toast with Poached Egg",
+    "description": "Classic breakfast featuring creamy avocado on toasted bread topped with a perfectly poached egg",
+    "imageUrl": "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400",
+    "prepTime": 5,
+    "cookTime": 10,
+    "servings": 1,
+    "difficulty": "EASY",
+    "cuisine": "AMERICAN",
+    "mealType": "BREAKFAST",
+    "dietaryTags": ["VEGETARIAN", "HEALTHY"],
+    "ingredients": [
+      {
+        "name": "Whole Grain Bread",
+        "quantity": 2,
+        "unit": "slices",
+        "productId": "prod-015"
+      },
+      {
+        "name": "Avocado",
+        "quantity": 1,
+        "unit": "medium",
+        "productId": "prod-016"
+      },
+      {
+        "name": "Eggs",
+        "quantity": 2,
+        "unit": "large",
+        "productId": "prod-017"
+      },
+      {
+        "name": "Lemon Juice",
+        "quantity": 1,
+        "unit": "tsp",
+        "productId": "prod-007"
+      },
+      {
+        "name": "Salt",
+        "quantity": 0.25,
+        "unit": "tsp",
+        "productId": "prod-018"
+      },
+      {
+        "name": "Black Pepper",
+        "quantity": 0.125,
+        "unit": "tsp",
+        "productId": "prod-019"
+      }
+    ],
+    "instructions": [
+      {
+        "stepNumber": 1,
+        "description": "Toast bread slices until golden brown."
+      },
+      {
+        "stepNumber": 2,
+        "description": "Mash avocado with lemon juice, salt, and pepper."
+      },
+      {
+        "stepNumber": 3,
+        "description": "Bring water to gentle simmer. Crack eggs into small bowls."
+      },
+      {
+        "stepNumber": 4,
+        "description": "Create whirlpool in water and gently drop in eggs. Cook 3-4 minutes."
+      },
+      {
+        "stepNumber": 5,
+        "description": "Spread avocado on toast and top with poached eggs."
+      }
+    ],
+    "nutritionInfo": {
+      "calories": 320,
+      "protein": 16,
+      "carbs": 24,
+      "fat": 20,
+      "fiber": 8
+    },
+    "ratings": {
+      "average": 4.3,
+      "count": 67
+    }
+  }
+]

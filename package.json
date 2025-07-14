@@ -1,0 +1,87 @@
+{
+  "name": "amazonmeal",
+  "version": "1.0.0",
+  "description": "AI-Powered Meal Planning Assistant for Amazon Fresh",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.19",
+    "@mui/material": "^5.14.20",
+    "@mui/x-date-pickers": "^6.18.2",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.6.2",
+    "date-fns": "^2.30.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write src/",
+    "server": "node server.js",
+    "dev": "concurrently \"npm run server\" \"npm start\"",
+    "check": "npm run lint && npm run build",
+    "precheck": "echo '🔍 Running pre-flight checks...'",
+    "postcheck": "echo '✅ All checks passed! Project is ready to run.'",
+    "validate": "npm run lint && echo '✅ Linting passed' && npm run build && echo '✅ Build successful'",
+    "quick-check": "npm run lint --silent && echo '✅ Code quality check passed'"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.8",
+    "concurrently": "^9.2.0",
+    "cors": "^2.8.5",
+    "eslint": "^8.54.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "express": "^5.1.0",
+    "prettier": "^3.1.0"
+  },
+  "homepage": ".",
+  "keywords": [
+    "meal-planning",
+    "ai",
+    "amazon-fresh",
+    "grocery-shopping",
+    "react",
+    "aws",
+    "hackathon"
+  ],
+  "author": "Amazon Hackathon Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amazon/amazonmeal"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
