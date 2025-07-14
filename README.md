@@ -4,7 +4,7 @@ An innovative AI-powered meal planning and grocery shopping solution that integr
 
 ## 🚀 Key Features
 
-### Core Functionality
+### Core functionality
 - **AI-Powered Meal Recommendations**: Personalized meal suggestions using Amazon Bedrock
 - **One-Click Meal Planning**: Generate complete weekly meal plans based on preferences
 - **Smart Shopping Lists**: Automatic ingredient aggregation with product mapping
