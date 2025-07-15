@@ -15,6 +15,7 @@ import PreferencesPage from './pages/Preferences/PreferencesPage';
 import RecipesPage from './pages/Recipes/RecipesPage';
 import Dashboard from './pages/Dashboard/Dashboard';
 import CheckoutSuccess from './pages/Checkout/CheckoutSuccess';
+import Cart from './pages/Cart';
 
 // Components
 import Layout from './components/layout/Layout';
@@ -52,6 +53,9 @@ function AppContent() {
         
         {/* Main recipes page */}
         <Route path="/recipes" element={<RecipesPage />} />
+        
+        {/* Shopping cart page */}
+        <Route path="/cart" element={<Cart />} />
         
         {/* Dashboard for returning users */}
         <Route path="/dashboard" element={<Dashboard />} />

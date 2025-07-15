@@ -26,17 +26,26 @@ An innovative AI-powered meal planning and grocery shopping solution that integr
 - **Context API** for efficient state management
 - **Custom hooks** for data fetching and business logic
 
-### Backend (AWS Serverless)
-- **AWS Lambda** functions for scalable serverless compute
-- **Amazon API Gateway** for RESTful API endpoints
-- **Amazon DynamoDB** for high-performance data storage
-- **Amazon Bedrock** for AI/ML capabilities
+### Backend (Development & Production)
+- **Express.js Development Server**: Local API server with mock data
+- **AWS Lambda** functions for scalable serverless compute (production)
+- **Amazon API Gateway** for RESTful API endpoints (production)
+- **Amazon DynamoDB** for high-performance data storage (production)
+- **Amazon Bedrock** for AI/ML capabilities (production)
 
 ### AI/ML Integration
 - **Meal Recommendation Engine**: Personalized suggestions based on user preferences
 - **Ingredient Substitution Engine**: Smart product alternatives
 - **Nutrition Analysis Engine**: Dietary goal optimization
 - **Voice Command Processor**: Natural language understanding
+
+### Development Server Features
+The Express.js development server (`server.js`) provides:
+- Mock recipe data from JSON files
+- Personalized recommendation API with dietary filtering
+- CORS support for frontend-backend communication
+- Static file serving for production builds
+- RESTful API endpoints matching production design
 
 ## 📁 Project Structure
 
@@ -53,47 +62,175 @@ AmazonMeal/
 │   └── genai_codegen_guide.md         # AI-assisted development guide
 ├── src/                               # Frontend React application
 │   ├── components/                    # Reusable UI components
+│   │   ├── common/                    # Shared components
+│   │   ├── layout/                    # Layout components (Header, Layout)
+│   │   ├── preferences/               # Preference-related components
+│   │   │   ├── AllergySelector.js     # Allergy selection component
+│   │   │   ├── DietaryRestrictions.js # Dietary restrictions selector
+│   │   │   ├── DietTypeSelector.js    # Diet type selection
+│   │   │   └── HealthGoals.js         # Health goals configuration
+│   │   ├── recipes/                   # Recipe-related components
+│   │   │   └── RecipeInstructions.js  # Recipe instruction display
+│   │   ├── ingredients/               # Ingredient and cart components
+│   │   │   └── CartSidebar.js         # Shopping cart sidebar
+│   │   ├── history/                   # Order history components
+│   │   ├── AppHeader.js               # Main application header
+│   │   ├── AppFooter.js               # Application footer
+│   │   └── Navbar.js                  # Navigation bar
 │   ├── pages/                         # Main application pages
-│   ├── contexts/                      # React contexts (Auth, etc.)
+│   │   ├── Checkout/                  # Checkout flow pages
+│   │   │   └── CheckoutSuccess.js     # Order confirmation page
+│   │   ├── Dashboard/                 # Dashboard pages
+│   │   │   └── Dashboard.js           # Main dashboard component
+│   │   ├── Preferences/               # User preference pages
+│   │   │   └── PreferencesPage.js     # Preferences management
+│   │   ├── Recipes/                   # Recipe browsing pages
+│   │   │   └── RecipesPage.js         # Recipe listing and search
+│   │   ├── Welcome/                   # Onboarding pages
+│   │   │   └── Welcome.js             # Welcome and setup flow
+│   │   ├── Cart.js                    # Shopping cart page
+│   │   ├── Dashboard.js               # Main dashboard (legacy)
+│   │   ├── Home.js                    # Home page
+│   │   ├── Login.js                   # User authentication
+│   │   ├── MealPlanner.js             # Meal planning interface
+│   │   ├── MealPlanCreator.js         # Meal plan creation
+│   │   ├── OrderConfirmation.js       # Order confirmation
+│   │   ├── PreferenceSetup.js         # Initial preference setup
+│   │   ├── Profile.js                 # User profile management
+│   │   ├── RecipeBrowser.js           # Recipe browsing
+│   │   ├── RecipeDetail.js            # Individual recipe details
+│   │   └── ShoppingList.js            # Shopping list management
+│   ├── contexts/                      # React contexts for state management
+│   │   ├── AuthContext.js             # Authentication state
+│   │   ├── CartContext.js             # Shopping cart state
+│   │   ├── RecipeContext.js           # Recipe data and filtering
+│   │   └── UserContext.js             # User profile and preferences
 │   ├── hooks/                         # Custom React hooks
+│   │   ├── useLocalStorage.js         # Local storage management
+│   │   └── useUserPreferences.js      # User preference management
 │   ├── services/                      # API service functions
-│   └── utils/                         # Utility functions and helpers
-├── lambda/                            # AWS Lambda functions
+│   │   ├── api.js                     # Base API configuration
+│   │   ├── cartService.js             # Cart management API
+│   │   ├── recipeService.js           # Recipe data API
+│   │   ├── recommendationService.js   # AI recommendation API
+│   │   └── userService.js             # User management API
+│   ├── data/                          # Mock data and seed files
+│   │   ├── preferences/               # User preference data
+│   │   │   ├── allergies.json         # Available allergies
+│   │   │   ├── diet-types.json        # Diet type options
+│   │   │   ├── dietary-restrictions.json # Dietary restrictions
+│   │   │   └── health-goals.json      # Health goal options
+│   │   ├── recipes/                   # Recipe data by meal type
+│   │   │   ├── breakfast.json         # Breakfast recipes
+│   │   │   ├── lunch.json             # Lunch recipes
+│   │   │   └── dinner.json            # Dinner recipes
+│   │   ├── users/                     # User profile data
+│   │   ├── products.json              # Product catalog
+│   │   └── recipes.json               # Combined recipe data
+│   ├── styles/                        # Styling and theme
+│   │   └── theme.js                   # Material-UI theme configuration
+│   ├── utils/                         # Utility functions and helpers
+│   │   └── constants.js               # Application constants
+│   ├── App.js                         # Main application component
+│   ├── index.js                       # Application entry point
+│   └── index.css                      # Global styles
+├── lambda/                            # AWS Lambda functions (serverless backend)
+│   ├── recommendationService/         # AI-powered meal recommendations
+│   │   ├── index.js                   # Main recommendation logic
+│   │   └── package.json               # Lambda dependencies
 │   ├── userProfileService/            # User management and preferences
 │   ├── recipeService/                 # Recipe data and filtering
-│   ├── recommendationService/         # AI-powered meal recommendations
-│   ├── shoppingService/               # Shopping list and cart management
-│   └── voiceService/                  # Voice command processing
-├── data/                              # Mock data and seed files
+│   ├── shoppingService/               # Shopping list management
+│   ├── cartService/                   # Shopping cart operations
+│   ├── voiceService/                  # Voice command processing
+│   ├── userService/                   # User account management
+│   ├── shared/                        # Shared Lambda utilities
+│   ├── recommendationService.js       # Legacy recommendation service
+│   └── shoppingService.js             # Legacy shopping service
 ├── infrastructure/                    # AWS infrastructure configuration
-└── docs/                              # Additional documentation
+│   └── dynamodb-tables.json           # DynamoDB table definitions
+├── tests/                             # Test suites
+│   ├── components/                    # Component tests
+│   ├── services/                      # Service tests
+│   └── integration/                   # Integration tests
+├── docs/                              # Additional documentation
+│   └── deployment-guide.md            # Deployment instructions
+├── build/                             # Production build output
+├── public/                            # Static assets
+│   └── index.html                     # HTML template
+├── server.js                          # Express.js development server
+├── package.json                       # Project dependencies and scripts
+├── package-lock.json                  # Dependency lock file
+├── project-structure.md               # Detailed project structure
+└── README.md                          # This file
 ```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 18+ and npm 8+
 - AWS CLI configured (for backend deployment)
 - Modern web browser with Web Speech API support
 
-### Frontend Development
+### Development Setup
 ```bash
+# Clone the repository
+git clone https://github.com/amazon/amazonmeal
+cd amazonmeal
+
 # Install dependencies
 npm install
 
-# Start development server
-npm start
+# Start development server with backend API
+npm run dev
 
-# Open http://localhost:3000
+# Or start frontend and backend separately
+npm run server  # Backend API on port 3001
+npm start       # Frontend on port 3000
 ```
 
-### Backend Setup
+### Available Scripts
+```bash
+# Development
+npm start          # Start React development server
+npm run server     # Start Express.js backend server
+npm run dev        # Start both frontend and backend concurrently
+
+# Code Quality
+npm run lint       # Run ESLint
+npm run lint:fix   # Fix ESLint issues automatically
+npm run format     # Format code with Prettier
+
+# Testing & Validation
+npm test           # Run test suite
+npm run build      # Create production build
+npm run validate   # Run linting and build checks
+npm run check      # Complete pre-flight checks
+
+# Quick Checks
+npm run quick-check # Fast code quality validation
+```
+
+### Environment Setup
+```bash
+# Create .env file for local development
+echo "REACT_APP_API_URL=http://localhost:3001/api" > .env
+echo "PORT=3001" >> .env
+
+# For production deployment
+echo "REACT_APP_API_URL=https://your-api-gateway-url.amazonaws.com" > .env.production
+```
+
+### Backend Setup (Production)
 ```bash
 # Navigate to lambda functions
 cd lambda/
 
 # Deploy Lambda functions (requires AWS CLI)
 # See infrastructure/ directory for deployment scripts
+aws lambda create-function --function-name amazonmeal-recommendations \
+  --runtime nodejs18.x --role arn:aws:iam::account:role/lambda-role \
+  --handler index.handler --zip-file fileb://recommendationService.zip
 ```
 
 ## 🎯 Demo Scenarios
@@ -118,24 +255,151 @@ cd lambda/
 - "What's for dinner tonight?"
 - "Add ingredients to my shopping list"
 
+## 🔧 Current Implementation Status
+
+### ✅ Completed Features
+- **React Frontend**: Fully functional UI with Material-UI components
+- **User Preferences**: Complete preference management system
+- **Recipe Management**: Browse, search, and view detailed recipes
+- **Shopping Cart**: Add ingredients and manage cart items
+- **Order Processing**: External API integration for order fulfillment
+- **Responsive Design**: Mobile and desktop optimized layouts
+- **Express.js Backend**: Development API server with mock data
+- **State Management**: React Context for global state
+- **Routing**: Multi-page navigation with React Router
+
+### 🚧 In Development
+- **AI Recommendations**: Enhanced personalization algorithms
+- **Voice Interface**: Speech recognition and commands
+- **AWS Integration**: Lambda functions and DynamoDB setup
+- **Real-time Updates**: WebSocket connections for live data
+
+### 📋 Planned Features
+- **Amazon Fresh API**: Real product catalog integration
+- **Payment Processing**: Enhanced checkout and order management
+- **Nutrition Tracking**: Detailed nutritional analysis
+- **Meal Plan Scheduling**: Calendar-based meal planning
+
+## 🔗 External Integrations
+
+### Order Processing API
+The application integrates with an external order processing service:
+- **Endpoint**: `https://order-processing-backend.vercel.app/orders`
+- **Trigger**: Activated when users complete checkout
+- **Data Sent**: Order ID, customer info, items, and total amount
+- **Response**: Order confirmation and tracking information
+
+For detailed integration documentation, see [ORDER_INTEGRATION.md](./ORDER_INTEGRATION.md).
+
 ## 🛠️ Technologies
 
 ### Frontend Stack
 - **React 18**: Modern React with hooks and concurrent features
-- **Material UI 5**: Comprehensive component library
-- **React Router 6**: Client-side routing
+- **Material UI 5**: Comprehensive component library with custom theming
+- **React Router 6**: Client-side routing and navigation
 - **Axios**: HTTP client for API communication
+- **Date-fns**: Modern date utility library
+- **Context API**: State management for user preferences, cart, and recipes
 
 ### Backend Stack
-- **AWS Lambda**: Serverless compute functions
-- **Amazon API Gateway**: RESTful API management
-- **Amazon DynamoDB**: NoSQL database for scalable storage
-- **Amazon Bedrock**: AI/ML services for personalization
+- **Express.js**: Development server for API endpoints
+- **AWS Lambda**: Serverless compute functions (production)
+- **Amazon API Gateway**: RESTful API management (production)
+- **Amazon DynamoDB**: NoSQL database for scalable storage (production)
+- **Amazon Bedrock**: AI/ML services for personalization (production)
+
+### Development Tools
+- **ESLint**: Code linting and quality assurance
+- **Prettier**: Code formatting
+- **Concurrently**: Run multiple npm scripts simultaneously
+- **CORS**: Cross-origin resource sharing middleware
 
 ### AI/ML Services
 - **Amazon Bedrock**: Foundation models for recommendations
 - **Natural Language Processing**: Voice command interpretation
 - **Recommendation Algorithms**: Personalized meal suggestions
+
+## 🧩 Component Architecture
+
+### Core Components
+
+#### State Management (Contexts)
+- **AuthContext**: User authentication and session management
+- **UserContext**: User profile and preferences
+- **RecipeContext**: Recipe data, filtering, and search
+- **CartContext**: Shopping cart state and operations
+
+#### Page Components
+- **Dashboard**: Main user dashboard with meal plans and recommendations
+- **RecipesPage**: Recipe browsing with search and filtering
+- **PreferencesPage**: User preference management
+- **Welcome**: Onboarding flow for new users
+- **CheckoutSuccess**: Order confirmation and success page
+
+#### Feature Components
+- **DietTypeSelector**: Diet preference selection (vegetarian, vegan, etc.)
+- **AllergySelector**: Allergy and intolerance management
+- **HealthGoals**: Health and nutrition goal setting
+- **RecipeInstructions**: Step-by-step cooking instructions
+- **CartSidebar**: Shopping cart with item management
+
+#### Service Layer
+- **recipeService**: Recipe data fetching and management
+- **recommendationService**: AI-powered meal recommendations
+- **cartService**: Shopping cart operations
+- **userService**: User profile and authentication
+- **api**: Base API configuration and utilities
+
+### Data Structure
+
+#### Recipe Data Model
+```javascript
+{
+  id: "string",
+  name: "string",
+  description: "string",
+  mealType: "breakfast|lunch|dinner",
+  prepTime: "number (minutes)",
+  cookTime: "number (minutes)",
+  servings: "number",
+  difficulty: "easy|medium|hard",
+  ingredients: [
+    {
+      name: "string",
+      amount: "string",
+      unit: "string"
+    }
+  ],
+  instructions: ["string"],
+  nutritionInfo: {
+    calories: "number",
+    protein: "number",
+    carbs: "number",
+    fat: "number"
+  },
+  dietaryInfo: {
+    vegetarian: "boolean",
+    vegan: "boolean",
+    glutenFree: "boolean",
+    dairyFree: "boolean"
+  }
+}
+```
+
+#### User Preferences Model
+```javascript
+{
+  dietaryRestrictions: ["string"],
+  allergies: ["string"],
+  healthGoals: ["string"],
+  cuisinePreferences: ["string"],
+  cookingSkillLevel: "beginner|intermediate|advanced",
+  timePreferences: {
+    maxPrepTime: "number",
+    maxCookTime: "number"
+  }
+}
+```
 
 ## 📊 Data Models
 
@@ -145,6 +409,41 @@ cd lambda/
 - **Products**: Mock Amazon Fresh product catalog
 - **MealPlans**: Generated meal recommendations with scheduling
 - **ShoppingLists**: Aggregated ingredients with product mapping
+
+## 🔌 API Endpoints
+
+### Current Development API (Express.js)
+```
+GET    /api/recipes                    # Get all recipes
+GET    /api/recipes/:id                # Get specific recipe
+POST   /api/recommendations/personalized # Get AI recommendations
+```
+
+### Planned Production API (AWS Lambda)
+```
+# User Management
+POST   /api/users/register             # User registration
+POST   /api/users/login                # User authentication
+GET    /api/users/profile              # Get user profile
+PUT    /api/users/profile              # Update user profile
+
+# Recipe Management
+GET    /api/recipes                    # Get recipes with filters
+GET    /api/recipes/:id                # Get recipe details
+POST   /api/recipes/search             # Search recipes
+
+# Recommendations
+POST   /api/recommendations/generate    # Generate meal plan
+GET    /api/recommendations/history     # Get recommendation history
+
+# Shopping & Cart
+POST   /api/cart/add                   # Add items to cart
+GET    /api/cart                       # Get cart contents
+POST   /api/cart/checkout              # Process checkout
+
+# Voice Commands
+POST   /api/voice/process              # Process voice commands
+```
 
 ## 🎨 Design Principles
 
@@ -168,12 +467,45 @@ cd lambda/
 - **Rapid Development**: Focus on core features and user experience
 - **Demo-Ready**: Optimized for presentation and judging criteria
 
+### Current Limitations
+- **Development Mode**: Uses Express.js server with mock data
+- **Limited AI**: Basic filtering instead of full ML recommendations
+- **No Real Payments**: Checkout flow is simulated
+- **Static Data**: Recipe and product data from JSON files
+
 ### Future Enhancements
 - Real AWS Cognito authentication
 - Actual Amazon Fresh API integration
 - Machine learning model training with user data
 - Multi-language support
 - Advanced voice processing capabilities
+
+### Key Dependencies
+```json
+{
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.19",
+    "@mui/material": "^5.14.20",
+    "@mui/x-date-pickers": "^6.18.2",
+    "axios": "^1.6.2",
+    "date-fns": "^2.30.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "cors": "^2.8.5",
+    "eslint": "^8.54.0",
+    "express": "^5.1.0",
+    "prettier": "^3.1.0"
+  }
+}
+```
 
 ## 📈 Business Impact
 
