@@ -32,7 +32,6 @@ const Cart = () => {
     isEmpty,                    // Add isEmpty check
     increaseQuantity,           // Add quantity controls
     decreaseQuantity,           // Add quantity controls
-    currentRecipe,              // Add current recipe info
     getCartSummary              // Add cart summary
   } = useCart();
   const { user } = useUser();

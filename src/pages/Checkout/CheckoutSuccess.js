@@ -139,16 +139,6 @@ function CheckoutSuccess() {
     processExternalOrder();
   }, []); // Remove dependencies to prevent re-running
 
-  // Auto-redirect after successful API call
-  useEffect(() => {
-    if (apiCallStatus === 'success') {
-      const timer = setTimeout(() => {
-        navigate('/dashboard');
-      }, 10000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [apiCallStatus, navigate]);
 
   const handleContinueShopping = () => {
     navigate('/recipes');

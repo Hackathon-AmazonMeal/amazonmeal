@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -84,6 +85,9 @@ app.post('/api/recommendations/personalized', (req, res) => {
     });
   }, 1500);
 });
+
+// Note: Preference API calls are now made directly from frontend to external service
+// No proxy endpoint needed
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {

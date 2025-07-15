@@ -12,6 +12,7 @@ import {
   Divider,
   Card,
   CardContent,
+  CircularProgress,
 } from '@mui/material';
 import { Restaurant } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -21,7 +22,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, getDemoUsers } = useAuth();
+  const [demoLoading, setDemoLoading] = useState(null);
+  const { signIn, signInWithDemo, getDemoUsers } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -39,9 +41,22 @@ const LoginPage = () => {
     setLoading(false);
   };
 
-  const handleDemoLogin = (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword('demo123');
+  const handleDemoLogin = async (demoEmail) => {
+    try {
+      setError('');
+      setDemoLoading(demoEmail);
+      console.log('Starting demo login for:', demoEmail);
+      
+      const user = await signInWithDemo(demoEmail);
+      console.log('Demo login successful, user:', user);
+      
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Demo login failed:', error);
+      setError(`Demo login failed: ${error.message}`);
+    } finally {
+      setDemoLoading(null);
+    }
   };
 
   const demoUsers = getDemoUsers();

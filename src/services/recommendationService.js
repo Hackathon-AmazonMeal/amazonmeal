@@ -1,10 +1,11 @@
 import { apiClient, API_ENDPOINTS, USE_MOCK_DATA, createApiResponse } from './api';
-import { useProtectedAPI } from '../hooks/useAuthRedirect';
 import { recipeService } from './recipeService';
+import axios from 'axios';
 
 class RecommendationService {
   constructor() {
     this.recipeService = recipeService;
+    this.PREFERENCE_API_URL = 'https://user-ms-iimt.vercel.app/api/preference';
   }
 
   // Check if user is authenticated before making requests
@@ -14,6 +15,37 @@ class RecommendationService {
       throw new Error('User not authenticated');
     }
     return token;
+  }
+
+  // Get personalized recipes from external API based on user preferences
+  async getPersonalizedRecipesFromAPI(userEmail, preferences) {
+    try {
+      const response = await axios.post(this.PREFERENCE_API_URL, {
+        email: userEmail,
+        preferences: {
+          dietType: preferences.dietType,
+          healthGoals: preferences.healthGoals || [],
+          mealType: preferences.mealType,
+          cookingTime: preferences.cookingTime,
+          cookingMethod: preferences.cookingMethod,
+          prepFor: preferences.prepFor || 1,
+          allergies: preferences.allergies || []
+        }
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000 // 10 second timeout
+      });
+
+      return createApiResponse(response.data, true, 'Personalized recipes fetched successfully');
+    } catch (error) {
+      console.error('Error fetching personalized recipes from external API:', error);
+      
+      // If external API fails, fallback to mock recommendations
+      console.log('Falling back to mock recommendations...');
+      return this.getMockPersonalizedRecommendations(preferences);
+    }
   }
 
   // Get personalized recipe recommendations based on user preferences

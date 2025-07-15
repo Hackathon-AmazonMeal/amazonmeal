@@ -9,7 +9,6 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
-  Stack,
 } from '@mui/material';
 import {
   Restaurant,

@@ -14,33 +14,61 @@ class OrderService {
    * @param {string} orderData.customerName - Customer name
    * @param {Array} orderData.items - Cart items
    * @param {number} orderData.totalAmount - Total order amount
+   * @param {string} orderData.recipeImageLink - Recipe image URL (optional)
    * @returns {Promise<Object>} API response
    */
   async processOrder(orderData) {
     try {
+      // Validate order data first
+      const validation = this.validateOrderData(orderData);
+      if (!validation.isValid) {
+        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      }
+
+      // Validate and prepare items
+      const itemValidation = this.validateAndPrepareItems(orderData.items);
+      if (!itemValidation.isValid) {
+        throw new Error(`Item validation failed: ${itemValidation.errors.join(', ')}`);
+      }
+
       // Generate order ID if not provided
       const orderId = orderData.orderId || this.generateOrderId();
       
-      // For multiple items, we'll send the first item as primary product
-      // and include all items in a custom field or description
-      const primaryItem = orderData.items[0];
-      const allItemsDescription = orderData.items
-        .map(item => `${item.name} (${item.quantity} ${item.unit})`)
-        .join(', ');
+      // Default recipe image if not provided
+      const recipeImageLink = orderData.recipeImageLink || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+      
+      let requestPayload;
+      const preparedItems = itemValidation.items;
 
-      const requestPayload = {
-        order_id: orderId,
-        email: orderData.email,
-        product: primaryItem ? primaryItem.name : 'AmazonMeal Order',
-        quantity: orderData.items.reduce((total, item) => total + item.quantity, 0),
-        amount: orderData.totalAmount,
-        customer_name: orderData.customerName,
-        recipe_image_link: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', // Default recipe image
-        // Additional fields for our use case
-        all_items: allItemsDescription,
-        item_count: orderData.items.length,
-        order_type: 'meal_kit'
-      };
+      // Check if we have single or multiple products
+      if (preparedItems.length === 1) {
+        // Single product format
+        const item = preparedItems[0];
+        requestPayload = {
+          order_id: orderId,
+          customer_name: orderData.customerName,
+          email: orderData.email,
+          product: item.name,
+          amount: parseFloat(orderData.totalAmount.toFixed(2)),
+          quantity: item.quantity,
+          recipe_image_link: recipeImageLink
+        };
+      } else {
+        // Multiple products format
+        const products = preparedItems.map(item => ({
+          name: item.name,
+          cost: parseFloat(item.price.toFixed(2)),
+          quantity: item.quantity
+        }));
+
+        requestPayload = {
+          order_id: orderId,
+          customer_name: orderData.customerName,
+          email: orderData.email,
+          recipe_image_link: recipeImageLink,
+          products: products
+        };
+      }
 
       console.log('Processing order with external API:', requestPayload);
 
@@ -87,10 +115,55 @@ class OrderService {
   }
 
   /**
-   * Validate order data before processing
-   * @param {Object} orderData - Order data to validate
-   * @returns {Object} Validation result
+   * Validate and prepare cart items for API payload
+   * @param {Array} items - Cart items to validate
+   * @returns {Object} Validation result with prepared items
    */
+  validateAndPrepareItems(items) {
+    const errors = [];
+    const preparedItems = [];
+
+    if (!Array.isArray(items) || items.length === 0) {
+      errors.push('At least one item is required');
+      return { isValid: false, errors, items: [] };
+    }
+
+    items.forEach((item, index) => {
+      const itemErrors = [];
+
+      // Validate item name
+      if (!item.name || typeof item.name !== 'string' || item.name.trim().length === 0) {
+        itemErrors.push(`Item ${index + 1}: Name is required`);
+      }
+
+      // Validate quantity
+      if (!item.quantity || typeof item.quantity !== 'number' || item.quantity <= 0) {
+        itemErrors.push(`Item ${index + 1}: Valid quantity is required`);
+      }
+
+      // Validate price (use default if not provided)
+      const price = item.price && typeof item.price === 'number' && item.price > 0 
+        ? item.price 
+        : 2.50; // Default price
+
+      if (itemErrors.length === 0) {
+        preparedItems.push({
+          name: item.name.trim(),
+          quantity: item.quantity,
+          price: price,
+          unit: item.unit || 'item'
+        });
+      }
+
+      errors.push(...itemErrors);
+    });
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      items: preparedItems
+    };
+  }
   validateOrderData(orderData) {
     const errors = [];
 

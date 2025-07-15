@@ -32,6 +32,9 @@ import { useRecipes } from '../../contexts/RecipeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
+// Services
+import preferenceService from '../../services/preferenceService';
+
 const steps = [
   'Diet',
   'Health Goal',
@@ -154,59 +157,58 @@ function PreferencesPage() {
       // Log complete preferences object
       console.log('Complete Preferences Object:', preferences);
       
-      // Get userId from logged in user
-      const userId = currentUser?.userId || currentUser?.id;
+      // Get user email for external API
+      const userEmail = preferenceService.getUserEmail(currentUser);
       
-      // Save preferences to backend API (mock for now)
-      try {
-        const response = await fetch('/api/preferences', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          },
-          body: JSON.stringify({
-            userId,
-            preferences,
-          }),
+      // Validate preferences before submission
+      const validation = preferenceService.validatePreferences(preferences);
+      if (!validation.isValid) {
+        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      }
+
+      // Submit preferences directly to external API
+      console.log('🚀 Starting direct external API submission...');
+      console.log('📧 User email:', userEmail);
+      console.log('🍽️ Preferences to submit:', preferences);
+      
+      const externalResult = await preferenceService.submitPreferences(userEmail, preferences);
+      
+      console.log('📥 External API result:', externalResult);
+      
+      if (externalResult.success) {
+        console.log('✅ External preference API call successful:', externalResult.data);
+        
+        // Save preferences locally in context
+        createUser({
+          ...preferences,
+          email: userEmail,
+          externalApiSuccess: true,
+          externalApiData: externalResult.data
         });
 
-        if (response.status === 401) {
-          // User session expired, redirect to login
-          navigate('/login');
-          return;
+        // Get personalized recommendations
+        try {
+          await getRecommendations(preferences);
+        } catch (recError) {
+          if (recError.message === 'User not authenticated') {
+            navigate('/login');
+            return;
+          }
+          throw recError;
         }
 
-        if (!response.ok) {
-          throw new Error('Failed to save preferences');
-        }
+        console.log('🎉 Preferences successfully submitted to external service!');
+        clearError();
 
-        const savedPreferences = await response.json();
-        
-        // Create user with preferences in context
-        createUser(savedPreferences);
-      } catch (fetchError) {
-        // If API call fails, still create user with preferences locally
-        console.warn('API call failed, saving preferences locally:', fetchError);
-        createUser(preferences);
+        // Navigate to recipes page
+        navigate('/recipes');
+      } else {
+        throw new Error('External API returned unsuccessful response');
       }
 
-      // Get personalized recommendations
-      try {
-        await getRecommendations(preferences);
-      } catch (recError) {
-        if (recError.message === 'User not authenticated') {
-          navigate('/login');
-          return;
-        }
-        throw recError;
-      }
-
-      // Navigate to recipes page
-      navigate('/recipes');
     } catch (error) {
-      console.error('Error setting up preferences:', error);
-      setError('Failed to save your preferences. Please try again.');
+      console.error('❌ Error submitting preferences:', error);
+      setError(error.message || 'Failed to submit your preferences to the external service. Please try again.');
     } finally {
       setIsSubmitting(false);
       setLoading(false);
@@ -396,10 +398,10 @@ function PreferencesPage() {
         {isSubmitting && (
           <Box textAlign="center" mt={3}>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Generating your personalized recommendations...
+              🔄 Submitting your preferences to external service...
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              This may take a few moments
+              Connecting directly to preference API to personalize your experience
             </Typography>
           </Box>
         )}
