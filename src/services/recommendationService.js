@@ -1,9 +1,19 @@
 import { apiClient, API_ENDPOINTS, USE_MOCK_DATA, createApiResponse } from './api';
+import { useProtectedAPI } from '../hooks/useAuthRedirect';
 import { recipeService } from './recipeService';
 
 class RecommendationService {
   constructor() {
     this.recipeService = recipeService;
+  }
+
+  // Check if user is authenticated before making requests
+  checkAuth() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+    return token;
   }
 
   // Get personalized recipe recommendations based on user preferences
@@ -13,6 +23,9 @@ class RecommendationService {
     }
 
     try {
+      // Check authentication before making request
+      this.checkAuth();
+      
       const response = await apiClient.post(API_ENDPOINTS.PERSONALIZED_RECOMMENDATIONS, {
         preferences,
         count: 15,
@@ -20,7 +33,13 @@ class RecommendationService {
       return response;
     } catch (error) {
       console.error('Failed to get personalized recommendations:', error);
-      // Fallback to mock recommendations
+      
+      // If authentication error, throw it to be handled by the component
+      if (error.message === 'User not authenticated') {
+        throw error;
+      }
+      
+      // Fallback to mock recommendations for other errors
       return this.getMockPersonalizedRecommendations(preferences);
     }
   }

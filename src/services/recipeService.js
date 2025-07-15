@@ -14,6 +14,15 @@ class RecipeService {
     ];
   }
 
+  // Check if user is authenticated before making requests
+  checkAuth() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+    return token;
+  }
+
   // Get all recipes
   async getAllRecipes() {
     if (USE_MOCK_DATA) {
@@ -23,10 +32,19 @@ class RecipeService {
     }
 
     try {
+      // Check authentication before making request
+      this.checkAuth();
+      
       const response = await apiClient.get(API_ENDPOINTS.RECIPES);
       return response;
     } catch (error) {
       console.error('Failed to fetch recipes:', error);
+      
+      // If authentication error, throw it to be handled by the component
+      if (error.message === 'User not authenticated') {
+        throw error;
+      }
+      
       throw new Error('Failed to load recipes. Please try again.');
     }
   }

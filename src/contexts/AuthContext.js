@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
     setCurrentUser(null);
     setToken(null);
     localStorage.removeItem('authToken');
@@ -149,6 +149,7 @@ export const AuthProvider = ({ children }) => {
     signIn,
     signUp,
     signOut,
+    logout: signOut, // Alias for compatibility
     updateUserPreferences,
     // Helper function to get demo users for login page
     getDemoUsers: () => MOCK_USERS.map(u => ({ email: u.email, username: u.username }))

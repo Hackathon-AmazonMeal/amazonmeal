@@ -27,19 +27,24 @@ import {
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useRecipes } from '../../contexts/RecipeContext';
 import { useCart } from '../../contexts/CartContext';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 function Dashboard() {
   const navigate = useNavigate();
   const { user, getDietaryRestrictions, getHealthGoals, getDietType } = useUserPreferences();
+  useAuthRedirect();
   const { recipes, getRecommendations, findRecipeById } = useRecipes();
   const { addRecipeToCart, error: cartError, clearError } = useCart();
-
   useEffect(() => {
     // Load recommendations if not already loaded
     if (user?.preferences && recipes.length === 0) {
-      getRecommendations(user.preferences);
+      getRecommendations(user.preferences).catch(error => {
+        if (error.message === 'User not authenticated') {
+          navigate('/login');
+        }
+      });
     }
-  }, [user, recipes.length, getRecommendations]);
+  }, [user, recipes.length, getRecommendations, navigate]);
 
   const handleRecipeSelect = (recipe) => {
     // Check if we have a full recipe object with ingredients

@@ -25,6 +25,7 @@ import {
 // Hooks and Context
 import { useRecipes } from '../../contexts/RecipeContext';
 import { useCart } from '../../contexts/CartContext';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 // import { useUserPreferences } from '../../hooks/useUserPreferences'; // Available if needed
 
 // Components
@@ -48,6 +49,9 @@ function RecipesPage() {
   const { addRecipeToCart } = useCart();
   
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  
+  // Ensure user is authenticated
+  useAuthRedirect();
 
   useEffect(() => {
     // Set the first recipe as selected when recipes load
@@ -93,6 +97,11 @@ function RecipesPage() {
   }
 
   if (error) {
+    // Check if error is due to authentication
+    if (error.includes('not authenticated') || error.includes('Session expired')) {
+      return null; // Let the useAuthRedirect hook handle the redirect
+    }
+    
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Alert severity="error" sx={{ mb: 3 }}>
