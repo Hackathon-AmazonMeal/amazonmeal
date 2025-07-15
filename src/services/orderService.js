@@ -35,6 +35,7 @@ class OrderService {
         quantity: orderData.items.reduce((total, item) => total + item.quantity, 0),
         amount: orderData.totalAmount,
         customer_name: orderData.customerName,
+        recipe_image_link: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', // Default recipe image
         // Additional fields for our use case
         all_items: allItemsDescription,
         item_count: orderData.items.length,

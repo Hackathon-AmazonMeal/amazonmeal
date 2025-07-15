@@ -137,6 +137,11 @@ export function RecipeProvider({ children }) {
       }
     },
 
+    // Get recipe by ID from loaded recipes (synchronous)
+    findRecipeById: (id) => {
+      return state.recipes.find(recipe => recipe.id === id) || null;
+    },
+
     // Get recipe by ID
     getRecipeById: async (id) => {
       try {
