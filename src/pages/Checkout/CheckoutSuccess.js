@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -9,16 +9,26 @@ import {
   CardContent,
   Stack,
   Chip,
+  Paper,
+  Divider,
 } from '@mui/material';
 import {
   CheckCircle,
   Restaurant,
   Dashboard,
   ShoppingCart,
+  Receipt,
+  Email,
+  Person,
 } from '@mui/icons-material';
 
 function CheckoutSuccess() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get order data passed from cart
+  const orderData = location.state || {};
+  const { orderId, customerInfo, orderTotal } = orderData;
 
   useEffect(() => {
     // Auto-redirect after 10 seconds
@@ -85,6 +95,70 @@ function CheckoutSuccess() {
             </Typography>
 
             {/* Order Details */}
+            {orderId && (
+              <Paper 
+                sx={{ 
+                  bgcolor: 'primary.50', 
+                  p: 3, 
+                  borderRadius: 2,
+                  mb: 4,
+                  border: '1px solid',
+                  borderColor: 'primary.200',
+                }}
+              >
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Receipt />
+                  Order Details
+                </Typography>
+                <Stack spacing={2}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="body1" color="text.secondary">
+                      Order ID:
+                    </Typography>
+                    <Typography variant="body1" fontWeight="bold">
+                      {orderId}
+                    </Typography>
+                  </Box>
+                  {customerInfo?.name && (
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Person fontSize="small" />
+                        Customer:
+                      </Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {customerInfo.name}
+                      </Typography>
+                    </Box>
+                  )}
+                  {customerInfo?.email && (
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Email fontSize="small" />
+                        Email:
+                      </Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {customerInfo.email}
+                      </Typography>
+                    </Box>
+                  )}
+                  {orderTotal && (
+                    <>
+                      <Divider />
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6" color="primary">
+                          Total Amount:
+                        </Typography>
+                        <Typography variant="h6" color="primary" fontWeight="bold">
+                          ${orderTotal.toFixed(2)}
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                </Stack>
+              </Paper>
+            )}
+
+            {/* What's Next Section */}
             <Box 
               sx={{ 
                 bgcolor: 'success.50', 

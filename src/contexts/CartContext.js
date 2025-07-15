@@ -129,6 +129,7 @@ export function CartProvider({ children }) {
         quantity: 1,
         originalAmount: ingredient.amount,
         originalUnit: ingredient.unit,
+        price: ingredient.price || 2.50, // Default price if not provided
       };
       dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
     },
@@ -189,6 +190,7 @@ export function CartProvider({ children }) {
           originalUnit: ingredient.unit,
           recipeId: recipe.id,
           recipeName: recipe.name,
+          price: ingredient.price || 2.50, // Default price if not provided
         };
         dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
       });
@@ -236,17 +238,24 @@ export function CartProvider({ children }) {
 
     // Get total estimated cost (mock calculation)
     getEstimatedTotal: () => {
-      // Mock pricing calculation
-      const baseCostPerItem = 2.50;
+      // Calculate total based on item prices and quantities
       return state.items.reduce((total, item) => {
-        return total + (baseCostPerItem * item.quantity);
+        const itemPrice = item.price || 2.50; // Default price if not set
+        return total + (itemPrice * item.quantity);
       }, 0);
     },
+  };
+
+  // Add computed properties
+  const computedValues = {
+    cartItems: state.items, // Alias for easier access
+    cartTotal: actions.getEstimatedTotal(), // Total cart value
   };
 
   const value = {
     ...state,
     ...actions,
+    ...computedValues,
   };
 
   return (
