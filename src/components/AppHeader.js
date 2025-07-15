@@ -21,6 +21,7 @@ import {
   ExitToApp
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import Cart from '../pages/Cart';
 
 const AppHeader = () => {
   const { currentUser, logout } = useAuth();
@@ -50,7 +51,7 @@ const AppHeader = () => {
     { label: 'Dashboard', path: '/', icon: <Home /> },
     { label: 'Recipes', path: '/recipes', icon: <Restaurant /> },
     { label: 'Meal Plans', path: '/meal-plans', icon: <Restaurant /> },
-    { label: 'Shopping List', path: '/shopping-list', icon: <ShoppingCart /> }
+    { label: 'Shopping Cart', path: '/cart', icon: <Cart /> }
   ];
 
   // Don't show header on login page
@@ -94,7 +95,7 @@ const AppHeader = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton
               color="inherit"
-              onClick={() => navigate('/shopping-list')}
+              onClick={() => navigate('/cart')}
               sx={{ mr: 1 }}
             >
               <Badge badgeContent={3} color="error">

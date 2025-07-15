@@ -56,6 +56,7 @@ function AppContent() {
         
         {/* Shopping cart page */}
         <Route path="/cart" element={<Cart />} />
+
         
         {/* Dashboard for returning users */}
         <Route path="/dashboard" element={<Dashboard />} />

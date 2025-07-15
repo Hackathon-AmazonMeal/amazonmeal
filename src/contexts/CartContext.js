@@ -171,6 +171,20 @@ export function CartProvider({ children }) {
     },
 
     addRecipeToCart: (recipe) => {
+      // Validate recipe object
+      if (!recipe || !recipe.id) {
+        console.error('Invalid recipe object:', recipe);
+        dispatch({ type: CART_ACTIONS.SET_ERROR, payload: 'Invalid recipe data' });
+        return;
+      }
+
+      // Check if recipe has ingredients
+      if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+        console.error('Recipe missing ingredients array:', recipe);
+        dispatch({ type: CART_ACTIONS.SET_ERROR, payload: 'Recipe ingredients not available' });
+        return;
+      }
+
       // Clear existing items
       dispatch({ type: CART_ACTIONS.CLEAR_CART });
       

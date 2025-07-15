@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Processing Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .loading { opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <h1>🧪 AmazonMeal Order Processing Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Order Processing</h2>
+        <p>This will test the exact same order processing logic used in the React app.</p>
+        <button onclick="testOrderProcessing()">🚀 Test Order Processing</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Mock Cart Data</h2>
+        <pre id="cart-data"></pre>
+    </div>
+
+    <script>
+        // Mock cart data (same structure as React app)
+        const mockCartItems = [
+            { id: 1, name: 'Fresh Tomatoes', quantity: 2, unit: 'lbs', price: 3.99 },
+            { id: 2, name: 'Mozzarella Cheese', quantity: 1, unit: 'package', price: 5.99 },
+            { id: 3, name: 'Fresh Basil', quantity: 1, unit: 'bunch', price: 2.49 }
+        ];
+
+        const mockCustomerInfo = {
+            name: 'Chef Ayush',
+            email: 'homeayush79@gmail.com'
+        };
+
+        // Display mock data
+        document.getElementById('cart-data').textContent = JSON.stringify({
+            cartItems: mockCartItems,
+            customerInfo: mockCustomerInfo,
+            totalAmount: mockCartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+        }, null, 2);
+
+        // Order processing function (same logic as orderService.js)
+        async function processOrder(orderData) {
+            const orderId = `LIVE-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+            
+            const primaryItem = orderData.items[0];
+            const allItemsDescription = orderData.items
+                .map(item => `${item.name} (${item.quantity} ${item.unit})`)
+                .join(', ');
+
+            const requestPayload = {
+                order_id: orderId,
+                email: orderData.email,
+                product: primaryItem ? primaryItem.name : 'AmazonMeal Order',
+                quantity: orderData.items.reduce((total, item) => total + item.quantity, 0),
+                amount: orderData.totalAmount,
+                customer_name: orderData.customerName,
+                all_items: allItemsDescription,
+                item_count: orderData.items.length,
+                order_type: 'meal_kit'
+            };
+
+            console.log('🚀 Processing order:', requestPayload);
+
+            const response = await fetch('https://order-processing-backend.vercel.app/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestPayload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return {
+                success: true,
+                data: result,
+                orderId: orderId
+            };
+        }
+
+        // Test function
+        async function testOrderProcessing() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p class="loading">🔄 Processing order...</p>';
+
+            try {
+                const orderData = {
+                    email: mockCustomerInfo.email,
+                    customerName: mockCustomerInfo.name,
+                    items: mockCartItems,
+                    totalAmount: mockCartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+                };
+
+                console.log('📤 Order data:', orderData);
+
+                const result = await processOrder(orderData);
+
+                if (result.success) {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Order Processed Successfully!</h3>
+                            <p><strong>Order ID:</strong> ${result.orderId}</p>
+                            <p><strong>Status:</strong> ${result.data.status}</p>
+                            <p><strong>Message:</strong> ${result.data.message}</p>
+                            <h4>📋 Full Response:</h4>
+                            <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                        </div>
+                    `;
+                    console.log('✅ Order successful:', result);
+                } else {
+                    throw new Error('Order processing returned unsuccessful result');
+                }
+
+            } catch (error) {
+                console.error('❌ Order failed:', error);
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Order Processing Failed</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Check the browser console for more details.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            console.log('🧪 Order Processing Test Page Loaded');
+            console.log('📋 Mock cart items:', mockCartItems);
+            console.log('👤 Mock customer info:', mockCustomerInfo);
+        });
+    </script>
+</body>
+</html>

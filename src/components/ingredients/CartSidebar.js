@@ -47,8 +47,34 @@ function CartSidebar() {
   const handleCheckout = () => {
     if (isEmpty()) return;
 
+    // Prepare order data for checkout
+    const orderData = {
+      orderId: `AM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      customerInfo: {
+        name: 'Chef Ayush',
+        email: 'homeayush79@gmail.com'
+      },
+      orderTotal: getEstimatedTotal(),
+      items: items.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        amount: item.amount,
+        unit: item.unit,
+        price: item.price || 2.50,
+        originalAmount: item.originalAmount,
+        originalUnit: item.originalUnit,
+      })),
+      totalItems,
+      currentRecipe: currentRecipe ? {
+        id: currentRecipe.id,
+        name: currentRecipe.name,
+      } : null,
+      externalApiCalled: false, // Let CheckoutSuccess handle the API call
+    };
+
     // Add to order history
-    const order = {
+    const historyOrder = {
       recipeId: currentRecipe?.id,
       recipeName: currentRecipe?.name,
       items: items.map(item => ({
@@ -61,9 +87,13 @@ function CartSidebar() {
       estimatedTotal: getEstimatedTotal(),
     };
 
-    addOrderToHistory(order);
+    addOrderToHistory(historyOrder);
     clearCart();
-    navigate('/checkout/success');
+    
+    // Navigate with order data
+    navigate('/checkout/success', { 
+      state: orderData 
+    });
   };
 
   const cartSummary = getCartSummary();

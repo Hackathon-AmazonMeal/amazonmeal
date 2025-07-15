@@ -31,8 +31,8 @@ import { useCart } from '../../contexts/CartContext';
 function Dashboard() {
   const navigate = useNavigate();
   const { user, getDietaryRestrictions, getHealthGoals, getDietType } = useUserPreferences();
-  const { recipes, getRecommendations } = useRecipes();
-  const { addRecipeToCart } = useCart();
+  const { recipes, getRecommendations, findRecipeById } = useRecipes();
+  const { addRecipeToCart, error: cartError, clearError } = useCart();
 
   useEffect(() => {
     // Load recommendations if not already loaded
@@ -42,7 +42,36 @@ function Dashboard() {
   }, [user, recipes.length, getRecommendations]);
 
   const handleRecipeSelect = (recipe) => {
-    addRecipeToCart(recipe);
+    // Check if we have a full recipe object with ingredients
+    if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
+      addRecipeToCart(recipe);
+      navigate('/recipes');
+    } else {
+      // If we only have partial recipe data (from order history), 
+      // try to find the full recipe or navigate to recipe detail
+      const fullRecipe = findRecipeById ? findRecipeById(recipe.id) : null;
+      if (fullRecipe) {
+        addRecipeToCart(fullRecipe);
+        navigate('/recipes');
+      } else {
+        // If we can't find the full recipe, just navigate to recipes page
+        navigate('/recipes');
+      }
+    }
+  };
+
+  const handleOrderSelect = (order) => {
+    // For order history, try to find the full recipe first
+    if (order.recipeId) {
+      const fullRecipe = findRecipeById(order.recipeId);
+      if (fullRecipe) {
+        addRecipeToCart(fullRecipe);
+        navigate('/recipes');
+        return;
+      }
+    }
+    
+    // If we can't find the full recipe, just navigate to recipes page
     navigate('/recipes');
   };
 
@@ -77,6 +106,17 @@ function Dashboard() {
             Here's your personalized recipe dashboard
           </Typography>
         </Box>
+
+        {/* Error Alert */}
+        {cartError && (
+          <Alert 
+            severity="error" 
+            sx={{ mb: 3 }}
+            onClose={clearError}
+          >
+            {cartError}
+          </Alert>
+        )}
 
         <Grid container spacing={4}>
           {/* Left Column */}
@@ -239,7 +279,7 @@ function Dashboard() {
                             bgcolor: 'action.hover',
                           },
                         }}
-                        onClick={() => handleRecipeSelect({ id: order.recipeId, name: order.recipeName })}
+                        onClick={() => handleOrderSelect(order)}
                       >
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <Box>
