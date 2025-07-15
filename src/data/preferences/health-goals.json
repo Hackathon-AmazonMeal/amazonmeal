@@ -1,0 +1,45 @@
+[
+  {
+    "id": "weight-loss",
+    "label": "Weight Loss",
+    "description": "Reduce caloric intake and lose weight",
+    "targetCalories": 1500
+  },
+  {
+    "id": "muscle-gain",
+    "label": "Muscle Gain",
+    "description": "Build muscle mass with high protein",
+    "targetCalories": 2200,
+    "targetProtein": 150
+  },
+  {
+    "id": "maintain-weight",
+    "label": "Maintain Weight",
+    "description": "Maintain current weight and health",
+    "targetCalories": 1800
+  },
+  {
+    "id": "heart-health",
+    "label": "Heart Health",
+    "description": "Improve cardiovascular health",
+    "targetSodium": 1500
+  },
+  {
+    "id": "diabetes-management",
+    "label": "Diabetes Management",
+    "description": "Control blood sugar levels",
+    "targetCarbs": 150
+  },
+  {
+    "id": "energy-boost",
+    "label": "Energy Boost",
+    "description": "Increase energy and vitality",
+    "targetCalories": 2000
+  },
+  {
+    "id": "digestive-health",
+    "label": "Digestive Health",
+    "description": "Improve gut health and digestion",
+    "targetFiber": 35
+  }
+]

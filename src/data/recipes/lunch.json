@@ -1,0 +1,424 @@
+[
+  {
+    "id": "quinoa-bowl",
+    "name": "Mediterranean Quinoa Bowl",
+    "description": "Nutritious quinoa bowl with roasted vegetables and tahini dressing",
+    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400",
+    "prepTime": 15,
+    "cookTime": 25,
+    "servings": 2,
+    "difficulty": "Medium",
+    "cuisine": "Mediterranean",
+    "mealType": "lunch",
+    "nutrition": {
+      "calories": 420,
+      "protein": 16,
+      "carbs": 58,
+      "fat": 16,
+      "fiber": 8,
+      "sodium": 480
+    },
+    "ingredients": [
+      {
+        "name": "Quinoa",
+        "amount": 1,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Chickpeas",
+        "amount": 1,
+        "unit": "can",
+        "category": "legumes"
+      },
+      {
+        "name": "Cucumber",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "amount": 1,
+        "unit": "cup",
+        "category": "produce"
+      },
+      {
+        "name": "Red onion",
+        "amount": 0.25,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Feta cheese",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Tahini",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon juice",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "oils"
+      }
+    ],
+    "instructions": [
+      "Cook quinoa according to package directions and let cool.",
+      "Drain and rinse chickpeas, then roast at 400°F for 20 minutes.",
+      "Dice cucumber, halve cherry tomatoes, and thinly slice red onion.",
+      "Whisk together tahini, lemon juice, olive oil, salt, and pepper.",
+      "Combine quinoa, roasted chickpeas, and vegetables in bowls.",
+      "Top with crumbled feta and drizzle with tahini dressing.",
+      "Serve at room temperature or chilled."
+    ],
+    "tags": ["vegetarian", "high-protein", "mediterranean"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": false,
+      "glutenFree": true,
+      "dairyFree": false,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "chicken-salad",
+    "name": "Grilled Chicken Caesar Salad",
+    "description": "Classic Caesar salad with grilled chicken breast",
+    "image": "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400",
+    "prepTime": 15,
+    "cookTime": 12,
+    "servings": 2,
+    "difficulty": "Medium",
+    "cuisine": "American",
+    "mealType": "lunch",
+    "nutrition": {
+      "calories": 380,
+      "protein": 32,
+      "carbs": 12,
+      "fat": 24,
+      "fiber": 4,
+      "sodium": 680
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "amount": 2,
+        "unit": "pieces",
+        "category": "meat"
+      },
+      {
+        "name": "Romaine lettuce",
+        "amount": 1,
+        "unit": "head",
+        "category": "produce"
+      },
+      {
+        "name": "Parmesan cheese",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Caesar dressing",
+        "amount": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Croutons",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "oils"
+      }
+    ],
+    "instructions": [
+      "Season chicken breasts with salt, pepper, and olive oil.",
+      "Grill chicken for 6 minutes per side until cooked through.",
+      "Let chicken rest for 5 minutes, then slice.",
+      "Wash and chop romaine lettuce.",
+      "Toss lettuce with Caesar dressing.",
+      "Top with sliced chicken, Parmesan, and croutons.",
+      "Serve immediately."
+    ],
+    "tags": ["high-protein", "low-carb", "classic"],
+    "dietaryInfo": {
+      "vegetarian": false,
+      "vegan": false,
+      "glutenFree": false,
+      "dairyFree": false,
+      "keto": true,
+      "paleo": false
+    }
+  },
+  {
+    "id": "veggie-wrap",
+    "name": "Hummus Veggie Wrap",
+    "description": "Fresh vegetables and hummus wrapped in a whole wheat tortilla",
+    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400",
+    "prepTime": 10,
+    "cookTime": 0,
+    "servings": 1,
+    "difficulty": "Easy",
+    "cuisine": "Mediterranean",
+    "mealType": "lunch",
+    "nutrition": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 12,
+      "fiber": 8,
+      "sodium": 580
+    },
+    "ingredients": [
+      {
+        "name": "Whole wheat tortilla",
+        "amount": 1,
+        "unit": "large",
+        "category": "grains"
+      },
+      {
+        "name": "Hummus",
+        "amount": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Cucumber",
+        "amount": 0.5,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Bell pepper",
+        "amount": 0.5,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Carrots",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Spinach",
+        "amount": 1,
+        "unit": "cup",
+        "category": "produce"
+      },
+      {
+        "name": "Red onion",
+        "amount": 2,
+        "unit": "slices",
+        "category": "produce"
+      }
+    ],
+    "instructions": [
+      "Spread hummus evenly over the tortilla.",
+      "Slice cucumber, bell pepper, and carrots into thin strips.",
+      "Layer spinach leaves on the tortilla.",
+      "Add sliced vegetables and red onion.",
+      "Roll tightly, starting from one end.",
+      "Cut in half diagonally and serve.",
+      "Wrap in foil for easy transport."
+    ],
+    "tags": ["vegetarian", "vegan", "high-fiber"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": true,
+      "glutenFree": false,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "salmon-bowl",
+    "name": "Teriyaki Salmon Bowl",
+    "description": "Grilled salmon with brown rice and steamed vegetables",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400",
+    "prepTime": 15,
+    "cookTime": 20,
+    "servings": 2,
+    "difficulty": "Medium",
+    "cuisine": "Asian",
+    "mealType": "lunch",
+    "nutrition": {
+      "calories": 450,
+      "protein": 35,
+      "carbs": 42,
+      "fat": 18,
+      "fiber": 4,
+      "sodium": 720
+    },
+    "ingredients": [
+      {
+        "name": "Salmon fillet",
+        "amount": 2,
+        "unit": "pieces",
+        "category": "fish"
+      },
+      {
+        "name": "Brown rice",
+        "amount": 1,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Broccoli",
+        "amount": 2,
+        "unit": "cups",
+        "category": "produce"
+      },
+      {
+        "name": "Carrots",
+        "amount": 1,
+        "unit": "cup",
+        "category": "produce"
+      },
+      {
+        "name": "Teriyaki sauce",
+        "amount": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame seeds",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "nuts"
+      },
+      {
+        "name": "Green onions",
+        "amount": 2,
+        "unit": "stalks",
+        "category": "produce"
+      }
+    ],
+    "instructions": [
+      "Cook brown rice according to package directions.",
+      "Steam broccoli and carrots until tender-crisp.",
+      "Season salmon with salt and pepper.",
+      "Grill salmon for 4-5 minutes per side.",
+      "Brush salmon with teriyaki sauce during last minute.",
+      "Serve salmon over rice with steamed vegetables.",
+      "Garnish with sesame seeds and sliced green onions."
+    ],
+    "tags": ["high-protein", "omega-3", "asian-inspired"],
+    "dietaryInfo": {
+      "vegetarian": false,
+      "vegan": false,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "lentil-soup",
+    "name": "Mediterranean Lentil Soup",
+    "description": "Hearty lentil soup with vegetables and herbs",
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?w=400",
+    "prepTime": 15,
+    "cookTime": 30,
+    "servings": 4,
+    "difficulty": "Easy",
+    "cuisine": "Mediterranean",
+    "mealType": "lunch",
+    "nutrition": {
+      "calories": 280,
+      "protein": 18,
+      "carbs": 45,
+      "fat": 6,
+      "fiber": 16,
+      "sodium": 520
+    },
+    "ingredients": [
+      {
+        "name": "Red lentils",
+        "amount": 1,
+        "unit": "cup",
+        "category": "legumes"
+      },
+      {
+        "name": "Vegetable broth",
+        "amount": 4,
+        "unit": "cups",
+        "category": "condiments"
+      },
+      {
+        "name": "Onion",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Carrots",
+        "amount": 2,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Celery",
+        "amount": 2,
+        "unit": "stalks",
+        "category": "produce"
+      },
+      {
+        "name": "Garlic",
+        "amount": 3,
+        "unit": "cloves",
+        "category": "produce"
+      },
+      {
+        "name": "Diced tomatoes",
+        "amount": 1,
+        "unit": "can",
+        "category": "canned"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "oils"
+      }
+    ],
+    "instructions": [
+      "Heat olive oil in a large pot over medium heat.",
+      "Sauté diced onion, carrots, and celery for 5 minutes.",
+      "Add minced garlic and cook for 1 minute.",
+      "Add lentils, broth, and diced tomatoes.",
+      "Bring to a boil, then reduce heat and simmer for 25 minutes.",
+      "Season with salt, pepper, and herbs.",
+      "Serve hot with crusty bread if desired."
+    ],
+    "tags": ["vegetarian", "vegan", "high-fiber", "protein-rich"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": true,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  }
+]

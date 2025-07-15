@@ -1,0 +1,42 @@
+[
+  {
+    "id": "vegetarian",
+    "label": "Vegetarian",
+    "description": "No meat, poultry, or fish"
+  },
+  {
+    "id": "vegan",
+    "label": "Vegan",
+    "description": "No animal products"
+  },
+  {
+    "id": "gluten-free",
+    "label": "Gluten-Free",
+    "description": "No wheat, barley, rye, or gluten"
+  },
+  {
+    "id": "dairy-free",
+    "label": "Dairy-Free",
+    "description": "No milk, cheese, or dairy products"
+  },
+  {
+    "id": "keto",
+    "label": "Ketogenic",
+    "description": "Very low carb, high fat"
+  },
+  {
+    "id": "paleo",
+    "label": "Paleo",
+    "description": "No grains, legumes, or processed foods"
+  },
+  {
+    "id": "low-sodium",
+    "label": "Low Sodium",
+    "description": "Reduced salt content"
+  },
+  {
+    "id": "low-carb",
+    "label": "Low Carb",
+    "description": "Reduced carbohydrate content"
+  }
+]

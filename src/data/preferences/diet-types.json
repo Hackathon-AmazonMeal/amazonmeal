@@ -1,0 +1,52 @@
+[
+  {
+    "id": "balanced",
+    "label": "Balanced",
+    "description": "Well-rounded nutrition with all food groups",
+    "macros": {
+      "carbs": 45,
+      "protein": 25,
+      "fat": 30
+    }
+  },
+  {
+    "id": "high-protein",
+    "label": "High Protein",
+    "description": "Emphasis on protein-rich foods",
+    "macros": {
+      "carbs": 30,
+      "protein": 40,
+      "fat": 30
+    }
+  },
+  {
+    "id": "low-carb",
+    "label": "Low Carb",
+    "description": "Reduced carbohydrate intake",
+    "macros": {
+      "carbs": 20,
+      "protein": 35,
+      "fat": 45
+    }
+  },
+  {
+    "id": "mediterranean",
+    "label": "Mediterranean",
+    "description": "Mediterranean-style eating pattern",
+    "macros": {
+      "carbs": 40,
+      "protein": 20,
+      "fat": 40
+    }
+  },
+  {
+    "id": "plant-based",
+    "label": "Plant-Based",
+    "description": "Focus on plant foods",
+    "macros": {
+      "carbs": 55,
+      "protein": 15,
+      "fat": 30
+    }
+  }
+]

@@ -1,127 +1,123 @@
-# AmazonMeal - Project Structure
+# Recipe Recommendation Platform - Project Structure
 
-Based on the Pippin design documents, here's the recommended project structure:
-
+## Frontend Structure (src/)
 ```
-AmazonMeal/
-├── README.md                          # Updated project overview
-├── design-docs/                       # Design documentation from Pippin
-│   ├── api_specification.md
-│   ├── component_diagram.md
-│   ├── genai_codegen_guide.md
-│   ├── high_level_design.md
-│   ├── implementation_plan.md
-│   ├── low_level_design.md
-│   ├── requirements_spec.md
-│   └── sequence_diagram.md
-├── src/                               # Frontend React application
-│   ├── components/                    # Reusable UI components
-│   │   ├── AppHeader.js
-│   │   ├── AppFooter.js
-│   │   ├── VoiceInterface.js
-│   │   ├── MealPlanCalendar.js
-│   │   ├── MealPlanSummary.js
-│   │   ├── RecommendedRecipes.js
-│   │   ├── ShoppingListSummary.js
+src/
+├── components/           # Reusable UI components
+│   ├── common/          # Generic components (buttons, inputs, etc.)
+│   │   ├── Button.js
+│   │   ├── Input.js
+│   │   ├── LoadingSpinner.js
+│   │   └── SuccessModal.js
+│   ├── layout/          # Layout components (header, footer, sidebar)
+│   │   ├── Header.js
+│   │   ├── Sidebar.js
+│   │   └── Layout.js
+│   ├── preferences/     # Preference-related components
+│   │   ├── DietaryRestrictions.js
+│   │   ├── AllergySelector.js
+│   │   ├── HealthGoals.js
+│   │   └── DietTypeSelector.js
+│   ├── recipes/         # Recipe-related components
 │   │   ├── RecipeCard.js
-│   │   └── NutritionSummary.js
-│   ├── pages/                         # Main application pages
-│   │   ├── Login.js
-│   │   ├── Dashboard.js
-│   │   ├── Profile.js
-│   │   ├── RecipeBrowser.js
-│   │   ├── RecipeDetail.js
-│   │   ├── MealPlanCreator.js
-│   │   └── ShoppingList.js
-│   ├── contexts/                      # React contexts
-│   │   ├── AuthContext.js
-│   │   └── AppContext.js
-│   ├── hooks/                         # Custom React hooks
-│   │   ├── useMealPlans.js
-│   │   ├── useShoppingList.js
-│   │   └── useRecommendations.js
-│   ├── services/                      # API service functions
-│   │   ├── api.js                     # Main API client
-│   │   ├── authService.js
-│   │   ├── recipeService.js
-│   │   ├── recommendationService.js
-│   │   └── shoppingService.js
-│   ├── utils/                         # Utility functions
-│   │   ├── constants.js
-│   │   ├── helpers.js
-│   │   └── mockData.js
-│   ├── styles/                        # CSS/SCSS files
-│   │   ├── globals.css
-│   │   ├── components.css
-│   │   └── pages.css
-│   └── App.js                         # Main application component
-├── lambda/                            # AWS Lambda functions
-│   ├── userProfileService/
-│   │   ├── index.js
-│   │   ├── handler.js
-│   │   └── package.json
-│   ├── recipeService/
-│   │   ├── index.js
-│   │   ├── handler.js
-│   │   └── package.json
-│   ├── recommendationService/
-│   │   ├── index.js
-│   │   ├── handler.js
-│   │   └── package.json
-│   ├── shoppingService/
-│   │   ├── index.js
-│   │   ├── handler.js
-│   │   └── package.json
-│   └── voiceService/
-│       ├── index.js
-│       ├── handler.js
-│       └── package.json
-├── data/                              # Mock data and seed files
-│   ├── recipes.json
-│   ├── products.json
-│   ├── users.json
-│   └── seedData.js
-├── infrastructure/                    # AWS infrastructure code
-│   ├── dynamodb-tables.json
-│   ├── api-gateway-config.json
-│   └── lambda-deployment.json
-├── tests/                            # Test files
-│   ├── components/
-│   ├── services/
-│   └── integration/
-├── docs/                             # Additional documentation
-│   ├── api-documentation.md
-│   ├── deployment-guide.md
-│   └── demo-scenarios.md
-├── package.json                      # Frontend dependencies
-├── package-lock.json
-└── .gitignore
+│   │   ├── RecipeCarousel.js
+│   │   ├── RecipeInstructions.js
+│   │   └── RecipeNavigation.js
+│   ├── ingredients/     # Ingredient-related components
+│   │   ├── IngredientList.js
+│   │   ├── IngredientItem.js
+│   │   ├── QuantityAdjuster.js
+│   │   └── CartSidebar.js
+│   └── history/         # User history components
+│       ├── OrderHistory.js
+│       ├── SavedPreferences.js
+│       └── QuickSelect.js
+├── pages/               # Main application pages
+│   ├── Welcome/         # Landing page for new users
+│   │   └── Welcome.js
+│   ├── Preferences/     # User preference setup
+│   │   └── PreferencesPage.js
+│   ├── Recipes/         # Recipe display and interaction
+│   │   └── RecipesPage.js
+│   ├── Dashboard/       # Returning user dashboard
+│   │   └── Dashboard.js
+│   └── Checkout/        # Checkout success page
+│       └── CheckoutSuccess.js
+├── contexts/            # React contexts for state management
+│   ├── UserContext.js   # User preferences and profile
+│   ├── RecipeContext.js # Recipe data and state
+│   └── CartContext.js   # Shopping cart state
+├── hooks/               # Custom React hooks
+│   ├── useUserPreferences.js # User preference management
+│   ├── useRecipes.js    # Recipe data fetching
+│   ├── useCart.js       # Cart management
+│   └── useLocalStorage.js # Local storage persistence
+├── services/            # API service functions
+│   ├── api.js          # Base API configuration
+│   ├── userService.js  # User management API calls
+│   ├── recipeService.js # Recipe-related API calls
+│   ├── recommendationService.js # AI recommendation API
+│   └── cartService.js  # Cart and checkout API calls
+├── utils/               # Utility functions and helpers
+│   ├── constants.js    # Application constants
+│   ├── helpers.js      # General helper functions
+│   ├── validators.js   # Form validation utilities
+│   └── recipeUtils.js  # Recipe-specific utilities
+└── styles/              # Global styles and themes
+    ├── theme.js        # Material UI theme configuration
+    ├── globals.css     # Global CSS styles
+    └── components.css  # Component-specific styles
 ```
 
-## Key Components Overview
+## Backend Structure (lambda/)
+```
+lambda/
+├── userService/            # User management and preferences
+│   ├── handler.js         # User CRUD operations
+│   ├── preferencesHandler.js # Preference management
+│   └── package.json       # Dependencies
+├── recipeService/          # Recipe data and management
+│   ├── handler.js         # Recipe CRUD operations
+│   ├── searchHandler.js   # Recipe search and filtering
+│   └── package.json       # Dependencies
+├── recommendationService/  # AI-powered recipe recommendations
+│   ├── handler.js         # Recommendation logic
+│   ├── aiService.js       # LLM integration for personalization
+│   ├── personalizationEngine.js # Preference-based filtering
+│   └── package.json       # Dependencies
+├── cartService/            # Shopping cart and order management
+│   ├── handler.js         # Cart operations
+│   ├── orderHandler.js    # Order history management
+│   └── package.json       # Dependencies
+└── shared/                 # Shared utilities across services
+    ├── database.js        # Database connection utilities
+    ├── auth.js            # Authentication helpers
+    └── constants.js       # Shared constants
+```
 
-### Frontend Architecture
-- **React 18** with Material UI 5 for modern, responsive design
-- **React Router 6** for navigation
-- **Context API** for state management
-- **Custom hooks** for data fetching and business logic
+## Data Structure (data/)
+```
+data/
+├── recipes/               # Recipe database
+│   ├── breakfast.json    # Breakfast recipes with nutrition info
+│   ├── lunch.json        # Lunch recipes with nutrition info
+│   ├── dinner.json       # Dinner recipes with nutrition info
+│   ├── snacks.json       # Snack recipes with nutrition info
+│   └── ingredients.json  # Ingredient database with nutritional data
+├── preferences/           # User preference templates
+│   ├── dietary-restrictions.json # Available dietary restrictions
+│   ├── allergies.json    # Common allergies list
+│   ├── health-goals.json # Available health goals
+│   └── diet-types.json   # Diet type options
+└── users/                 # Sample user data
+    ├── profiles.json     # User profile examples
+    └── order-history.json # Sample order history
+```
 
-### Backend Architecture
-- **AWS Lambda** functions for serverless compute
-- **Amazon API Gateway** for REST API endpoints
-- **Amazon DynamoDB** for data storage
-- **Amazon Bedrock** for AI/ML capabilities
-
-### Data Models
-- **Users**: Profile and preferences
-- **Recipes**: Ingredients, instructions, nutrition
-- **Products**: Mock Amazon Fresh catalog
-- **MealPlans**: Generated meal recommendations
-- **ShoppingLists**: Ingredient aggregation
-
-### Key Features
-1. **AI-Powered Recommendations**: Personalized meal suggestions
-2. **Voice Interface**: Voice commands for meal planning
-3. **Shopping Integration**: One-click shopping list generation
-4. **Nutrition Analysis**: Dietary goal tracking
-5. **Responsive Design**: Mobile and desktop optimized
+## Key Features Implementation
+- **First-Time User Flow**: Comprehensive preference collection with LLM integration
+- **Recipe Display**: 3-recipe carousel with detailed instructions and ingredient sidebar
+- **Returning User Flow**: Dashboard with order history and preference editing
+- **Cart Management**: Interactive ingredient quantities with checkout flow
+- **Personalization**: AI-driven recipe recommendations based on user preferences
+- **State Management**: Efficient React context and local storage integration
