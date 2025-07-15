@@ -8,23 +8,31 @@ import {
   Box,
   IconButton,
   Badge,
+  Menu,
+  MenuItem,
+  Avatar,
 } from '@mui/material';
 import {
   Restaurant,
   ShoppingCart,
   Dashboard,
   Settings,
+  ExitToApp,
+  AccountCircle,
 } from '@mui/icons-material';
 
 // Hooks
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isNewUser } = useUserPreferences();
   const { totalItems } = useCart();
+  const { currentUser, signOut } = useAuth();
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -34,8 +42,31 @@ function Header() {
     return location.pathname === path;
   };
 
-  // Don't show header on welcome page
-  if (location.pathname === '/welcome') {
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+    handleClose();
+  };
+
+  // Don't show header on welcome and login pages
+  if (location.pathname === '/welcome' || location.pathname === '/login') {
+    return null;
+  }
+
+  // If user is not logged in, don't show header
+  if (!currentUser) {
     return null;
   }
 
@@ -138,16 +169,47 @@ function Header() {
               </Badge>
             </IconButton>
 
-            {/* Settings */}
+            {/* User Menu */}
             <IconButton
-              onClick={() => handleNavigation('/preferences')}
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
               sx={{
                 color: 'text.primary',
                 ml: 1,
               }}
             >
-              <Settings />
+              <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                {currentUser.username ? currentUser.username.charAt(0).toUpperCase() : <AccountCircle />}
+              </Avatar>
             </IconButton>
+            
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={() => { handleNavigation('/preferences'); handleClose(); }}>
+                <Settings sx={{ mr: 1 }} />
+                Preferences
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <ExitToApp sx={{ mr: 1 }} />
+                Logout
+              </MenuItem>
+            </Menu>
           </Box>
         )}
 

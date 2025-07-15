@@ -18,41 +18,61 @@ import {
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 
 // Components
-import DietaryRestrictions from '../../components/preferences/DietaryRestrictions';
-import AllergySelector from '../../components/preferences/AllergySelector';
-import HealthGoals from '../../components/preferences/HealthGoals';
 import DietTypeSelector from '../../components/preferences/DietTypeSelector';
+import HealthGoals from '../../components/preferences/HealthGoals';
+import MealTypeSelector from '../../components/preferences/MealTypeSelector';
+import CookingTimeToggle from '../../components/preferences/CookingTimeToggle';
+import CookingMethodSelector from '../../components/preferences/CookingMethodSelector';
+import PrepForSelector from '../../components/preferences/PrepForSelector';
+import AllergySelector from '../../components/preferences/AllergySelector';
 
 // Hooks and Context
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useRecipes } from '../../contexts/RecipeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 const steps = [
-  'Dietary Restrictions',
+  'Diet',
+  'Health Goal',
+  'Meal Type',
+  'Cooking Time',
+  'Cooking Method',
+  'Prep for',
   'Allergies',
-  'Health Goals',
-  'Diet Type',
 ];
 
 function PreferencesPage() {
   const navigate = useNavigate();
   const { createUser, setLoading, setError, clearError } = useUserPreferences();
   const { getRecommendations } = useRecipes();
+  const { currentUser } = useAuth();
+  
+  // Ensure user is authenticated
+  useAuthRedirect();
 
   const [activeStep, setActiveStep] = useState(0);
   const [preferences, setPreferences] = useState({
-    dietaryRestrictions: [],
-    allergies: [],
+    dietType: 'vegetarian',
     healthGoals: [],
-    dietType: 'balanced',
+    mealType: 'dinner',
+    cookingTime: 'medium',
+    cookingMethod: 'stovetop',
+    prepFor: 1,
+    allergies: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Clear any existing errors when component mounts
+  // Clear any existing errors when component mounts and check auth
   useEffect(() => {
     clearError();
-  }, [clearError]);
+    
+    // If user is not authenticated, redirect to login
+    if (!currentUser) {
+      navigate('/login');
+    }
+  }, [clearError, currentUser, navigate]);
 
   const handleNext = () => {
     // Validate current step
@@ -80,19 +100,37 @@ function PreferencesPage() {
     const stepErrors = {};
 
     switch (step) {
-      case 0: // Dietary Restrictions - optional
+      case 0: // Diet Type
+        if (!preferences.dietType) {
+          stepErrors.dietType = 'Please select a diet type';
+        }
         break;
-      case 1: // Allergies - optional
-        break;
-      case 2: // Health Goals
+      case 1: // Health Goals
         if (preferences.healthGoals.length === 0) {
           stepErrors.healthGoals = 'Please select at least one health goal';
         }
         break;
-      case 3: // Diet Type
-        if (!preferences.dietType) {
-          stepErrors.dietType = 'Please select a diet type';
+      case 2: // Meal Type
+        if (!preferences.mealType) {
+          stepErrors.mealType = 'Please select a meal type';
         }
+        break;
+      case 3: // Cooking Time
+        if (!preferences.cookingTime) {
+          stepErrors.cookingTime = 'Please select a cooking time';
+        }
+        break;
+      case 4: // Cooking Method
+        if (!preferences.cookingMethod) {
+          stepErrors.cookingMethod = 'Please select a cooking method';
+        }
+        break;
+      case 5: // Prep For
+        if (!preferences.prepFor) {
+          stepErrors.prepFor = 'Please select who you are cooking for';
+        }
+        break;
+      case 6: // Allergies - optional
         break;
       default:
         break;
@@ -107,17 +145,68 @@ function PreferencesPage() {
       setLoading(true);
       clearError();
 
-      // Create user with preferences
-      createUser(preferences);
+      // Check if user is still authenticated
+      if (!currentUser) {
+        navigate('/login');
+        return;
+      }
+
+      // Log complete preferences object
+      console.log('Complete Preferences Object:', preferences);
+      
+      // Get userId from logged in user
+      const userId = currentUser?.userId || currentUser?.id;
+      
+      // Save preferences to backend API (mock for now)
+      try {
+        const response = await fetch('/api/preferences', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          },
+          body: JSON.stringify({
+            userId,
+            preferences,
+          }),
+        });
+
+        if (response.status === 401) {
+          // User session expired, redirect to login
+          navigate('/login');
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to save preferences');
+        }
+
+        const savedPreferences = await response.json();
+        
+        // Create user with preferences in context
+        createUser(savedPreferences);
+      } catch (fetchError) {
+        // If API call fails, still create user with preferences locally
+        console.warn('API call failed, saving preferences locally:', fetchError);
+        createUser(preferences);
+      }
 
       // Get personalized recommendations
-      await getRecommendations(preferences);
+      try {
+        await getRecommendations(preferences);
+      } catch (recError) {
+        if (recError.message === 'User not authenticated') {
+          navigate('/login');
+          return;
+        }
+        throw recError;
+      }
 
       // Navigate to recipes page
       navigate('/recipes');
     } catch (error) {
       console.error('Error setting up preferences:', error);
-      setError('Failed to set up your preferences. Please try again.');
+      setError('Failed to save your preferences. Please try again.');
     } finally {
       setIsSubmitting(false);
       setLoading(false);
@@ -144,21 +233,13 @@ function PreferencesPage() {
     switch (step) {
       case 0:
         return (
-          <DietaryRestrictions
-            selected={preferences.dietaryRestrictions}
-            onChange={(value) => updatePreferences('dietaryRestrictions', value)}
-            error={errors.dietaryRestrictions}
+          <DietTypeSelector
+            selected={preferences.dietType}
+            onChange={(value) => updatePreferences('dietType', value)}
+            error={errors.dietType}
           />
         );
       case 1:
-        return (
-          <AllergySelector
-            selected={preferences.allergies}
-            onChange={(value) => updatePreferences('allergies', value)}
-            error={errors.allergies}
-          />
-        );
-      case 2:
         return (
           <HealthGoals
             selected={preferences.healthGoals}
@@ -166,12 +247,44 @@ function PreferencesPage() {
             error={errors.healthGoals}
           />
         );
+      case 2:
+        return (
+          <MealTypeSelector
+            selected={preferences.mealType}
+            onChange={(value) => updatePreferences('mealType', value)}
+            error={errors.mealType}
+          />
+        );
       case 3:
         return (
-          <DietTypeSelector
-            selected={preferences.dietType}
-            onChange={(value) => updatePreferences('dietType', value)}
-            error={errors.dietType}
+          <CookingTimeToggle
+            selected={preferences.cookingTime}
+            onChange={(value) => updatePreferences('cookingTime', value)}
+            error={errors.cookingTime}
+          />
+        );
+      case 4:
+        return (
+          <CookingMethodSelector
+            selected={preferences.cookingMethod}
+            onChange={(value) => updatePreferences('cookingMethod', value)}
+            error={errors.cookingMethod}
+          />
+        );
+      case 5:
+        return (
+          <PrepForSelector
+            selected={preferences.prepFor}
+            onChange={(value) => updatePreferences('prepFor', value)}
+            error={errors.prepFor}
+          />
+        );
+      case 6:
+        return (
+          <AllergySelector
+            selected={preferences.allergies}
+            onChange={(value) => updatePreferences('allergies', value)}
+            error={errors.allergies}
           />
         );
       default:
