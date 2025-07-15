@@ -25,6 +25,7 @@ import {
   Warning,
 } from '@mui/icons-material';
 import orderService from '../../services/orderService';
+import { cartService } from '../../services/cartService';
 
 function CheckoutSuccess() {
   const navigate = useNavigate();
@@ -114,6 +115,17 @@ function CheckoutSuccess() {
           setApiCallStatus('success');
           setExternalOrderId(result.orderId);
           console.log('External order processed successfully:', result);
+          
+          // Process order after successful fulfillment
+          try {
+            console.log('Processing order fulfillment for order ID:', orderId);
+            await cartService.processOrder(orderId);
+            console.log('Order fulfillment processing completed successfully');
+          } catch (processError) {
+            console.error('Failed to process order fulfillment:', processError);
+            // Don't fail the entire flow if processing fails
+            // The order was still successful, just log the error
+          }
         } else {
           throw new Error('External order processing failed');
         }

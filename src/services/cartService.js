@@ -103,6 +103,29 @@ class CartService {
     }
   }
 
+  // Process order after successful fulfillment
+  async processOrder(orderId) {
+    try {
+      const response = await fetch(`https://order-processing-backend.vercel.app/orders/${orderId}/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Order processing failed: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Order processed successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('Failed to process order:', error);
+      throw new Error('Failed to process order. Please try again.');
+    }
+  }
+
   // Calculate shipping cost
   calculateShipping(items, location = 'default') {
     // Mock shipping calculation
