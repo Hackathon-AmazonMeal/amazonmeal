@@ -1,46 +1,97 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('build'));
 
-// Mock API endpoints
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'AmazonMeal API is running' });
-});
+// Mock data
+const breakfastRecipes = require('./data/recipes/breakfast.json');
+const lunchRecipes = require('./data/recipes/lunch.json');
+const dinnerRecipes = require('./data/recipes/dinner.json');
 
+const allRecipes = [...breakfastRecipes, ...lunchRecipes, ...dinnerRecipes];
+
+// API Routes
 app.get('/api/recipes', (req, res) => {
   res.json({
-    recipes: [
-      { id: 1, name: 'Grilled Chicken Salad', cuisine: 'American', cookTime: 20 },
-      { id: 2, name: 'Pasta Carbonara', cuisine: 'Italian', cookTime: 25 },
-      { id: 3, name: 'Salmon Teriyaki', cuisine: 'Japanese', cookTime: 30 }
-    ]
+    success: true,
+    data: allRecipes,
+    message: 'Recipes fetched successfully',
+    timestamp: new Date().toISOString(),
   });
 });
 
-app.get('/api/meal-plans', (req, res) => {
+app.get('/api/recipes/:id', (req, res) => {
+  const recipe = allRecipes.find(r => r.id === req.params.id);
+  if (!recipe) {
+    return res.status(404).json({
+      success: false,
+      message: 'Recipe not found',
+      timestamp: new Date().toISOString(),
+    });
+  }
+  
   res.json({
-    mealPlan: [
-      { day: 'Monday', breakfast: 'Oatmeal', lunch: 'Salad', dinner: 'Pasta' },
-      { day: 'Tuesday', breakfast: 'Toast', lunch: 'Soup', dinner: 'Chicken' }
-    ]
+    success: true,
+    data: recipe,
+    message: 'Recipe fetched successfully',
+    timestamp: new Date().toISOString(),
   });
 });
 
-app.get('/api/shopping-list', (req, res) => {
-  res.json({
-    items: [
-      { id: 1, name: 'Chicken Breast', quantity: '2 lbs', checked: false },
-      { id: 2, name: 'Mixed Greens', quantity: '1 bag', checked: false },
-      { id: 3, name: 'Olive Oil', quantity: '1 bottle', checked: true }
-    ]
-  });
+app.post('/api/recommendations/personalized', (req, res) => {
+  // Simulate AI processing delay
+  setTimeout(() => {
+    // Simple filtering based on preferences
+    let filteredRecipes = allRecipes;
+    
+    const { preferences } = req.body;
+    
+    // Apply dietary restrictions
+    if (preferences.dietaryRestrictions && preferences.dietaryRestrictions.length > 0) {
+      filteredRecipes = filteredRecipes.filter(recipe => {
+        return preferences.dietaryRestrictions.every(restriction => {
+          switch (restriction) {
+            case 'vegetarian':
+              return recipe.dietaryInfo.vegetarian;
+            case 'vegan':
+              return recipe.dietaryInfo.vegan;
+            case 'gluten-free':
+              return recipe.dietaryInfo.glutenFree;
+            case 'dairy-free':
+              return recipe.dietaryInfo.dairyFree;
+            default:
+              return true;
+          }
+        });
+      });
+    }
+    
+    // Take first 15 recipes
+    const recommendations = filteredRecipes.slice(0, 15);
+    
+    res.json({
+      success: true,
+      data: recommendations,
+      message: 'Personalized recommendations generated successfully',
+      timestamp: new Date().toISOString(),
+    });
+  }, 1500);
+});
+
+// Serve React app for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 AmazonMeal API server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📱 Frontend: http://localhost:3000`);
+  console.log(`🔧 API: http://localhost:${PORT}/api`);
 });

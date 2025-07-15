@@ -1,86 +1,78 @@
-// App.js - Main application component
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import RecipeBrowser from './pages/RecipeBrowser';
-import RecipeDetail from './pages/RecipeDetail';
-import MealPlanCreator from './pages/MealPlanCreator';
-import ShoppingList from './pages/ShoppingList';
-import AppHeader from './components/AppHeader';
-import AppFooter from './components/AppFooter';
+import { Box } from '@mui/material';
 
-// Material UI theme configuration
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#FF9900', // Amazon orange
-    },
-    secondary: {
-      main: '#232F3E', // Amazon dark blue
-    },
-    background: {
-      default: '#F7F7F7',
-    },
-  },
-  typography: {
-    fontFamily: '"Amazon Ember", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  },
-});
+// Context Providers
+import { UserProvider } from './contexts/UserContext';
+import { RecipeProvider } from './contexts/RecipeContext';
+import { CartProvider } from './contexts/CartContext';
 
-// Private route component
-const PrivateRoute = ({ children }) => {
-  const { currentUser } = useAuth();
-  return currentUser ? children : <Navigate to="/login" replace />;
-};
+// Pages
+import Welcome from './pages/Welcome/Welcome';
+import PreferencesPage from './pages/Preferences/PreferencesPage';
+import RecipesPage from './pages/Recipes/RecipesPage';
+import Dashboard from './pages/Dashboard/Dashboard';
+import CheckoutSuccess from './pages/Checkout/CheckoutSuccess';
+
+// Components
+import Layout from './components/layout/Layout';
+
+// Theme
+import theme from './styles/theme';
+
+// Custom hook for user state
+import { useUserPreferences } from './hooks/useUserPreferences';
 
 function AppContent() {
+  const { user, isLoading } = useUserPreferences();
+
+  if (isLoading) {
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+      >
+        Loading...
+      </Box>
+    );
+  }
+
   return (
-    <Router>
-      <div className="app-container">
-        <AppHeader />
-        <main className="main-content">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } />
-            <Route path="/profile" element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            } />
-            <Route path="/recipes" element={
-              <PrivateRoute>
-                <RecipeBrowser />
-              </PrivateRoute>
-            } />
-            <Route path="/recipe/:recipeId" element={
-              <PrivateRoute>
-                <RecipeDetail />
-              </PrivateRoute>
-            } />
-            <Route path="/meal-plans" element={
-              <PrivateRoute>
-                <MealPlanCreator />
-              </PrivateRoute>
-            } />
-            <Route path="/shopping-list" element={
-              <PrivateRoute>
-                <ShoppingList />
-              </PrivateRoute>
-            } />
-          </Routes>
-        </main>
-        <AppFooter />
-      </div>
-    </Router>
+    <Layout>
+      <Routes>
+        {/* Welcome route for new users */}
+        <Route path="/welcome" element={<Welcome />} />
+        
+        {/* Preferences setup route */}
+        <Route path="/preferences" element={<PreferencesPage />} />
+        
+        {/* Main recipes page */}
+        <Route path="/recipes" element={<RecipesPage />} />
+        
+        {/* Dashboard for returning users */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* Checkout success page */}
+        <Route path="/checkout/success" element={<CheckoutSuccess />} />
+        
+        {/* Default route logic */}
+        <Route 
+          path="/" 
+          element={
+            user && user.preferences ? 
+              <Navigate to="/dashboard" replace /> : 
+              <Navigate to="/welcome" replace />
+          } 
+        />
+        
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   );
 }
 
@@ -88,9 +80,15 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <UserProvider>
+        <RecipeProvider>
+          <CartProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </CartProvider>
+        </RecipeProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 }

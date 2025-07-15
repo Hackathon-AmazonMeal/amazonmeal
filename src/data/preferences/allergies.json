@@ -1,0 +1,47 @@
+[
+  {
+    "id": "nuts",
+    "label": "Tree Nuts",
+    "description": "Almonds, walnuts, cashews, etc."
+  },
+  {
+    "id": "peanuts",
+    "label": "Peanuts",
+    "description": "Peanuts and peanut products"
+  },
+  {
+    "id": "dairy",
+    "label": "Dairy",
+    "description": "Milk, cheese, yogurt, butter"
+  },
+  {
+    "id": "eggs",
+    "label": "Eggs",
+    "description": "Chicken eggs and egg products"
+  },
+  {
+    "id": "soy",
+    "label": "Soy",
+    "description": "Soybeans and soy products"
+  },
+  {
+    "id": "shellfish",
+    "label": "Shellfish",
+    "description": "Shrimp, crab, lobster, etc."
+  },
+  {
+    "id": "fish",
+    "label": "Fish",
+    "description": "All types of fish"
+  },
+  {
+    "id": "wheat",
+    "label": "Wheat",
+    "description": "Wheat and wheat products"
+  },
+  {
+    "id": "sesame",
+    "label": "Sesame",
+    "description": "Sesame seeds and tahini"
+  }
+]

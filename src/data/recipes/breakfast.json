@@ -1,0 +1,370 @@
+[
+  {
+    "id": "avocado-toast",
+    "name": "Avocado Toast with Poached Egg",
+    "description": "Creamy avocado on whole grain toast topped with a perfectly poached egg",
+    "image": "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400",
+    "prepTime": 10,
+    "cookTime": 5,
+    "servings": 1,
+    "difficulty": "Easy",
+    "cuisine": "American",
+    "mealType": "breakfast",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 18,
+      "fiber": 12,
+      "sodium": 380
+    },
+    "ingredients": [
+      {
+        "name": "Whole grain bread",
+        "amount": 2,
+        "unit": "slices",
+        "category": "grains"
+      },
+      {
+        "name": "Avocado",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Egg",
+        "amount": 1,
+        "unit": "large",
+        "category": "dairy"
+      },
+      {
+        "name": "Lemon juice",
+        "amount": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Salt",
+        "amount": 0.25,
+        "unit": "tsp",
+        "category": "spices"
+      },
+      {
+        "name": "Black pepper",
+        "amount": 0.125,
+        "unit": "tsp",
+        "category": "spices"
+      }
+    ],
+    "instructions": [
+      "Toast the bread slices until golden brown.",
+      "Mash the avocado with lemon juice, salt, and pepper.",
+      "Bring a pot of water to a gentle simmer and add a splash of vinegar.",
+      "Crack the egg into a small bowl, then gently slide into the simmering water.",
+      "Poach for 3-4 minutes until whites are set but yolk is still runny.",
+      "Spread mashed avocado on toast and top with poached egg.",
+      "Season with additional salt and pepper to taste."
+    ],
+    "tags": ["vegetarian", "high-protein", "heart-healthy"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": false,
+      "glutenFree": false,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "greek-yogurt-parfait",
+    "name": "Greek Yogurt Berry Parfait",
+    "description": "Layered Greek yogurt with fresh berries and granola",
+    "image": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400",
+    "prepTime": 5,
+    "cookTime": 0,
+    "servings": 1,
+    "difficulty": "Easy",
+    "cuisine": "Mediterranean",
+    "mealType": "breakfast",
+    "nutrition": {
+      "calories": 280,
+      "protein": 20,
+      "carbs": 35,
+      "fat": 8,
+      "fiber": 6,
+      "sodium": 85
+    },
+    "ingredients": [
+      {
+        "name": "Greek yogurt",
+        "amount": 1,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Mixed berries",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "produce"
+      },
+      {
+        "name": "Granola",
+        "amount": 0.25,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Honey",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "In a glass or bowl, layer half the yogurt.",
+      "Add half the berries and a drizzle of honey.",
+      "Add half the granola.",
+      "Repeat layers with remaining ingredients.",
+      "Serve immediately for best texture."
+    ],
+    "tags": ["vegetarian", "high-protein", "probiotic"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": false,
+      "glutenFree": true,
+      "dairyFree": false,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "overnight-oats",
+    "name": "Overnight Oats with Chia Seeds",
+    "description": "Make-ahead oats with chia seeds, almond milk, and fresh fruit",
+    "image": "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400",
+    "prepTime": 5,
+    "cookTime": 0,
+    "servings": 1,
+    "difficulty": "Easy",
+    "cuisine": "American",
+    "mealType": "breakfast",
+    "nutrition": {
+      "calories": 310,
+      "protein": 12,
+      "carbs": 45,
+      "fat": 10,
+      "fiber": 14,
+      "sodium": 120
+    },
+    "ingredients": [
+      {
+        "name": "Rolled oats",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Almond milk",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Chia seeds",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "nuts"
+      },
+      {
+        "name": "Maple syrup",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Vanilla extract",
+        "amount": 0.5,
+        "unit": "tsp",
+        "category": "spices"
+      },
+      {
+        "name": "Banana",
+        "amount": 0.5,
+        "unit": "medium",
+        "category": "produce"
+      }
+    ],
+    "instructions": [
+      "Combine oats, almond milk, chia seeds, maple syrup, and vanilla in a jar.",
+      "Stir well to combine all ingredients.",
+      "Cover and refrigerate overnight or at least 4 hours.",
+      "In the morning, stir and add sliced banana.",
+      "Add additional toppings as desired and enjoy cold."
+    ],
+    "tags": ["vegan", "high-fiber", "make-ahead"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": true,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "veggie-scramble",
+    "name": "Vegetable Scramble",
+    "description": "Fluffy scrambled eggs with colorful vegetables",
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400",
+    "prepTime": 10,
+    "cookTime": 8,
+    "servings": 2,
+    "difficulty": "Easy",
+    "cuisine": "American",
+    "mealType": "breakfast",
+    "nutrition": {
+      "calories": 220,
+      "protein": 16,
+      "carbs": 8,
+      "fat": 14,
+      "fiber": 3,
+      "sodium": 420
+    },
+    "ingredients": [
+      {
+        "name": "Eggs",
+        "amount": 4,
+        "unit": "large",
+        "category": "dairy"
+      },
+      {
+        "name": "Bell pepper",
+        "amount": 0.5,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Onion",
+        "amount": 0.25,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Spinach",
+        "amount": 1,
+        "unit": "cup",
+        "category": "produce"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "oils"
+      },
+      {
+        "name": "Salt",
+        "amount": 0.5,
+        "unit": "tsp",
+        "category": "spices"
+      },
+      {
+        "name": "Black pepper",
+        "amount": 0.25,
+        "unit": "tsp",
+        "category": "spices"
+      }
+    ],
+    "instructions": [
+      "Heat olive oil in a large non-stick pan over medium heat.",
+      "Add diced onion and bell pepper, cook for 3-4 minutes until softened.",
+      "Add spinach and cook until wilted.",
+      "Beat eggs with salt and pepper in a bowl.",
+      "Pour eggs into the pan with vegetables.",
+      "Gently scramble eggs, stirring frequently until just set.",
+      "Remove from heat and serve immediately."
+    ],
+    "tags": ["vegetarian", "high-protein", "low-carb"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": false,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": true,
+      "paleo": true
+    }
+  },
+  {
+    "id": "protein-smoothie",
+    "name": "Green Protein Smoothie",
+    "description": "Nutrient-packed smoothie with spinach, banana, and protein powder",
+    "image": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400",
+    "prepTime": 5,
+    "cookTime": 0,
+    "servings": 1,
+    "difficulty": "Easy",
+    "cuisine": "American",
+    "mealType": "breakfast",
+    "nutrition": {
+      "calories": 290,
+      "protein": 25,
+      "carbs": 32,
+      "fat": 8,
+      "fiber": 7,
+      "sodium": 180
+    },
+    "ingredients": [
+      {
+        "name": "Spinach",
+        "amount": 2,
+        "unit": "cups",
+        "category": "produce"
+      },
+      {
+        "name": "Banana",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Protein powder",
+        "amount": 1,
+        "unit": "scoop",
+        "category": "supplements"
+      },
+      {
+        "name": "Almond milk",
+        "amount": 1,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Almond butter",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "nuts"
+      },
+      {
+        "name": "Ice cubes",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "other"
+      }
+    ],
+    "instructions": [
+      "Add all ingredients to a high-speed blender.",
+      "Blend on high for 60-90 seconds until smooth and creamy.",
+      "Add more almond milk if needed for desired consistency.",
+      "Pour into a glass and serve immediately.",
+      "Garnish with additional fruit if desired."
+    ],
+    "tags": ["high-protein", "vegan", "post-workout"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": true,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  }
+]

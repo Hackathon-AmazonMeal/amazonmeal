@@ -1,0 +1,478 @@
+[
+  {
+    "id": "chicken-stir-fry",
+    "name": "Chicken and Vegetable Stir-Fry",
+    "description": "Quick and healthy stir-fry with chicken and colorful vegetables",
+    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400",
+    "prepTime": 15,
+    "cookTime": 12,
+    "servings": 3,
+    "difficulty": "Medium",
+    "cuisine": "Asian",
+    "mealType": "dinner",
+    "nutrition": {
+      "calories": 340,
+      "protein": 28,
+      "carbs": 24,
+      "fat": 16,
+      "fiber": 5,
+      "sodium": 680
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "amount": 1,
+        "unit": "lb",
+        "category": "meat"
+      },
+      {
+        "name": "Bell peppers",
+        "amount": 2,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Broccoli",
+        "amount": 2,
+        "unit": "cups",
+        "category": "produce"
+      },
+      {
+        "name": "Snap peas",
+        "amount": 1,
+        "unit": "cup",
+        "category": "produce"
+      },
+      {
+        "name": "Garlic",
+        "amount": 3,
+        "unit": "cloves",
+        "category": "produce"
+      },
+      {
+        "name": "Ginger",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "produce"
+      },
+      {
+        "name": "Soy sauce",
+        "amount": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame oil",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "oils"
+      },
+      {
+        "name": "Brown rice",
+        "amount": 1.5,
+        "unit": "cups",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Cook brown rice according to package directions.",
+      "Cut chicken into bite-sized pieces and season with salt and pepper.",
+      "Heat 1 tbsp sesame oil in a large wok or skillet over high heat.",
+      "Stir-fry chicken for 5-6 minutes until cooked through, remove and set aside.",
+      "Add remaining oil and stir-fry vegetables for 3-4 minutes until crisp-tender.",
+      "Add garlic and ginger, stir-fry for 30 seconds.",
+      "Return chicken to pan, add soy sauce and toss to combine.",
+      "Serve over brown rice and garnish with sesame seeds if desired."
+    ],
+    "tags": ["high-protein", "low-carb", "quick-dinner"],
+    "dietaryInfo": {
+      "vegetarian": false,
+      "vegan": false,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": true
+    }
+  },
+  {
+    "id": "pasta-primavera",
+    "name": "Whole Wheat Pasta Primavera",
+    "description": "Light pasta dish with seasonal vegetables and herbs",
+    "image": "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400",
+    "prepTime": 15,
+    "cookTime": 15,
+    "servings": 4,
+    "difficulty": "Easy",
+    "cuisine": "Italian",
+    "mealType": "dinner",
+    "nutrition": {
+      "calories": 380,
+      "protein": 14,
+      "carbs": 58,
+      "fat": 12,
+      "fiber": 8,
+      "sodium": 420
+    },
+    "ingredients": [
+      {
+        "name": "Whole wheat pasta",
+        "amount": 12,
+        "unit": "oz",
+        "category": "grains"
+      },
+      {
+        "name": "Zucchini",
+        "amount": 2,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Yellow squash",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "amount": 2,
+        "unit": "cups",
+        "category": "produce"
+      },
+      {
+        "name": "Asparagus",
+        "amount": 1,
+        "unit": "lb",
+        "category": "produce"
+      },
+      {
+        "name": "Garlic",
+        "amount": 4,
+        "unit": "cloves",
+        "category": "produce"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 3,
+        "unit": "tbsp",
+        "category": "oils"
+      },
+      {
+        "name": "Parmesan cheese",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Fresh basil",
+        "amount": 0.25,
+        "unit": "cup",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Cook pasta according to package directions until al dente.",
+      "While pasta cooks, heat olive oil in a large skillet.",
+      "Sauté sliced zucchini and yellow squash for 3-4 minutes.",
+      "Add asparagus and cook for 2-3 minutes.",
+      "Add cherry tomatoes and garlic, cook for 2 minutes.",
+      "Drain pasta and toss with vegetables.",
+      "Add fresh basil and Parmesan cheese.",
+      "Season with salt and pepper, serve immediately."
+    ],
+    "tags": ["vegetarian", "high-fiber", "seasonal"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": false,
+      "glutenFree": false,
+      "dairyFree": false,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "baked-cod",
+    "name": "Herb-Crusted Baked Cod",
+    "description": "Flaky cod with herb crust served with roasted vegetables",
+    "image": "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=400",
+    "prepTime": 15,
+    "cookTime": 25,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "American",
+    "mealType": "dinner",
+    "nutrition": {
+      "calories": 320,
+      "protein": 32,
+      "carbs": 18,
+      "fat": 14,
+      "fiber": 6,
+      "sodium": 480
+    },
+    "ingredients": [
+      {
+        "name": "Cod fillets",
+        "amount": 4,
+        "unit": "pieces",
+        "category": "fish"
+      },
+      {
+        "name": "Panko breadcrumbs",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Fresh parsley",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh dill",
+        "amount": 1,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon zest",
+        "amount": 1,
+        "unit": "tsp",
+        "category": "produce"
+      },
+      {
+        "name": "Brussels sprouts",
+        "amount": 1,
+        "unit": "lb",
+        "category": "produce"
+      },
+      {
+        "name": "Sweet potato",
+        "amount": 2,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 3,
+        "unit": "tbsp",
+        "category": "oils"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 425°F.",
+      "Cut Brussels sprouts in half and cube sweet potatoes.",
+      "Toss vegetables with 2 tbsp olive oil, salt, and pepper.",
+      "Roast vegetables for 15 minutes.",
+      "Mix breadcrumbs, herbs, lemon zest, and remaining oil.",
+      "Place cod on baking sheet and top with herb mixture.",
+      "Bake fish for 12-15 minutes until flakes easily.",
+      "Serve fish with roasted vegetables."
+    ],
+    "tags": ["high-protein", "omega-3", "low-carb"],
+    "dietaryInfo": {
+      "vegetarian": false,
+      "vegan": false,
+      "glutenFree": false,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": true
+    }
+  },
+  {
+    "id": "veggie-curry",
+    "name": "Coconut Vegetable Curry",
+    "description": "Creamy coconut curry with mixed vegetables and chickpeas",
+    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400",
+    "prepTime": 20,
+    "cookTime": 25,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Indian",
+    "mealType": "dinner",
+    "nutrition": {
+      "calories": 390,
+      "protein": 14,
+      "carbs": 48,
+      "fat": 18,
+      "fiber": 12,
+      "sodium": 580
+    },
+    "ingredients": [
+      {
+        "name": "Coconut milk",
+        "amount": 1,
+        "unit": "can",
+        "category": "canned"
+      },
+      {
+        "name": "Chickpeas",
+        "amount": 1,
+        "unit": "can",
+        "category": "legumes"
+      },
+      {
+        "name": "Sweet potato",
+        "amount": 2,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Cauliflower",
+        "amount": 1,
+        "unit": "head",
+        "category": "produce"
+      },
+      {
+        "name": "Spinach",
+        "amount": 4,
+        "unit": "cups",
+        "category": "produce"
+      },
+      {
+        "name": "Onion",
+        "amount": 1,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Garlic",
+        "amount": 4,
+        "unit": "cloves",
+        "category": "produce"
+      },
+      {
+        "name": "Ginger",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "produce"
+      },
+      {
+        "name": "Curry powder",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "spices"
+      },
+      {
+        "name": "Basmati rice",
+        "amount": 1.5,
+        "unit": "cups",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Cook basmati rice according to package directions.",
+      "Heat oil in a large pot over medium heat.",
+      "Sauté diced onion until translucent, about 5 minutes.",
+      "Add garlic, ginger, and curry powder, cook for 1 minute.",
+      "Add cubed sweet potato and cauliflower florets.",
+      "Pour in coconut milk and bring to a simmer.",
+      "Cook for 15 minutes until vegetables are tender.",
+      "Add chickpeas and spinach, cook until spinach wilts.",
+      "Season with salt and serve over rice."
+    ],
+    "tags": ["vegetarian", "vegan", "high-fiber", "comfort-food"],
+    "dietaryInfo": {
+      "vegetarian": true,
+      "vegan": true,
+      "glutenFree": true,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  },
+  {
+    "id": "turkey-meatballs",
+    "name": "Turkey Meatballs with Marinara",
+    "description": "Lean turkey meatballs in homemade marinara sauce",
+    "image": "https://images.unsplash.com/photo-1551326844-4df70f78d0e9?w=400",
+    "prepTime": 20,
+    "cookTime": 30,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Italian",
+    "mealType": "dinner",
+    "nutrition": {
+      "calories": 420,
+      "protein": 32,
+      "carbs": 38,
+      "fat": 16,
+      "fiber": 6,
+      "sodium": 720
+    },
+    "ingredients": [
+      {
+        "name": "Ground turkey",
+        "amount": 1,
+        "unit": "lb",
+        "category": "meat"
+      },
+      {
+        "name": "Whole wheat breadcrumbs",
+        "amount": 0.5,
+        "unit": "cup",
+        "category": "grains"
+      },
+      {
+        "name": "Egg",
+        "amount": 1,
+        "unit": "large",
+        "category": "dairy"
+      },
+      {
+        "name": "Onion",
+        "amount": 0.5,
+        "unit": "medium",
+        "category": "produce"
+      },
+      {
+        "name": "Garlic",
+        "amount": 3,
+        "unit": "cloves",
+        "category": "produce"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "amount": 1,
+        "unit": "can",
+        "category": "canned"
+      },
+      {
+        "name": "Fresh basil",
+        "amount": 0.25,
+        "unit": "cup",
+        "category": "herbs"
+      },
+      {
+        "name": "Whole wheat pasta",
+        "amount": 8,
+        "unit": "oz",
+        "category": "grains"
+      },
+      {
+        "name": "Olive oil",
+        "amount": 2,
+        "unit": "tbsp",
+        "category": "oils"
+      }
+    ],
+    "instructions": [
+      "Mix ground turkey, breadcrumbs, egg, minced onion, and garlic.",
+      "Form mixture into 16 meatballs.",
+      "Heat olive oil in a large skillet over medium heat.",
+      "Brown meatballs on all sides, about 8 minutes total.",
+      "Add crushed tomatoes and bring to a simmer.",
+      "Cover and cook for 15 minutes until meatballs are cooked through.",
+      "Meanwhile, cook pasta according to package directions.",
+      "Stir fresh basil into sauce and serve over pasta."
+    ],
+    "tags": ["high-protein", "lean-meat", "family-friendly"],
+    "dietaryInfo": {
+      "vegetarian": false,
+      "vegan": false,
+      "glutenFree": false,
+      "dairyFree": true,
+      "keto": false,
+      "paleo": false
+    }
+  }
+]
