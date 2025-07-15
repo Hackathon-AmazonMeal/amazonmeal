@@ -11,9 +11,9 @@ app.use(express.json());
 app.use(express.static('build'));
 
 // Mock data
-const breakfastRecipes = require('./data/recipes/breakfast.json');
-const lunchRecipes = require('./data/recipes/lunch.json');
-const dinnerRecipes = require('./data/recipes/dinner.json');
+const breakfastRecipes = require('./src/data/recipes/breakfast.json');
+const lunchRecipes = require('./src/data/recipes/lunch.json');
+const dinnerRecipes = require('./src/data/recipes/dinner.json');
 
 const allRecipes = [...breakfastRecipes, ...lunchRecipes, ...dinnerRecipes];
 

@@ -12,35 +12,41 @@ import {
   Divider,
   CircularProgress,
   Alert,
+  Snackbar,
   Stack,
-  Snackbar
+  Chip
 } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { Delete, ShoppingCart, Person, Email, Add, Remove } from '@mui/icons-material';
+import { 
+  Delete, 
+  ShoppingCart, 
+  Person, 
+  Email, 
+  Add, 
+  Remove,
+  Restaurant 
+} from '@mui/icons-material';
 import orderService from '../services/orderService';
 
 const Cart = () => {
-  // Use the SAME properties and methods as CartSidebar for perfect sync
+  // Use the SAME properties and methods as CartSidebar
   const { 
-    items: cartItems,           // Alias to match existing code
-    removeIngredient, 
-    clearCart, 
-    getEstimatedTotal,          // Use same method as CartSidebar
-    totalItems,                 // Add total items count
-    isEmpty,                    // Add isEmpty check
-    increaseQuantity,           // Add quantity controls
-    decreaseQuantity,           // Add quantity controls
-    currentRecipe,              // Add current recipe info
-    getCartSummary              // Add cart summary
+    items,                    // Same as CartSidebar
+    currentRecipe,           // Same as CartSidebar
+    totalItems,              // Same as CartSidebar
+    isEmpty,                 // Same as CartSidebar
+    increaseQuantity,        // Same as CartSidebar
+    decreaseQuantity,        // Same as CartSidebar
+    removeIngredient,        // Same as CartSidebar
+    clearCart,               // Same as CartSidebar
+    getEstimatedTotal,       // Same as CartSidebar
+    getCartSummary           // Same as CartSidebar
   } = useCart();
+  
   const { user } = useUser();
   const navigate = useNavigate();
-  
-  // Calculate total using same method as CartSidebar
-  const cartTotal = getEstimatedTotal();
-  const cartSummary = getCartSummary();
   
   // State for order processing
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
@@ -53,8 +59,12 @@ const Cart = () => {
     email: user?.email || user?.preferences?.email || 'homeayush79@gmail.com',
   });
 
+  // Get computed values (same as CartSidebar)
+  const cartSummary = getCartSummary();
+  const estimatedTotal = getEstimatedTotal();
+
   const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
+    if (isEmpty()) return;
     
     try {
       setIsProcessingOrder(true);
@@ -62,12 +72,21 @@ const Cart = () => {
 
       const customerInfo = getCustomerInfo();
 
+      // Convert cart items to the format expected by orderService
+      const orderItems = items.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        price: item.price || 2.50
+      }));
+
       // Validate order data
       const validation = orderService.validateOrderData({
         email: customerInfo.email,
         customerName: customerInfo.name,
-        items: cartItems,
-        totalAmount: cartTotal,
+        items: orderItems,
+        totalAmount: estimatedTotal,
       });
 
       if (!validation.isValid) {
@@ -76,15 +95,15 @@ const Cart = () => {
       }
 
       console.log('Processing order with customer info:', customerInfo);
-      console.log('Cart items:', cartItems);
-      console.log('Total amount:', cartTotal);
+      console.log('Cart items:', orderItems);
+      console.log('Total amount:', estimatedTotal);
 
       // Process order with external API
       const orderResult = await orderService.processOrder({
         email: customerInfo.email,
         customerName: customerInfo.name,
-        items: cartItems,
-        totalAmount: cartTotal,
+        items: orderItems,
+        totalAmount: estimatedTotal,
       });
 
       if (orderResult.success) {
@@ -98,13 +117,13 @@ const Cart = () => {
             state: { 
               orderId: orderResult.orderId,
               customerInfo: customerInfo,
-              orderTotal: cartTotal,
-              items: cartItems,
+              orderTotal: estimatedTotal,
+              items: orderItems,
               externalApiCalled: true, // Flag to indicate API was already called
               externalOrderId: orderResult.orderId
             }
           });
-        }, 2000); // Increased delay to show success message
+        }, 2000);
       }
     } catch (error) {
       console.error('Checkout failed:', error);
@@ -141,12 +160,44 @@ const Cart = () => {
           </Box>
         ) : (
           <Paper elevation={2}>
+            {/* Recipe Info (same as CartSidebar) */}
+            {currentRecipe && (
+              <Box sx={{ p: 3, bgcolor: 'primary.50', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Restaurant color="primary" />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Recipe: {currentRecipe.name}
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  All ingredients for this recipe have been added to your cart
+                </Typography>
+              </Box>
+            )}
+
+            {/* Cart Summary Header */}
+            <Box sx={{ p: 3, bgcolor: 'grey.50', borderBottom: '1px solid', borderColor: 'divider' }}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="h6">
+                  Cart Summary
+                </Typography>
+                <Chip 
+                  label={`${totalItems} items`} 
+                  size="small" 
+                  color="primary" 
+                />
+                <Chip 
+                  label={`${cartSummary.totalUniqueItems} unique`} 
+                  size="small" 
+                  variant="outlined" 
+                />
+              </Stack>
+            </Box>
+
             <List>
-              {cartItems.map((item, index) => (
+              {items.map((item, index) => (
                 <React.Fragment key={item.id}>
-                  <ListItem
-                    sx={{ py: 2 }}
-                  >
+                  <ListItem sx={{ py: 2 }}>
                     <ListItemText
                       primary={
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -206,13 +257,13 @@ const Cart = () => {
                       <Delete />
                     </IconButton>
                   </ListItem>
-                  {index < cartItems.length - 1 && <Divider />}
+                  {index < items.length - 1 && <Divider />}
                 </React.Fragment>
               ))}
             </List>
             
             <Box sx={{ p: 3, bgcolor: 'grey.50' }}>
-              {/* Cart Summary (same as CartSidebar) */}
+              {/* Cart Totals (same calculation as CartSidebar) */}
               <Stack spacing={2} sx={{ mb: 3 }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body1" color="text.secondary">
@@ -239,7 +290,7 @@ const Cart = () => {
                     Estimated Total:
                   </Typography>
                   <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                    ${cartTotal.toFixed(2)}
+                    ${estimatedTotal.toFixed(2)}
                   </Typography>
                 </Stack>
               </Stack>
@@ -252,7 +303,7 @@ const Cart = () => {
               </Alert>
               
               {/* Show customer info that will be used */}
-              <Box sx={{ mb: 2, p: 2, bgcolor: 'info.50', borderRadius: 1, border: '1px solid', borderColor: 'info.200' }}>
+              <Box sx={{ mb: 3, p: 2, bgcolor: 'info.50', borderRadius: 1, border: '1px solid', borderColor: 'info.200' }}>
                 <Typography variant="body2" color="info.main" gutterBottom>
                   <Person sx={{ fontSize: 16, mr: 0.5 }} />
                   Order will be placed for: <strong>{getCustomerInfo().name}</strong>
@@ -280,7 +331,7 @@ const Cart = () => {
                   disabled={isEmpty() || isProcessingOrder}
                   startIcon={isProcessingOrder ? <CircularProgress size={20} /> : null}
                 >
-                  {isProcessingOrder ? 'Processing Order...' : `Checkout - $${cartTotal.toFixed(2)}`}
+                  {isProcessingOrder ? 'Processing Order...' : `Checkout - $${estimatedTotal.toFixed(2)}`}
                 </Button>
               </Box>
             </Box>
