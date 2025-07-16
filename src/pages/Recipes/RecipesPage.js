@@ -25,6 +25,7 @@ import {
 // Hooks and Context
 import { useRecipes } from '../../contexts/RecipeContext';
 import { useCart } from '../../contexts/CartContext';
+import { useUser } from '../../contexts/UserContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 // import { useUserPreferences } from '../../hooks/useUserPreferences'; // Available if needed
 
@@ -44,27 +45,120 @@ function RecipesPage() {
     previousRecipe,
     hasMoreRecipes,
     getRecipeCount,
+    setRecipes,
+    setLoading,
+    setError,
   } = useRecipes();
   
   const { addRecipeToCart } = useCart();
+  const { user } = useUser();
   
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   
   // Ensure user is authenticated
   useAuthRedirect();
 
-  useEffect(() => {
-    // Set the first recipe as selected when recipes load
-    if (recipes.length > 0 && !selectedRecipe) {
-      const currentRecipe = getCurrentRecipe();
-      if (currentRecipe && currentRecipe.id) {
-        setSelectedRecipe(currentRecipe);
-      }
+  // API function to fetch personalized recipes
+  const fetchPersonalizedRecipes = async () => {
+    if (!user || !user.preferences) {
+      setError('User preferences not found');
+      return;
     }
-  }, [recipes, selectedRecipe, getCurrentRecipe]);
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Build preferences payload
+      const preferences = {};
+      if (user.preferences.dietType) preferences.dietType = user.preferences.dietType;
+      if (user.preferences.healthGoals && user.preferences.healthGoals.length > 0) {
+        preferences.healthGoals = user.preferences.healthGoals;
+      }
+      if (user.preferences.mealType) preferences.mealType = user.preferences.mealType;
+      if (user.preferences.cookingTime) preferences.cookingTime = user.preferences.cookingTime;
+      if (user.preferences.cookingMethod) preferences.cookingMethod = user.preferences.cookingMethod;
+      if (user.preferences.prepFor) preferences.prepFor = user.preferences.prepFor;
+      if (user.preferences.allergies && user.preferences.allergies.length > 0) {
+        preferences.allergies = user.preferences.allergies;
+      }
+
+      const payload = {
+        email: user.email || "user@tesin.com", // Default email if not in user context
+        preferences
+      };
+
+      const response = await fetch('https://user-ms-iimt.vercel.app/preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const apiData = await response.json();
+
+      // Transform API response to recipe format (only API-provided data)
+      const transformedRecipes = apiData.map((item, index) => ({
+        id: `recipe-${index}`,
+        name: item.title,
+        description: item.summary,
+        image: 'https://via.placeholder.com/300x200/f0f0f0/666666?text=Recipe', // Keep placeholder image
+        ingredients: [
+          ...item.ingredients.necessary_items.map(ingredient => ({
+            name: ingredient.item_name,
+            amount: ingredient.quantity,
+            unit: 'units',
+            category: 'ingredient',
+            price: ingredient.price,
+            id: ingredient._id,
+          })),
+          ...item.ingredients.optional_items.map(ingredient => ({
+            name: ingredient.item_name,
+            amount: ingredient.quantity,
+            unit: 'units',
+            category: 'optional',
+            price: ingredient.price,
+            id: ingredient._id,
+          }))
+        ],
+        instructions: [item.procedure],
+        summary: item.summary,
+        youtube: item.youtube, // Include if provided by API
+      }));
+
+      setRecipes(transformedRecipes);
+    } catch (error) {
+      console.error('Error fetching personalized recipes:', error);
+      setError(error.message || 'Failed to load personalized recipes');
+    }
+  };
+
+  // Fetch recipes on component mount
+  useEffect(() => {
+    if (user && user.preferences) {
+      fetchPersonalizedRecipes();
+    }
+  }, [user]);
+
+  // Remove auto-selection - let user choose which recipe to select
+  // useEffect(() => {
+  //   // Set the first recipe as selected when recipes load
+  //   if (recipes.length > 0 && !selectedRecipe) {
+  //     const currentRecipe = getCurrentRecipe();
+  //     if (currentRecipe && currentRecipe.id) {
+  //       setSelectedRecipe(currentRecipe);
+  //     }
+  //   }
+  // }, [recipes, selectedRecipe, getCurrentRecipe]);
 
   const handleRecipeSelect = (recipe) => {
     setSelectedRecipe(recipe);
+    addRecipeToCart(recipe); // Automatically add ingredients to cart when recipe is selected
   };
 
   const handleAddToCart = (recipe) => {
@@ -73,10 +167,6 @@ function RecipesPage() {
 
   const visibleRecipes = getVisibleRecipes();
   const currentRecipe = selectedRecipe || getCurrentRecipe();
-
-  console.log('Visible recipes:', visibleRecipes);
-  console.log('Current recipe:', currentRecipe);
-  console.log('All recipes:', recipes);
 
   if (isLoading) {
     return (
@@ -141,40 +231,52 @@ function RecipesPage() {
 
         <Grid container spacing={3}>
           {/* Recipe Carousel - Top Section */}
-          <Grid item xs={12} lg={8}>
+          <Grid item xs={12} lg={selectedRecipe ? 8 : 12}>
             <Box mb={3}>
-              <Stack 
-                direction="row" 
-                justifyContent="space-between" 
-                alignItems="center"
-                mb={2}
+              {/* Header - Title Only */}
+              <Typography 
+                variant="h5" 
+                sx={{ fontWeight: 600, mb: 3 }}
               >
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                  Browse Recipes ({currentRecipeIndex + 1}-{Math.min(currentRecipeIndex + 3, getRecipeCount())} of {getRecipeCount()})
-                </Typography>
-                
-                {hasMoreRecipes() && (
-                  <Stack direction="row" spacing={1}>
-                    <IconButton 
-                      onClick={previousRecipe}
-                      sx={{ bgcolor: 'background.paper' }}
-                    >
-                      <ArrowBack />
-                    </IconButton>
-                    <IconButton 
-                      onClick={nextRecipe}
-                      sx={{ bgcolor: 'background.paper' }}
-                    >
-                      <ArrowForward />
-                    </IconButton>
-                  </Stack>
-                )}
-              </Stack>
+                Browse Recipes ({currentRecipeIndex + 1}-{Math.min(currentRecipeIndex + 3, getRecipeCount())} of {getRecipeCount()})
+              </Typography>
 
-              {/* Recipe Cards */}
-              <Grid container spacing={2}>
-                {visibleRecipes.filter(recipe => recipe && recipe.id).map((recipe, index) => (
-                  <Grid item xs={12} md={4} key={recipe.id}>
+              {/* Carousel with Side Navigation */}
+              <Box 
+                display="flex" 
+                alignItems="center" 
+                gap={2}
+                sx={{ minHeight: '400px' }}
+              >
+                {/* Left Arrow */}
+                <IconButton 
+                  onClick={previousRecipe}
+                  disabled={!hasMoreRecipes()}
+                  sx={{ 
+                    bgcolor: 'background.paper',
+                    boxShadow: 2,
+                    width: 48,
+                    height: 48,
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                      color: 'white',
+                      transform: 'scale(1.1)',
+                    },
+                    '&:disabled': {
+                      bgcolor: 'grey.100',
+                      color: 'grey.400',
+                    },
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <ArrowBack />
+                </IconButton>
+
+                {/* Recipe Cards Container */}
+                <Box flex={1}>
+                  <Grid container spacing={2}>
+                    {visibleRecipes.filter(recipe => recipe && recipe.id).map((recipe, index) => (
+                      <Grid item xs={12} md={4} key={recipe.id}>
                     <Card
                       sx={{
                         height: '100%',
@@ -213,38 +315,6 @@ function RecipesPage() {
                           {recipe.name}
                         </Typography>
                         
-                        <Stack direction="row" spacing={2} mb={2}>
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                            <AccessTime fontSize="small" color="action" />
-                            <Typography variant="caption">
-                              {recipe.prepTime + recipe.cookTime} min
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                            <Restaurant fontSize="small" color="action" />
-                            <Typography variant="caption">
-                              {recipe.servings} servings
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                            <LocalFireDepartment fontSize="small" color="action" />
-                            <Typography variant="caption">
-                              {recipe.nutrition.calories} cal
-                            </Typography>
-                          </Box>
-                        </Stack>
-
-                        <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
-                          {recipe.tags.slice(0, 2).map((tag) => (
-                            <Chip
-                              key={tag}
-                              label={tag}
-                              size="small"
-                              variant="outlined"
-                              sx={{ fontSize: '0.75rem' }}
-                            />
-                          ))}
-                        </Box>
 
                         <Button
                           variant="contained"
@@ -258,11 +328,37 @@ function RecipesPage() {
                           Add to Cart
                         </Button>
                       </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+
+              {/* Right Arrow */}
+              <IconButton 
+                onClick={nextRecipe}
+                disabled={!hasMoreRecipes()}
+                sx={{ 
+                  bgcolor: 'background.paper',
+                  boxShadow: 2,
+                  width: 48,
+                  height: 48,
+                  '&:hover': {
+                    bgcolor: 'primary.light',
+                    color: 'white',
+                    transform: 'scale(1.1)',
+                  },
+                  '&:disabled': {
+                    bgcolor: 'grey.100',
+                    color: 'grey.400',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <ArrowForward />
+              </IconButton>
             </Box>
+          </Box>
 
             {/* Recipe Instructions - Bottom Section */}
             {currentRecipe && (
@@ -270,10 +366,12 @@ function RecipesPage() {
             )}
           </Grid>
 
-          {/* Cart Sidebar - Right Section */}
-          <Grid item xs={12} lg={4}>
-            <CartSidebar />
-          </Grid>
+          {/* Cart Sidebar - Right Section - Only show when recipe is selected */}
+          {selectedRecipe && (
+            <Grid item xs={12} lg={4}>
+              <CartSidebar />
+            </Grid>
+          )}
         </Grid>
       </Container>
     </Box>
