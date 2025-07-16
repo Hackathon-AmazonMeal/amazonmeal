@@ -61,7 +61,7 @@ function PreferencesPage() {
     mealType: 'dinner',
     cookingTime: 'medium',
     cookingMethod: 'stovetop',
-    prepFor: 1,
+    numberOfPeople: 1,
     allergies: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -158,19 +158,22 @@ function PreferencesPage() {
       console.log('Complete Preferences Object:', preferences);
       
       // Get userId from logged in user
-      const userId = currentUser?.userId || currentUser?.id;
+      const userId = currentUser?.email || currentUser?.userId;
       
       // Save preferences to backend API (mock for now)
       try {
-        const response = await fetch('/api/preferences', {
+        const pref = JSON.stringify({
+            email: userId,
+            preferences: preferences,
+          });
+          console.log("preference: ", pref);
+
+        const response = await fetch('https://user-ms-iimt.vercel.app/preference', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            userId,
-            preferences,
-          }),
+          body: pref,
         });
 
         if (response.status === 401) {
@@ -237,7 +240,7 @@ function PreferencesPage() {
         return (
           <DietTypeSelector
             selected={preferences.dietType}
-            onChange={(value) => updatePreferences('dietType', value)}
+            onChange={(value) => updatePreferences('cateogry', value)}
             error={errors.dietType}
           />
         );
@@ -277,7 +280,7 @@ function PreferencesPage() {
         return (
           <PrepForSelector
             selected={preferences.prepFor}
-            onChange={(value) => updatePreferences('prepFor', value)}
+            onChange={(value) => updatePreferences('numberOfPeople', value)}
             error={errors.prepFor}
           />
         );
