@@ -3,6 +3,24 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const UserContext = createContext();
 
+// Mock users for demo - based on design specifications
+const MOCK_USERS = [
+  {
+    userId: 'user-1',
+    username: 'healthyeater',
+    email: 'demo@example.com',
+    preferences: {
+      dietaryRestrictions: ['VEGETARIAN'],
+      allergies: ['PEANUTS'],
+      dislikedIngredients: ['cilantro', 'olives'],
+      cookingTime: 'QUICK',
+      cuisinePreferences: ['ITALIAN', 'MEXICAN', 'ASIAN'],
+      skillLevel: 'BEGINNER'
+    },
+    orderHistory: []
+  }
+];
+
 // Action types
 const USER_ACTIONS = {
   SET_USER: 'SET_USER',
@@ -11,11 +29,12 @@ const USER_ACTIONS = {
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
+  SIGN_OUT: 'SIGN_OUT',
 };
 
 // Initial state
 const initialState = {
-  user: null,
+  currentUser: null,
   isLoading: false,
   error: null,
 };
@@ -26,7 +45,7 @@ function userReducer(state, action) {
     case USER_ACTIONS.SET_USER:
       return {
         ...state,
-        user: action.payload,
+        currentUser: action.payload,
         isLoading: false,
         error: null,
       };
@@ -34,20 +53,23 @@ function userReducer(state, action) {
     case USER_ACTIONS.UPDATE_PREFERENCES:
       return {
         ...state,
-        user: {
-          ...state.user,
-          preferences: action.payload,
+        currentUser: {
+          ...state.currentUser,
+          preferences: {
+            ...state.currentUser?.preferences,
+            ...action.payload
+          },
         },
       };
     
     case USER_ACTIONS.ADD_ORDER_HISTORY:
       return {
         ...state,
-        user: {
-          ...state.user,
+        currentUser: {
+          ...state.currentUser,
           orderHistory: [
             action.payload,
-            ...(state.user?.orderHistory || []),
+            ...(state.currentUser?.orderHistory || []),
           ].slice(0, 5), // Keep only last 5 orders
         },
       };
@@ -70,6 +92,11 @@ function userReducer(state, action) {
         ...state,
         error: null,
       };
+      
+    case USER_ACTIONS.SIGN_OUT:
+      return {
+        ...initialState,
+      };
     
     default:
       return state;
@@ -79,94 +106,162 @@ function userReducer(state, action) {
 // Provider component
 export function UserProvider({ children }) {
   const [state, dispatch] = useReducer(userReducer, initialState);
-  const [storedUser, setStoredUser] = useLocalStorage('recipeUser', null);
+  const [storedUser, setStoredUser] = useLocalStorage('currentUser', null);
 
   // Load user from localStorage on mount
   useEffect(() => {
+    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
+    
     if (storedUser) {
-      dispatch({ type: USER_ACTIONS.SET_USER, payload: storedUser });
+      try {
+        const parsedUser = typeof storedUser === 'string' ? JSON.parse(storedUser) : storedUser;
+        dispatch({ type: USER_ACTIONS.SET_USER, payload: parsedUser });
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('currentUser');
+      }
     }
+    
+    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
   }, [storedUser]);
 
   // Save user to localStorage when user changes
   useEffect(() => {
-    if (state.user) {
-      setStoredUser(state.user);
+    if (state.currentUser) {
+      setStoredUser(state.currentUser);
     }
-  }, [state.user, setStoredUser]);
+  }, [state.currentUser, setStoredUser]);
 
-  // Action creators
-  const actions = {
-    setUser: (user) => {
-      dispatch({ type: USER_ACTIONS.SET_USER, payload: user });
-    },
+  // Authentication actions
+  const signIn = async (email, password) => {
+    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
+    try {
+      // Find mock user by email (for demo)
+      const user = MOCK_USERS.find(u => u.email === email);
+      if (user) {
+        dispatch({ type: USER_ACTIONS.SET_USER, payload: user });
+        return user;
+      }
+      throw new Error('Invalid credentials');
+    } catch (error) {
+      dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error.message });
+      throw error;
+    } finally {
+      dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
+    }
+  };
 
-    updatePreferences: (preferences) => {
-      dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
-    },
-
-    addOrderToHistory: (order) => {
-      const orderWithTimestamp = {
-        ...order,
-        timestamp: new Date().toISOString(),
-        id: Date.now().toString(),
-      };
-      dispatch({ type: USER_ACTIONS.ADD_ORDER_HISTORY, payload: orderWithTimestamp });
-    },
-
-    setLoading: (loading) => {
-      dispatch({ type: USER_ACTIONS.SET_LOADING, payload: loading });
-    },
-
-    setError: (error) => {
-      dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error });
-    },
-
-    clearError: () => {
-      dispatch({ type: USER_ACTIONS.CLEAR_ERROR });
-    },
-
-    // Create new user with preferences
-    createUser: (preferences) => {
+  const signUp = async (userData) => {
+    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
+    try {
       const newUser = {
-        id: Date.now().toString(),
-        preferences,
-        orderHistory: [],
-        createdAt: new Date().toISOString(),
+        userId: `user-${Date.now()}`,
+        username: userData.username,
+        email: userData.email,
+        preferences: userData.preferences || {
+          dietaryRestrictions: [],
+          allergies: [],
+          dislikedIngredients: [],
+          cookingTime: 'MEDIUM',
+          cuisinePreferences: [],
+          skillLevel: 'BEGINNER'
+        },
+        orderHistory: []
       };
+
       dispatch({ type: USER_ACTIONS.SET_USER, payload: newUser });
       return newUser;
-    },
+    } catch (error) {
+      dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error.message });
+      throw error;
+    } finally {
+      dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
+    }
+  };
 
-    // Check if user is new (no preferences set)
-    isNewUser: () => {
-      return !state.user || !state.user.preferences;
-    },
+  const signOut = async () => {
+    dispatch({ type: USER_ACTIONS.SIGN_OUT });
+    localStorage.removeItem('currentUser');
+  };
 
-    // Get user's dietary restrictions
-    getDietaryRestrictions: () => {
-      return state.user?.preferences?.dietaryRestrictions || [];
-    },
+  // User preference actions
+  const updatePreferences = (preferences) => {
+    dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
+  };
 
-    // Get user's allergies
-    getAllergies: () => {
-      return state.user?.preferences?.allergies || [];
-    },
+  const addOrderToHistory = (order) => {
+    const orderWithTimestamp = {
+      ...order,
+      timestamp: new Date().toISOString(),
+      id: Date.now().toString(),
+    };
+    dispatch({ type: USER_ACTIONS.ADD_ORDER_HISTORY, payload: orderWithTimestamp });
+  };
 
-    // Get user's health goals
-    getHealthGoals: () => {
-      return state.user?.preferences?.healthGoals || [];
-    },
+  // Error handling actions
+  const setError = (error) => {
+    dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error });
+  };
 
-    // Get user's preferred diet type
-    getDietType: () => {
-      return state.user?.preferences?.dietType || 'balanced';
-    },
+  const clearError = () => {
+    dispatch({ type: USER_ACTIONS.CLEAR_ERROR });
+  };
+
+  const setLoading = (loading) => {
+    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: loading });
+  };
+
+  // Helper functions
+  const isNewUser = () => {
+    return !state.currentUser || !state.currentUser.preferences;
+  };
+
+  const getDietaryRestrictions = () => {
+    return state.currentUser?.preferences?.dietaryRestrictions || [];
+  };
+
+  const getAllergies = () => {
+    return state.currentUser?.preferences?.allergies || [];
+  };
+
+  const getHealthGoals = () => {
+    return state.currentUser?.preferences?.healthGoals || [];
+  };
+
+  const getDietType = () => {
+    return state.currentUser?.preferences?.dietType || 'balanced';
   };
 
   const value = {
-    ...state,
-    ...actions,
+    // State
+    currentUser: state.currentUser,
+    isLoading: state.isLoading,
+    error: state.error,
+    
+    // Authentication
+    signIn,
+    signUp,
+    signOut,
+    logout: signOut, // Alias for compatibility
+    
+    // User preferences
+    updatePreferences,
+    addOrderToHistory,
+    
+    // Helper functions
+    isNewUser,
+    getDietaryRestrictions,
+    getAllergies,
+    getHealthGoals,
+    getDietType,
+    
+    // Error handling
+    setError,
+    clearError,
+    setLoading,
+    
+    // Demo users for login page
+    getDemoUsers: () => MOCK_USERS.map(u => ({ email: u.email, username: u.username }))
   };
 
   return (

@@ -5,8 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 
 // Context Providers
-import { AuthProvider } from './contexts/AuthContext';
-import { UserProvider } from './contexts/UserContext';
+import { UserProvider, useUser } from './contexts/UserContext';
 import { RecipeProvider } from './contexts/RecipeContext';
 import { CartProvider } from './contexts/CartContext';
 
@@ -25,15 +24,10 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 // Theme
 import theme from './styles/theme';
 
-// Custom hook for user state
-import { useUserPreferences } from './hooks/useUserPreferences';
-import { useAuth } from './contexts/AuthContext';
-
 function AppContent() {
-  const { currentUser, loading } = useAuth();
-  const { user, isLoading } = useUserPreferences();
+  const { currentUser, isLoading } = useUser();
 
-  if (loading || isLoading) {
+  if (isLoading) {
     return (
       <Box 
         display="flex" 
@@ -60,7 +54,7 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-            <Route 
+        <Route 
           path="/dashboard" 
           element={
             <ProtectedRoute>
@@ -93,13 +87,9 @@ function AppContent() {
         <Route 
           path="/" 
           element={
-            currentUser ? (
-              user && user.preferences ? 
+            currentUser && currentUser.preferences ? 
                 <Navigate to="/dashboard" replace /> : 
-                <Navigate to="/welcome" replace />
-            ) : (
               <Navigate to="/login" replace />
-            )
           } 
         />
         
@@ -114,17 +104,15 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <UserProvider>
-          <RecipeProvider>
-            <CartProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </CartProvider>
-          </RecipeProvider>
-        </UserProvider>
-      </AuthProvider>
+      <UserProvider>
+        <RecipeProvider>
+          <CartProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </CartProvider>
+        </RecipeProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 }

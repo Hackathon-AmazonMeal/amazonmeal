@@ -14,14 +14,14 @@ import {
   CardContent,
 } from '@mui/material';
 import { Restaurant } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useUser } from '../../contexts/UserContext';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, getDemoUsers } = useAuth();
+  const { signIn, getDemoUsers } = useUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
