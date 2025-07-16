@@ -1,13 +1,13 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useUser } from '../../contexts/UserContext';
 import { Box, CircularProgress } from '@mui/material';
 
 const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, isLoading } = useUser();
   const location = useLocation();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box 
         display="flex" 

@@ -29,8 +29,7 @@ import AllergySelector from '../../components/preferences/AllergySelector';
 // Hooks and Context
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useRecipes } from '../../contexts/RecipeContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import { useUser } from '../../contexts/UserContext';
 
 const steps = [
   'Diet',
@@ -44,12 +43,16 @@ const steps = [
 
 function PreferencesPage() {
   const navigate = useNavigate();
-  const { createUser, setLoading, setError, clearError } = useUserPreferences();
+  const { setLoading, setError, clearError } = useUserPreferences();
   const { getRecommendations } = useRecipes();
-  const { currentUser } = useAuth();
+  const { currentUser, updatePreferences: updateUserPreferences } = useUser();
   
-  // Ensure user is authenticated
-  useAuthRedirect();
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login');
+    }
+  }, [currentUser, navigate]);
 
   const [activeStep, setActiveStep] = useState(0);
   const [preferences, setPreferences] = useState({
@@ -163,7 +166,6 @@ function PreferencesPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
             userId,
@@ -183,12 +185,12 @@ function PreferencesPage() {
 
         const savedPreferences = await response.json();
         
-        // Create user with preferences in context
-        createUser(savedPreferences);
+        // Update user preferences in context
+        updateUserPreferences(savedPreferences);
       } catch (fetchError) {
-        // If API call fails, still create user with preferences locally
+        // If API call fails, still update preferences locally
         console.warn('API call failed, saving preferences locally:', fetchError);
-        createUser(preferences);
+        updateUserPreferences(preferences);
       }
 
       // Get personalized recommendations

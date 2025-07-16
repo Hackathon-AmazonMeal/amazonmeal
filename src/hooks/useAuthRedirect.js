@@ -1,38 +1,37 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useUser } from '../contexts/UserContext';
 
 // Custom hook to handle authentication redirects
 export const useAuthRedirect = () => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, isLoading } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Don't redirect while loading
-    if (loading) return;
+    if (isLoading) return;
 
     // If user is not authenticated, redirect to login
     if (!currentUser) {
       navigate('/login', { replace: true });
     }
-  }, [currentUser, loading, navigate]);
+  }, [currentUser, isLoading, navigate]);
 
-  return { currentUser, loading };
+  return { currentUser, isLoading };
 };
 
 // Hook to protect API calls - redirects to login if user is not authenticated
 export const useProtectedAPI = () => {
-  const { currentUser, token } = useAuth();
+  const { currentUser } = useUser();
   const navigate = useNavigate();
 
   const makeProtectedRequest = async (url, options = {}) => {
-    if (!currentUser || !token) {
+    if (!currentUser) {
       navigate('/login');
       throw new Error('User not authenticated');
     }
 
     const headers = {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
       ...options.headers,
     };

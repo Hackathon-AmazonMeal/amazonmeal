@@ -24,14 +24,14 @@ import {
 // Hooks
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useUser } from '../../contexts/UserContext';
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isNewUser } = useUserPreferences();
   const { totalItems } = useCart();
-  const { currentUser, signOut } = useAuth();
+  const { currentUser, signOut } = useUser();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleNavigation = (path) => {
@@ -61,7 +61,7 @@ function Header() {
   };
 
   // Don't show header on welcome and login pages
-  if (location.pathname === '/welcome' || location.pathname === '/login') {
+  if (location.pathname === '/login') {
     return null;
   }
 
@@ -107,8 +107,6 @@ function Header() {
           </Typography>
         </Box>
 
-        {/* Navigation */}
-        {!isNewUser() && (
           <Box display="flex" alignItems="center" gap={1}>
             {/* Dashboard */}
             <Button
@@ -163,6 +161,7 @@ function Header() {
                 color: totalItems > 0 ? 'primary.main' : 'text.primary',
                 ml: 1,
               }}
+              onClick={() => handleNavigation('/cart')}
             >
               <Badge badgeContent={totalItems} color="primary">
                 <ShoppingCart />
@@ -211,18 +210,6 @@ function Header() {
               </MenuItem>
             </Menu>
           </Box>
-        )}
-
-        {/* Show preferences button for new users */}
-        {isNewUser() && location.pathname !== '/preferences' && (
-          <Button
-            variant="contained"
-            onClick={() => handleNavigation('/preferences')}
-            sx={{ ml: 2 }}
-          >
-            Set Preferences
-          </Button>
-        )}
       </Toolbar>
     </AppBar>
   );

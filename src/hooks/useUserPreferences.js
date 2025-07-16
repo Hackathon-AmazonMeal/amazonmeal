@@ -4,12 +4,11 @@ export function useUserPreferences() {
   const userContext = useUser();
 
   return {
-    user: userContext.user,
+    user: userContext.currentUser,
     isLoading: userContext.isLoading,
     error: userContext.error,
     
     // User management
-    createUser: userContext.createUser,
     updatePreferences: userContext.updatePreferences,
     addOrderToHistory: userContext.addOrderToHistory,
     
