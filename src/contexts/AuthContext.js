@@ -15,32 +15,6 @@ const MOCK_USERS = [
       cuisinePreferences: ['ITALIAN', 'MEXICAN', 'ASIAN'],
       skillLevel: 'BEGINNER'
     }
-  },
-  {
-    userId: 'user-2',
-    username: 'familychef',
-    email: 'family@example.com',
-    preferences: {
-      dietaryRestrictions: [],
-      allergies: ['SHELLFISH'],
-      dislikedIngredients: ['mushrooms'],
-      cookingTime: 'MEDIUM',
-      cuisinePreferences: ['AMERICAN', 'ITALIAN', 'MEXICAN'],
-      skillLevel: 'INTERMEDIATE'
-    }
-  },
-  {
-    userId: 'user-3',
-    username: 'fitnessfan',
-    email: 'fitness@example.com',
-    preferences: {
-      dietaryRestrictions: ['GLUTEN_FREE', 'LOW_CARB'],
-      allergies: [],
-      dislikedIngredients: ['processed_foods'],
-      cookingTime: 'ANY',
-      cuisinePreferences: ['MEDITERRANEAN', 'ASIAN', 'AMERICAN'],
-      skillLevel: 'ADVANCED'
-    }
   }
 ];
 

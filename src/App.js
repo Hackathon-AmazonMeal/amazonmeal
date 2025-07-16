@@ -11,7 +11,6 @@ import { RecipeProvider } from './contexts/RecipeContext';
 import { CartProvider } from './contexts/CartContext';
 
 // Pages
-import Welcome from './pages/Welcome/Welcome';
 import LoginPage from './pages/Login/LoginPage';
 import PreferencesPage from './pages/Preferences/PreferencesPage';
 import RecipesPage from './pages/Recipes/RecipesPage';
@@ -52,16 +51,6 @@ function AppContent() {
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
-        
-        {/* Protected routes */}
-        <Route 
-          path="/welcome" 
-          element={
-            <ProtectedRoute>
-              <Welcome />
-            </ProtectedRoute>
-          } 
-        />
         
         <Route 
           path="/preferences" 
