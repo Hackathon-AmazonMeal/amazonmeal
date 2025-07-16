@@ -17,6 +17,7 @@ import PreferencesPage from './pages/Preferences/PreferencesPage';
 import RecipesPage from './pages/Recipes/RecipesPage';
 import Dashboard from './pages/Dashboard/Dashboard';
 import CheckoutSuccess from './pages/Checkout/CheckoutSuccess';
+import Cart from './pages/Cart';
 
 // Components
 import Layout from './components/layout/Layout';
@@ -70,7 +71,14 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-        
+            <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route 
           path="/recipes" 
           element={
@@ -80,15 +88,8 @@ function AppContent() {
           } 
         />
         
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        
+        {/* Dashboard for returning users */}
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route 
           path="/checkout/success" 
           element={
@@ -97,7 +98,8 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-        
+        {/* Shopping cart page */}
+        <Route path="/cart" element={<Cart />} />
         {/* Default route logic */}
         <Route 
           path="/" 

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -11,9 +12,9 @@ app.use(express.json());
 app.use(express.static('build'));
 
 // Mock data
-const breakfastRecipes = require('./data/recipes/breakfast.json');
-const lunchRecipes = require('./data/recipes/lunch.json');
-const dinnerRecipes = require('./data/recipes/dinner.json');
+const breakfastRecipes = require('./src/data/recipes/breakfast.json');
+const lunchRecipes = require('./src/data/recipes/lunch.json');
+const dinnerRecipes = require('./src/data/recipes/dinner.json');
 
 const allRecipes = [...breakfastRecipes, ...lunchRecipes, ...dinnerRecipes];
 
@@ -84,6 +85,9 @@ app.post('/api/recommendations/personalized', (req, res) => {
     });
   }, 1500);
 });
+
+// Note: Preference API calls are now made directly from frontend to external service
+// No proxy endpoint needed
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {

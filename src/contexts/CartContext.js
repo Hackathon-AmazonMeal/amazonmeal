@@ -129,6 +129,7 @@ export function CartProvider({ children }) {
         quantity: 1,
         originalAmount: ingredient.amount,
         originalUnit: ingredient.unit,
+        price: ingredient.price || 2.50, // Default price if not provided
       };
       dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
     },
@@ -170,6 +171,20 @@ export function CartProvider({ children }) {
     },
 
     addRecipeToCart: (recipe) => {
+      // Validate recipe object
+      if (!recipe || !recipe.id) {
+        console.error('Invalid recipe object:', recipe);
+        dispatch({ type: CART_ACTIONS.SET_ERROR, payload: 'Invalid recipe data' });
+        return;
+      }
+
+      // Check if recipe has ingredients
+      if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+        console.error('Recipe missing ingredients array:', recipe);
+        dispatch({ type: CART_ACTIONS.SET_ERROR, payload: 'Recipe ingredients not available' });
+        return;
+      }
+
       // Clear existing items
       dispatch({ type: CART_ACTIONS.CLEAR_CART });
       
@@ -189,6 +204,7 @@ export function CartProvider({ children }) {
           originalUnit: ingredient.unit,
           recipeId: recipe.id,
           recipeName: recipe.name,
+          price: ingredient.price || 2.50, // Default price if not provided
         };
         dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
       });
@@ -236,17 +252,24 @@ export function CartProvider({ children }) {
 
     // Get total estimated cost (mock calculation)
     getEstimatedTotal: () => {
-      // Mock pricing calculation
-      const baseCostPerItem = 2.50;
+      // Calculate total based on item prices and quantities
       return state.items.reduce((total, item) => {
-        return total + (baseCostPerItem * item.quantity);
+        const itemPrice = item.price || 2.50; // Default price if not set
+        return total + (itemPrice * item.quantity);
       }, 0);
     },
+  };
+
+  // Add computed properties
+  const computedValues = {
+    cartItems: state.items, // Alias for easier access
+    cartTotal: actions.getEstimatedTotal(), // Total cart value
   };
 
   const value = {
     ...state,
     ...actions,
+    ...computedValues,
   };
 
   return (

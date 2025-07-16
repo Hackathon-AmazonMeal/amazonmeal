@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { userService } from '../services/userService';
 
 const UserContext = createContext();
 
@@ -11,6 +12,7 @@ const USER_ACTIONS = {
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
+  SET_LOGIN_EMAIL: 'SET_LOGIN_EMAIL',
 };
 
 // Initial state
@@ -18,6 +20,7 @@ const initialState = {
   user: null,
   isLoading: false,
   error: null,
+  loginEmail: null,
 };
 
 // Reducer function
@@ -69,6 +72,12 @@ function userReducer(state, action) {
       return {
         ...state,
         error: null,
+      };
+
+    case USER_ACTIONS.SET_LOGIN_EMAIL:
+      return {
+        ...state,
+        loginEmail: action.payload,
       };
     
     default:
@@ -126,10 +135,70 @@ export function UserProvider({ children }) {
       dispatch({ type: USER_ACTIONS.CLEAR_ERROR });
     },
 
+    setLoginEmail: (email) => {
+      dispatch({ type: USER_ACTIONS.SET_LOGIN_EMAIL, payload: email });
+    },
+
+    // Enhanced login with external preference API
+    loginWithEmail: async (email) => {
+      dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
+      dispatch({ type: USER_ACTIONS.CLEAR_ERROR });
+
+      try {
+        const response = await userService.loginWithEmail(email);
+        
+        if (response.success) {
+          const userData = {
+            ...response.data,
+            email,
+          };
+          
+          dispatch({ type: USER_ACTIONS.SET_USER, payload: userData });
+          dispatch({ type: USER_ACTIONS.SET_LOGIN_EMAIL, payload: email });
+          
+          return { success: true, user: userData, hasExistingPreferences: !!response.data.preferences };
+        } else {
+          throw new Error(response.message || 'Login failed');
+        }
+      } catch (error) {
+        console.error('Login failed:', error);
+        dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error.message });
+        return { success: false, error: error.message };
+      } finally {
+        dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
+      }
+    },
+
+    // Load preferences from external API
+    loadExternalPreferences: async (email) => {
+      if (!email) return { success: false, error: 'Email is required' };
+
+      dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
+      dispatch({ type: USER_ACTIONS.CLEAR_ERROR });
+
+      try {
+        const response = await userService.getUserPreferencesByEmail(email);
+        
+        if (response.success && response.data) {
+          dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: response.data });
+          return { success: true, preferences: response.data };
+        } else {
+          return { success: false, error: 'No preferences found for this email' };
+        }
+      } catch (error) {
+        console.error('Failed to load external preferences:', error);
+        dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error.message });
+        return { success: false, error: error.message };
+      } finally {
+        dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
+      }
+    },
+
     // Create new user with preferences
-    createUser: (preferences) => {
+    createUser: (preferences, email = null) => {
       const newUser = {
         id: Date.now().toString(),
+        email: email || state.loginEmail,
         preferences,
         orderHistory: [],
         createdAt: new Date().toISOString(),
@@ -161,6 +230,16 @@ export function UserProvider({ children }) {
     // Get user's preferred diet type
     getDietType: () => {
       return state.user?.preferences?.dietType || 'balanced';
+    },
+
+    // Get user's email
+    getUserEmail: () => {
+      return state.user?.email || state.loginEmail;
+    },
+
+    // Check if user has existing preferences from external API
+    hasExternalPreferences: () => {
+      return state.user?.preferences && Object.keys(state.user.preferences).length > 0;
     },
   };
 

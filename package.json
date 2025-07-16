@@ -34,7 +34,14 @@
     "precheck": "echo '🔍 Running pre-flight checks...'",
     "postcheck": "echo '✅ All checks passed! Project is ready to run.'",
     "validate": "npm run lint && echo '✅ Linting passed' && npm run build && echo '✅ Build successful'",
-    "quick-check": "npm run lint --silent && echo '✅ Code quality check passed'"
+    "quick-check": "npm run lint --silent && echo '✅ Code quality check passed'",
+    "test:external-api": "node test-external-preference-api.js",
+    "test:transformation": "node test-transformation.js",
+    "test:integration": "npm run test:external-api && npm run test:transformation",
+    "demo:external-api": "echo '🚀 Testing external preference API integration...' && npm run test:integration",
+    "test:cors-fix": "node test-cors-fix.js",
+    "monitor:api": "node monitor-external-api.js",
+    "track:api": "node track-api-calls.js"
   },
   "eslintConfig": {
     "extends": [
@@ -61,7 +68,7 @@
     "eslint": "^8.54.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "prettier": "^3.1.0"
   },
   "homepage": ".",

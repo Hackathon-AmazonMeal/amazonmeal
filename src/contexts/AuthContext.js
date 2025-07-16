@@ -1,5 +1,6 @@
 // AuthContext.js - Authentication context for mock authentication
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { userService } from '../services/userService';
 
 // Mock users for demo - based on design specifications
 const MOCK_USERS = [
@@ -51,24 +52,89 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('authToken'));
 
-  // Mock sign in - in real app would call API
+  // Enhanced sign in with external preference loading
   const signIn = async (email, password) => {
     setLoading(true);
     try {
       // Find mock user by email (for demo)
-      const user = MOCK_USERS.find(u => u.email === email);
-      if (user) {
-        setCurrentUser(user);
-        // Generate mock JWT token
-        const mockToken = `mock-jwt-${Date.now()}`;
-        setToken(mockToken);
-        localStorage.setItem('authToken', mockToken);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        return user;
+      const mockUser = MOCK_USERS.find(u => u.email === email);
+      if (!mockUser) {
+        throw new Error('Invalid credentials');
       }
-      throw new Error('Invalid credentials');
+
+      // Load preferences from external API
+      console.log('Loading preferences from external API for email:', email);
+      const preferencesResponse = await userService.getUserPreferencesByEmail(email);
+      
+      let userWithPreferences = { ...mockUser };
+      
+      if (preferencesResponse.success && preferencesResponse.data) {
+        // Use external preferences if available
+        console.log('External preferences loaded successfully:', preferencesResponse.data);
+        userWithPreferences.preferences = preferencesResponse.data;
+        userWithPreferences.preferencesSource = 'external_api';
+      } else {
+        // Keep mock preferences as fallback
+        console.log('Using fallback mock preferences for user:', email);
+        userWithPreferences.preferencesSource = 'mock_data';
+      }
+
+      setCurrentUser(userWithPreferences);
+      
+      // Generate mock JWT token
+      const mockToken = `mock-jwt-${Date.now()}`;
+      setToken(mockToken);
+      localStorage.setItem('authToken', mockToken);
+      localStorage.setItem('currentUser', JSON.stringify(userWithPreferences));
+      
+      return userWithPreferences;
     } catch (error) {
+      console.error('Login failed:', error);
       throw new Error('Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Enhanced demo login with external preference loading
+  const signInWithDemo = async (email) => {
+    setLoading(true);
+    try {
+      // Find mock user by email (for demo)
+      const mockUser = MOCK_USERS.find(u => u.email === email);
+      if (!mockUser) {
+        throw new Error('Demo user not found');
+      }
+
+      // Load preferences from external API
+      console.log('Loading preferences from external API for demo user:', email);
+      const preferencesResponse = await userService.getUserPreferencesByEmail(email);
+      
+      let userWithPreferences = { ...mockUser };
+      
+      if (preferencesResponse.success && preferencesResponse.data) {
+        // Use external preferences if available
+        console.log('External preferences loaded successfully for demo user:', preferencesResponse.data);
+        userWithPreferences.preferences = preferencesResponse.data;
+        userWithPreferences.preferencesSource = 'external_api';
+      } else {
+        // Keep mock preferences as fallback
+        console.log('Using fallback mock preferences for demo user:', email);
+        userWithPreferences.preferencesSource = 'mock_data';
+      }
+
+      setCurrentUser(userWithPreferences);
+      
+      // Generate mock JWT token
+      const mockToken = `mock-jwt-${Date.now()}`;
+      setToken(mockToken);
+      localStorage.setItem('authToken', mockToken);
+      localStorage.setItem('currentUser', JSON.stringify(userWithPreferences));
+      
+      return userWithPreferences;
+    } catch (error) {
+      console.error('Demo login failed:', error);
+      throw new Error('Demo login failed');
     } finally {
       setLoading(false);
     }
@@ -147,6 +213,7 @@ export const AuthProvider = ({ children }) => {
     token,
     loading,
     signIn,
+    signInWithDemo,
     signUp,
     signOut,
     logout: signOut, // Alias for compatibility
