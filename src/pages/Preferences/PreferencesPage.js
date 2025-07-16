@@ -155,18 +155,18 @@ function PreferencesPage() {
       console.log('Complete Preferences Object:', preferences);
       
       // Get userId from logged in user
-      const userId = currentUser?.userId || currentUser?.id;
+      const email = currentUser?.userId || currentUser?.id;
       
       // Save preferences to backend API (mock for now)
       try {
-        const response = await fetch('/api/preferences', {
+        const response = await fetch('https://user-ms-iimt.vercel.app/preference', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
-            userId,
+            email,
             preferences,
           }),
         });
