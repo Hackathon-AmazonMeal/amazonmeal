@@ -21,7 +21,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, getDemoUsers } = useUser();
+  const { signIn, signUp, getDemoUsers } = useUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -39,10 +39,39 @@ const LoginPage = () => {
     setLoading(false);
   };
 
+  const handleGuestLogin = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      // Create a guest user with minimal information
+      const guestUser = {
+        username: `Guest_${Math.floor(Math.random() * 10000)}`,
+        email: `guest_${Date.now()}@example.com`,
+        preferences: {
+          dietaryRestrictions: [],
+          allergies: [],
+          dislikedIngredients: [],
+          cookingTime: 'MEDIUM',
+          cuisinePreferences: [],
+          skillLevel: 'BEGINNER'
+        }
+      };
+      
+      await signUp(guestUser);
+      // Redirect to preferences page for setup
+      navigate('/preferences');
+    } catch (error) {
+      setError('Failed to create guest account');
+    }
+    
+    setLoading(false);
+  };
+
   const handleDemoLogin = (demoEmail) => {
     setEmail(demoEmail);
     setPassword('demo123');
   };
+
 
   const demoUsers = getDemoUsers();
 
@@ -122,6 +151,24 @@ const LoginPage = () => {
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </Box>
+
+          <Divider sx={{ my: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              OR TRY WITHOUT ACCOUNT
+            </Typography>
+          </Divider>
+
+          {/* Guest Login Button */}
+          <Button
+            fullWidth
+            variant="contained"
+            color="secondary"
+            sx={{ mb: 3, py: 1.5 }}
+            onClick={handleGuestLogin}
+            disabled={loading}
+          >
+            Login as Guest
+          </Button>
 
           <Divider sx={{ my: 3 }}>
             <Typography variant="body2" color="text.secondary">

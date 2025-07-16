@@ -70,6 +70,14 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
+        <Route 
+          path="/cart" 
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } 
+        />
         
         {/* Dashboard for returning users */}
         <Route path="/dashboard" element={<Dashboard />} />
