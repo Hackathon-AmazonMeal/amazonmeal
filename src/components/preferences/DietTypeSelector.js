@@ -98,12 +98,6 @@ function DietTypeSelector({ selected = 'vegetarian', onChange, error }) {
           ))}
         </Grid>
       </RadioGroup>
-
-      {error && (
-        <FormHelperText error sx={{ mt: 2, fontSize: '1rem' }}>
-          {error}
-        </FormHelperText>
-      )}
     </Box>
   );
 }

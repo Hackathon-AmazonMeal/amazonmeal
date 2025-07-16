@@ -129,8 +129,8 @@ function PreferencesPage() {
         }
         break;
       case 5: // Prep For
-        if (!preferences.prepFor) {
-          stepErrors.prepFor = 'Please select who you are cooking for';
+        if (!preferences.numberOfPeople) {
+          stepErrors.numberOfPeople = 'Please select who you are cooking for';
         }
         break;
       case 6: // Allergies - optional
@@ -240,8 +240,7 @@ function PreferencesPage() {
         return (
           <DietTypeSelector
             selected={preferences.dietType}
-            onChange={(value) => updatePreferences('cateogry', value)}
-            error={errors.dietType}
+            onChange={(value) => updatePreferences('dietType', value)}
           />
         );
       case 1:
@@ -249,7 +248,6 @@ function PreferencesPage() {
           <HealthGoals
             selected={preferences.healthGoals}
             onChange={(value) => updatePreferences('healthGoals', value)}
-            error={errors.healthGoals}
           />
         );
       case 2:
@@ -257,7 +255,6 @@ function PreferencesPage() {
           <MealTypeSelector
             selected={preferences.mealType}
             onChange={(value) => updatePreferences('mealType', value)}
-            error={errors.mealType}
           />
         );
       case 3:
@@ -265,7 +262,6 @@ function PreferencesPage() {
           <CookingTimeToggle
             selected={preferences.cookingTime}
             onChange={(value) => updatePreferences('cookingTime', value)}
-            error={errors.cookingTime}
           />
         );
       case 4:
@@ -273,15 +269,13 @@ function PreferencesPage() {
           <CookingMethodSelector
             selected={preferences.cookingMethod}
             onChange={(value) => updatePreferences('cookingMethod', value)}
-            error={errors.cookingMethod}
           />
         );
       case 5:
         return (
           <PrepForSelector
-            selected={preferences.prepFor}
+            selected={preferences.numberOfPeople}
             onChange={(value) => updatePreferences('numberOfPeople', value)}
-            error={errors.prepFor}
           />
         );
       case 6:
@@ -289,7 +283,6 @@ function PreferencesPage() {
           <AllergySelector
             selected={preferences.allergies}
             onChange={(value) => updatePreferences('allergies', value)}
-            error={errors.allergies}
           />
         );
       default:
