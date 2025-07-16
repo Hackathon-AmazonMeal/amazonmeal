@@ -20,6 +20,7 @@ import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Delete, ShoppingCart, Person, Email, Add, Remove } from '@mui/icons-material';
 import orderService from '../services/orderService';
+import cartService from '../services/cartService';
 
 const Cart = () => {
   // Use the SAME properties and methods as CartSidebar for perfect sync
@@ -88,12 +89,23 @@ const Cart = () => {
       });
 
       if (orderResult.success) {
-        // Clear cart and show success
-        clearCart();
-        setSuccessMessage(`Order ${orderResult.orderId} processed successfully!`);
+        
+        // setSuccessMessage(`Order ${orderResult.orderId} processed successfully!`);
+
+        //Email sent API
+        // Process order after successful fulfillment
+        try {
+          console.log('Processing order fulfillment for order ID:', orderResult.orderId);
+          await cartService.processOrder(orderResult.orderId);
+          console.log('Order fulfillment processing completed successfully');
+        } catch (processError) {
+          console.error('Failed to process order fulfillment:', processError);
+          // Don't fail the entire flow if processing fails
+          // The order was still successful, just log the error
+        }
         
         // Navigate to success page after a short delay
-        setTimeout(() => {
+        
           navigate('/checkout/success', { 
             state: { 
               orderId: orderResult.orderId,
@@ -104,7 +116,9 @@ const Cart = () => {
               externalOrderId: orderResult.orderId
             }
           });
-        }, 2000); // Increased delay to show success message
+        
+        // Clear cart and show success
+        clearCart();
       }
     } catch (error) {
       console.error('Checkout failed:', error);
