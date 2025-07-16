@@ -28,21 +28,21 @@ class OrderService {
         .map(item => `${item.name} (${item.quantity} ${item.unit})`)
         .join(', ');
 
+        console.log("item: ", orderData)
+
       const requestPayload = {
         order_id: orderId,
         email: orderData.email,
-        product: primaryItem ? primaryItem.name : 'AmazonMeal Order',
-        quantity: orderData.items.reduce((total, item) => total + item.quantity, 0),
-        amount: orderData.totalAmount,
         customer_name: orderData.customerName,
         recipe_image_link: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', // Default recipe image
-        // Additional fields for our use case
-        all_items: allItemsDescription,
-        item_count: orderData.items.length,
-        order_type: 'meal_kit'
+        products: orderData.items.map((item) => {
+          return {
+            name: item.name,
+            cost: item.price,
+            quantity: item.quantity
+          }
+        }),
       };
-
-      console.log('Processing order with external API:', requestPayload);
 
       const response = await axios.post(ORDER_PROCESSING_API, requestPayload, {
         headers: {
