@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const UserContext = createContext();
@@ -54,25 +54,25 @@ function userReducer(state, action) {
     case USER_ACTIONS.UPDATE_PREFERENCES:
       return {
         ...state,
-        currentUser: {
+        currentUser: state.currentUser ? {
           ...state.currentUser,
           preferences: {
-            ...state.currentUser?.preferences,
+            ...state.currentUser.preferences,
             ...action.payload
           },
-        },
+        } : null,
       };
     
     case USER_ACTIONS.ADD_ORDER_HISTORY:
       return {
         ...state,
-        currentUser: {
+        currentUser: state.currentUser ? {
           ...state.currentUser,
           orderHistory: [
             action.payload,
-            ...(state.currentUser?.orderHistory || []),
+            ...(state.currentUser.orderHistory || []),
           ].slice(0, 5), // Keep only last 5 orders
-        },
+        } : null,
       };
     
     case USER_ACTIONS.SET_LOADING:
@@ -104,15 +104,24 @@ function userReducer(state, action) {
   }
 }
 
+// Helper function to compare objects deeply
+function isEqual(obj1, obj2) {
+  return JSON.stringify(obj1) === JSON.stringify(obj2);
+}
+
 // Provider component
 export function UserProvider({ children }) {
   const [state, dispatch] = useReducer(userReducer, initialState);
   const [storedUser, setStoredUser] = useLocalStorage('currentUser', null);
+  
+  // Flag to prevent initial sync from triggering updates
+  const isInitialSync = React.useRef(true);
+  
+  // Flag to track if we're updating from localStorage
+  const isUpdatingFromStorage = React.useRef(false);
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount - only run once
   useEffect(() => {
-    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
-    
     if (storedUser) {
       try {
         const parsedUser = typeof storedUser === 'string' ? JSON.parse(storedUser) : storedUser;
@@ -123,15 +132,23 @@ export function UserProvider({ children }) {
       }
     }
     
-    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
-  }, [storedUser]);
+    // Mark initial sync as complete
+    isInitialSync.current = false;
+  }, []); // Empty dependency array means this only runs once on mount
 
-  // Save user to localStorage when user changes
+  // Persist user changes to localStorage, but only when state.currentUser changes
+  // and is different from what's already in localStorage
   useEffect(() => {
-    if (state.currentUser) {
+    // Skip during initial sync or when updating from storage
+    if (isInitialSync.current || isUpdatingFromStorage.current) {
+      return;
+    }
+    
+    // Only update localStorage if the user has changed and is different from stored value
+    if (!isEqual(state.currentUser, storedUser)) {
       setStoredUser(state.currentUser);
     }
-  }, [state.currentUser, setStoredUser]);
+  }, [state.currentUser, setStoredUser, storedUser]);
 
   // Authentication actions
   const signIn = async (email, password) => {
@@ -185,71 +202,53 @@ export function UserProvider({ children }) {
     localStorage.removeItem('currentUser');
   };
 
-  // User preference actions
-  const updatePreferences = (preferences) => {
+  // User preference actions - wrapped in useCallback to prevent unnecessary re-renders
+  const updatePreferences = useCallback((preferences) => {
     dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
-  };
+  }, []);
 
-  // Update a specific preference field
-  const updatePreferenceField = (field, value) => {
-    dispatch({ 
-      type: USER_ACTIONS.UPDATE_PREFERENCES, 
-      payload: { [field]: value } 
-    });
-  };
-
-  // Reset preferences to defaults
-  const resetPreferences = () => {
-    const defaultPreferences = {
-      dietType: 'vegetarian',
-      healthGoals: [],
-      mealType: 'dinner',
-      cookingTime: 'medium',
-      cookingMethod: 'stovetop',
-      numberOfPeople: 1,
-      allergies: [],
-    };
-    dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: defaultPreferences });
-  };
-
-  const addOrderToHistory = (order) => {
+  const addOrderToHistory = useCallback((order) => {
     const orderWithTimestamp = {
       ...order,
       timestamp: new Date().toISOString(),
       id: Date.now().toString(),
     };
     dispatch({ type: USER_ACTIONS.ADD_ORDER_HISTORY, payload: orderWithTimestamp });
-  };
+  }, []);
 
   // Error handling actions
-  const setError = (error) => {
+  const setError = useCallback((error) => {
     dispatch({ type: USER_ACTIONS.SET_ERROR, payload: error });
-  };
+  }, []);
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatch({ type: USER_ACTIONS.CLEAR_ERROR });
-  };
+  }, []);
 
-  const setLoading = (loading) => {
+  const setLoading = useCallback((loading) => {
     dispatch({ type: USER_ACTIONS.SET_LOADING, payload: loading });
-  };
+  }, []);
 
   // Helper functions
-  const isNewUser = () => {
+  const isNewUser = useCallback(() => {
     return !state.currentUser || !state.currentUser.preferences;
-  };
+  }, [state.currentUser]);
 
-  const getAllergies = () => {
+  const getDietaryRestrictions = useCallback(() => {
+    return state.currentUser?.preferences?.dietaryRestrictions || [];
+  }, [state.currentUser]);
+
+  const getAllergies = useCallback(() => {
     return state.currentUser?.preferences?.allergies || [];
-  };
+  }, [state.currentUser]);
 
-  const getHealthGoals = () => {
+  const getHealthGoals = useCallback(() => {
     return state.currentUser?.preferences?.healthGoals || [];
-  };
+  }, [state.currentUser]);
 
-  const getDietType = () => {
-    return state.currentUser?.preferences?.dietType || 'vegetarian';
-  };
+  const getDietType = useCallback(() => {
+    return state.currentUser?.preferences?.dietType || 'balanced';
+  }, [state.currentUser]);
 
   const value = {
     // State

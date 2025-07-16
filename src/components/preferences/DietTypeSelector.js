@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Typography,
   Card,
   CardContent,
   Grid,
-  FormHelperText,
   Radio,
   RadioGroup,
   FormControlLabel,
-  Stack,
 } from '@mui/material';
 import {
   Restaurant,
@@ -18,7 +17,10 @@ import {
 } from '@mui/icons-material';
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 
-const dietTypes = [
+/**
+ * Diet type options with their metadata
+ */
+const DIET_TYPES = [
   {
     id: 'vegetarian',
     label: 'Vegetarian',
@@ -42,14 +44,19 @@ const dietTypes = [
   },
 ];
 
-function DietTypeSelector({ selected, onChange, error }) {
-  // Get diet type from context if not provided as prop
-  const { getDietType, updatePreferenceField } = useUserPreferences();
-  const contextDietType = getDietType();
-  
-  // Use prop if provided, otherwise use context value
-  const [selectedDietType, setSelectedDietType] = useState(selected || contextDietType);
+/**
+ * DietTypeSelector component for selecting dietary preference
+ * 
+ * @param {Object} props - Component props
+ * @param {string} props.selected - Currently selected diet type
+ * @param {Function} props.onChange - Callback when selection changes
+ * @param {string} [props.error] - Error message to display
+ * @returns {JSX.Element} Diet type selection component
+ */
+function DietTypeSelector({ selected = 'vegetarian', onChange, error }) {
+  const [selectedDietType, setSelectedDietType] = useState(selected);
 
+  // Update local state when prop changes
   // Update local state when prop changes
   useEffect(() => {
     if (selected) {
@@ -57,6 +64,10 @@ function DietTypeSelector({ selected, onChange, error }) {
     }
   }, [selected]);
 
+  /**
+   * Handle radio button change event
+   * @param {Object} event - Change event
+   */
   const handleChange = (event) => {
     const value = event.target.value;
     setSelectedDietType(value);
@@ -80,9 +91,13 @@ function DietTypeSelector({ selected, onChange, error }) {
         Choose your dietary preference.
       </Typography>
 
-      <RadioGroup value={selectedDietType} onChange={handleChange}>
+      <RadioGroup 
+        value={selectedDietType} 
+        onChange={handleChange}
+        aria-label="diet type selection"
+      >
         <Grid container spacing={3}>
-          {dietTypes.map((diet) => (
+          {DIET_TYPES.map((diet) => (
             <Grid item xs={12} md={4} key={diet.id}>
               <Card
                 sx={{
@@ -98,6 +113,8 @@ function DietTypeSelector({ selected, onChange, error }) {
                   }
                   updatePreferenceField('dietType', diet.id);
                 }}
+                role="radio"
+                aria-checked={selectedDietType === diet.id}
               >
                 <CardContent sx={{ p: 3, textAlign: 'center' }}>
                   <Box sx={{ color: `${diet.color}.main`, mb: 2, fontSize: '2rem' }}>
@@ -119,12 +136,35 @@ function DietTypeSelector({ selected, onChange, error }) {
       </RadioGroup>
       
       {error && (
-        <FormHelperText error sx={{ mt: 2, fontSize: '0.9rem' }}>
+        <Typography color="error" variant="body2" sx={{ mt: 2 }}>
           {error}
-        </FormHelperText>
+        </Typography>
       )}
     </Box>
   );
 }
 
+DietTypeSelector.propTypes = {
+  /**
+   * Currently selected diet type
+   */
+  selected: PropTypes.string,
+  
+  /**
+   * Callback function when selection changes
+   */
+  onChange: PropTypes.func.isRequired,
+  
+  /**
+   * Error message to display
+   */
+  error: PropTypes.string,
+};
+
+DietTypeSelector.defaultProps = {
+  selected: 'vegetarian',
+  error: null,
+};
+
 export default DietTypeSelector;
+

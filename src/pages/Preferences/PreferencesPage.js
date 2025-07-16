@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import {
   Box,
   Container,
@@ -29,8 +30,14 @@ import AllergySelector from '../../components/preferences/AllergySelector';
 // Hooks and Context
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useUser } from '../../contexts/UserContext';
+import { useApi } from '../../hooks/useApi';
 
-const steps = [
+// Utils
+import { validatePreferences } from '../../utils/validation';
+import { API, DIET_TYPES, MEAL_TYPES, COOKING_TIMES, COOKING_METHODS, ERROR_MESSAGES } from '../../utils/constants';
+
+// Constants
+const STEPS = [
   'Diet',
   'Health Goal',
   'Meal Type',
@@ -40,74 +47,141 @@ const steps = [
   'Allergies',
 ];
 
+// Default preferences
+const DEFAULT_PREFERENCES = {
+  dietType: DIET_TYPES.VEGETARIAN,
+  healthGoals: [],
+  mealType: MEAL_TYPES.DINNER,
+  cookingTime: COOKING_TIMES.MEDIUM,
+  cookingMethod: COOKING_METHODS.STOVETOP,
+  numberOfPeople: 1,
+  allergies: [],
+};
+
+// Step to validation key mapping
+const STEP_VALIDATION_MAP = [
+  'dietType',
+  'healthGoals',
+  'mealType',
+  'cookingTime',
+  'cookingMethod',
+  'numberOfPeople',
+  'allergies',
+];
+
+/**
+ * PreferencesPage component for setting user preferences
+ * Implements a multi-step form with validation and submission handling
+ */
 function PreferencesPage() {
   const navigate = useNavigate();
-  const { setLoading, setError, clearError, preferences: userPreferences } = useUserPreferences();
+  const { setLoading: setUserLoading, clearError: clearUserError } = useUserPreferences();
+  const { getRecommendations } = useRecipes();
   const { currentUser, updatePreferences: updateUserPreferences } = useUser();
+  const { post, isLoading: isApiLoading, error: apiError, clearError: clearApiError } = useApi();
   
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/login');
-    }
-  }, [currentUser, navigate]);
-
+  // State management
   const [activeStep, setActiveStep] = useState(0);
-  // Initialize preferences from user context
-  const [preferences, setPreferences] = useState(() => {
-    // Get preferences from user context if available
-    if (userPreferences) {
-      return {
-        dietType: userPreferences.dietType || 'vegetarian',
-        healthGoals: userPreferences.healthGoals || [],
-        mealType: userPreferences.mealType || 'dinner',
-        cookingTime: userPreferences.cookingTime || 'medium',
-        cookingMethod: userPreferences.cookingMethod || 'stovetop',
-        numberOfPeople: userPreferences.numberOfPeople || 1,
-        allergies: userPreferences.allergies || [],
-      };
-    }
-    
-    // Default preferences if user has none
-    return {
-      dietType: 'vegetarian',
-      healthGoals: [],
-      mealType: 'dinner',
-      cookingTime: 'medium',
-      cookingMethod: 'stovetop',
-      numberOfPeople: 1,
-      allergies: [],
-    };
-  });
+  const [preferences, setPreferences] = useState({ ...DEFAULT_PREFERENCES });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Update preferences when user preferences change
+  // Clear any existing errors when component mounts
   useEffect(() => {
-    if (userPreferences) {
-      setPreferences({
-        dietType: userPreferences.dietType || 'vegetarian',
-        healthGoals: userPreferences.healthGoals || [],
-        mealType: userPreferences.mealType || 'dinner',
-        cookingTime: userPreferences.cookingTime || 'medium',
-        cookingMethod: userPreferences.cookingMethod || 'stovetop',
-        numberOfPeople: userPreferences.numberOfPeople || 1,
-        allergies: userPreferences.allergies || [],
-      });
-    }
-  }, [userPreferences]);
+    clearUserError();
+    clearApiError();
+  }, [clearUserError, clearApiError]);
 
-  // Clear any existing errors when component mounts and check auth
-  useEffect(() => {
-    clearError();
-    
-    // If user is not authenticated, redirect to login
-    if (!currentUser) {
-      navigate('/login');
-    }
-  }, [clearError, currentUser, navigate]);
+  /**
+   * Validates the current step's data
+   * @param {number} step - Current step index
+   * @returns {Object} - Object containing validation errors
+   */
+  const validateStep = useCallback((step) => {
+    const validationKey = STEP_VALIDATION_MAP[step];
+    return validatePreferences(preferences, validationKey);
+  }, [preferences]);
 
-  const handleNext = () => {
+  /**
+   * Handles form submission
+   * Saves preferences and navigates to recipes page
+   */
+  const handleSubmit = useCallback(async () => {
+    try {
+      setIsSubmitting(true);
+      setUserLoading(true);
+      clearUserError();
+      clearApiError();
+
+      // Check if user is authenticated or guest
+      const isGuest = !currentUser;
+      
+      // Get userId from logged in user or use 'guest' for guest users
+      const userId = currentUser?.email || currentUser?.userId || 'guest';
+      
+      // Save preferences to backend API
+      try {
+        const preferenceData = {
+          email: userId,
+          preferences: preferences,
+        };
+
+        const savedPreferences = await post(API.PREFERENCES, preferenceData);
+        
+        // Update user preferences in context if user is authenticated
+        if (!isGuest) {
+          updateUserPreferences(savedPreferences);
+        }
+      } catch (fetchError) {
+        // If API call fails with 401, redirect to login
+        if (fetchError.message.includes('401') && !isGuest) {
+          navigate('/login');
+          return;
+        }
+        
+        // If API call fails, still update preferences locally
+        console.warn('API call failed, saving preferences locally:', fetchError);
+        if (!isGuest) {
+          updateUserPreferences(preferences);
+        }
+      }
+
+      // Get personalized recommendations
+      try {
+        await getRecommendations(preferences);
+      } catch (recError) {
+        if (recError.message === 'User not authenticated' && !isGuest) {
+          navigate('/login');
+          return;
+        }
+        throw recError;
+      }
+
+      // Navigate to recipes page
+      navigate('/recipes');
+    } catch (error) {
+      console.error('Error setting up preferences:', error);
+      setErrors({ submit: ERROR_MESSAGES.PREFERENCES_SAVE_FAILED });
+    } finally {
+      setIsSubmitting(false);
+      setUserLoading(false);
+    }
+  }, [
+    clearUserError, 
+    clearApiError,
+    currentUser, 
+    getRecommendations, 
+    navigate, 
+    post,
+    preferences, 
+    setUserLoading, 
+    updateUserPreferences
+  ]);
+
+  /**
+   * Handles navigation to next step or form submission
+   */
+  const handleNext = useCallback(() => {
     // Validate current step
     const stepErrors = validateStep(activeStep);
     if (Object.keys(stepErrors).length > 0) {
@@ -117,125 +191,27 @@ function PreferencesPage() {
 
     setErrors({});
     
-    if (activeStep === steps.length - 1) {
+    if (activeStep === STEPS.length - 1) {
       handleSubmit();
     } else {
       setActiveStep((prevStep) => prevStep + 1);
     }
-  };
+  }, [activeStep, handleSubmit, validateStep]);
 
-  const handleBack = () => {
+  /**
+   * Handles navigation to previous step
+   */
+  const handleBack = useCallback(() => {
     setActiveStep((prevStep) => prevStep - 1);
     setErrors({});
-  };
+  }, []);
 
-  const validateStep = (step) => {
-    const stepErrors = {};
-
-    switch (step) {
-      case 0: // Diet Type
-        if (!preferences.dietType) {
-          stepErrors.dietType = 'Please select a diet type';
-        }
-        break;
-      case 1: // Health Goals
-        if (preferences.healthGoals.length === 0) {
-          stepErrors.healthGoals = 'Please select at least one health goal';
-        }
-        break;
-      case 2: // Meal Type
-        if (!preferences.mealType) {
-          stepErrors.mealType = 'Please select a meal type';
-        }
-        break;
-      case 3: // Cooking Time
-        if (!preferences.cookingTime) {
-          stepErrors.cookingTime = 'Please select a cooking time';
-        }
-        break;
-      case 4: // Cooking Method
-        if (!preferences.cookingMethod) {
-          stepErrors.cookingMethod = 'Please select a cooking method';
-        }
-        break;
-      case 5: // Prep For
-        if (!preferences.numberOfPeople) {
-          stepErrors.numberOfPeople = 'Please select who you are cooking for';
-        }
-        break;
-      case 6: // Allergies - optional
-        break;
-      default:
-        break;
-    }
-
-    return stepErrors;
-  };
-
-  const handleSubmit = async () => {
-    try {
-      setIsSubmitting(true);
-      setLoading(true);
-      clearError();
-
-      // Check if user is still authenticated
-      if (!currentUser) {
-        navigate('/login');
-        return;
-      }
-
-      // Log complete preferences object
-      console.log('Complete Preferences Object:', preferences);
-      
-      // Get userId from logged in user
-      const userId = currentUser?.email || currentUser?.userId;
-      
-      // Save preferences to backend API (mock for now)
-      try {
-        const pref = JSON.stringify({
-            email: userId,
-            preferences: preferences,
-          });
-          console.log("preference: ", pref);
-
-        const response = await fetch('https://user-ms-iimt.vercel.app/preference', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: pref,
-        });
-
-        if (response.status === 401) {
-          // User session expired, redirect to login
-          navigate('/login');
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error('Failed to save preferences');
-        }
-        
-        // Update user preferences in context
-        updateUserPreferences(preferences);
-      } catch (fetchError) {
-        // If API call fails, still update preferences locally
-        console.warn('API call failed, saving preferences locally:', fetchError);
-        updateUserPreferences(preferences);
-      }
-
-      // Navigate to recipes page
-      navigate('/recipes');
-    } catch (error) {
-      console.error('Error setting up preferences:', error);
-      setError('Failed to save your preferences. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-      setLoading(false);
-    }
-  };
-
-  const updatePreferences = (key, value) => {
+  /**
+   * Updates preference state and clears related errors
+   * @param {string} key - Preference key to update
+   * @param {any} value - New value for the preference
+   */
+  const updatePreference = useCallback((key, value) => {
     setPreferences(prev => ({
       ...prev,
       [key]: value,
@@ -249,66 +225,90 @@ function PreferencesPage() {
         return newErrors;
       });
     }
-  };
+  }, [errors]);
 
-  const renderStepContent = (step) => {
+  /**
+   * Renders the content for the current step
+   * @param {number} step - Current step index
+   * @returns {JSX.Element} - Component for the current step
+   */
+  const renderStepContent = useCallback((step) => {
     switch (step) {
       case 0:
         return (
           <DietTypeSelector
             selected={preferences.dietType}
-            onChange={(value) => updatePreferences('dietType', value)}
+            onChange={(value) => updatePreference('dietType', value)}
+            error={errors.dietType}
           />
         );
       case 1:
         return (
           <HealthGoals
             selected={preferences.healthGoals}
-            onChange={(value) => updatePreferences('healthGoals', value)}
+            onChange={(value) => updatePreference('healthGoals', value)}
+            error={errors.healthGoals}
           />
         );
       case 2:
         return (
           <MealTypeSelector
             selected={preferences.mealType}
-            onChange={(value) => updatePreferences('mealType', value)}
+            onChange={(value) => updatePreference('mealType', value)}
+            error={errors.mealType}
           />
         );
       case 3:
         return (
           <CookingTimeToggle
             selected={preferences.cookingTime}
-            onChange={(value) => updatePreferences('cookingTime', value)}
+            onChange={(value) => updatePreference('cookingTime', value)}
+            error={errors.cookingTime}
           />
         );
       case 4:
         return (
           <CookingMethodSelector
             selected={preferences.cookingMethod}
-            onChange={(value) => updatePreferences('cookingMethod', value)}
+            onChange={(value) => updatePreference('cookingMethod', value)}
+            error={errors.cookingMethod}
           />
         );
       case 5:
         return (
           <PrepForSelector
             selected={preferences.numberOfPeople}
-            onChange={(value) => updatePreferences('numberOfPeople', value)}
+            onChange={(value) => updatePreference('numberOfPeople', value)}
+            error={errors.numberOfPeople}
           />
         );
       case 6:
         return (
           <AllergySelector
             selected={preferences.allergies}
-            onChange={(value) => updatePreferences('allergies', value)}
+            onChange={(value) => updatePreference('allergies', value)}
+            error={errors.allergies}
           />
         );
       default:
         return null;
     }
-  };
+  }, [preferences, updatePreference, errors]);
 
-  const isLastStep = activeStep === steps.length - 1;
-  const isFirstStep = activeStep === 0;
+  // Memoize these values to prevent unnecessary re-renders
+  const isLastStep = useMemo(() => activeStep === STEPS.length - 1, [activeStep]);
+  const isFirstStep = useMemo(() => activeStep === 0, [activeStep]);
+
+  // Combine API and form errors
+  const hasError = useMemo(() => 
+    Object.keys(errors).length > 0 || apiError, 
+    [errors, apiError]
+  );
+  
+  const errorMessage = useMemo(() => 
+    errors.submit || apiError || (Object.values(errors)[0]), 
+    [errors, apiError]
+  );
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
@@ -335,7 +335,7 @@ function PreferencesPage() {
         {/* Stepper */}
         <Box mb={4}>
           <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
+            {STEPS.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
               </Step>
@@ -355,9 +355,9 @@ function PreferencesPage() {
         </Card>
 
         {/* Error Display */}
-        {Object.keys(errors).length > 0 && (
+        {hasError && (
           <Alert severity="error" sx={{ mb: 3 }}>
-            {Object.values(errors)[0]}
+            {errorMessage}
           </Alert>
         )}
 
@@ -370,25 +370,26 @@ function PreferencesPage() {
         >
           <Button
             onClick={handleBack}
-            disabled={isFirstStep || isSubmitting}
+            disabled={isFirstStep || isSubmitting || isApiLoading}
             startIcon={<ArrowBack />}
             variant="outlined"
             size="large"
+            aria-label="Go back to previous step"
           >
             Back
           </Button>
 
           <Box textAlign="center">
             <Typography variant="body2" color="text.secondary">
-              Step {activeStep + 1} of {steps.length}
+              Step {activeStep + 1} of {STEPS.length}
             </Typography>
           </Box>
 
           <Button
             onClick={handleNext}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isApiLoading}
             endIcon={
-              isSubmitting ? (
+              (isSubmitting || isApiLoading) ? (
                 <CircularProgress size={20} />
               ) : isLastStep ? null : (
                 <ArrowForward />
@@ -397,8 +398,9 @@ function PreferencesPage() {
             variant="contained"
             size="large"
             sx={{ minWidth: 120 }}
+            aria-label={isLastStep ? "Submit preferences" : "Go to next step"}
           >
-            {isSubmitting
+            {(isSubmitting || isApiLoading)
               ? 'Processing...'
               : isLastStep
               ? 'Get My Recipes'
@@ -408,8 +410,8 @@ function PreferencesPage() {
         </Stack>
 
         {/* Progress Indicator */}
-        {isSubmitting && (
-          <Box textAlign="center" mt={3}>
+        {(isSubmitting || isApiLoading) && (
+          <Box textAlign="center" mt={3} role="status" aria-live="polite">
             <Typography variant="body2" color="text.secondary" gutterBottom>
               Generating your personalized recommendations...
             </Typography>
@@ -422,5 +424,8 @@ function PreferencesPage() {
     </Box>
   );
 }
+
+// PropTypes would be defined here if the component accepted props
+PreferencesPage.propTypes = {};
 
 export default PreferencesPage;
