@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Direct external API endpoint - no proxy
-const EXTERNAL_PREFERENCE_API_URL = 'https://user-ms-iimt.vercel.app/api/preference';
+const EXTERNAL_PREFERENCE_API_URL = 'https://user-ms-iimt.vercel.app/preference';
 
 class PreferenceService {
   /**

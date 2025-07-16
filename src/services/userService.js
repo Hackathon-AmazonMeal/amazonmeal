@@ -2,12 +2,12 @@ import { apiClient, API_ENDPOINTS, USE_MOCK_DATA, createApiResponse } from './ap
 
 class UserService {
   // External preference API configuration
-  static EXTERNAL_PREFERENCE_API = 'https://user-ms-iimt.vercel.app/api/preference';
+  static EXTERNAL_PREFERENCE_API = 'https://user-ms-iimt.vercel.app/preference';
 
   // Get user preferences from external API by email
   async getUserPreferencesByEmail(email) {
     try {
-      const response = await fetch(`${UserService.EXTERNAL_PREFERENCE_API}?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`${UserService.EXTERNAL_PREFERENCE_API}/${encodeURIComponent(email)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
