@@ -16,6 +16,7 @@ import {
   Nature,
   Egg,
 } from '@mui/icons-material';
+import { useUserPreferences } from '../../hooks/useUserPreferences';
 
 const dietTypes = [
   {
@@ -41,17 +42,32 @@ const dietTypes = [
   },
 ];
 
-function DietTypeSelector({ selected = 'vegetarian', onChange, error }) {
-  const [selectedDietType, setSelectedDietType] = useState(selected);
+function DietTypeSelector({ selected, onChange, error }) {
+  // Get diet type from context if not provided as prop
+  const { getDietType, updatePreferenceField } = useUserPreferences();
+  const contextDietType = getDietType();
+  
+  // Use prop if provided, otherwise use context value
+  const [selectedDietType, setSelectedDietType] = useState(selected || contextDietType);
 
+  // Update local state when prop changes
   useEffect(() => {
-    setSelectedDietType(selected);
+    if (selected) {
+      setSelectedDietType(selected);
+    }
   }, [selected]);
 
   const handleChange = (event) => {
     const value = event.target.value;
     setSelectedDietType(value);
-    onChange(value);
+    
+    // Call prop onChange if provided
+    if (onChange) {
+      onChange(value);
+    }
+    
+    // Always update context
+    updatePreferenceField('dietType', value);
   };
 
   return (
@@ -77,7 +93,10 @@ function DietTypeSelector({ selected = 'vegetarian', onChange, error }) {
                 }}
                 onClick={() => {
                   setSelectedDietType(diet.id);
-                  onChange(diet.id);
+                  if (onChange) {
+                    onChange(diet.id);
+                  }
+                  updatePreferenceField('dietType', diet.id);
                 }}
               >
                 <CardContent sx={{ p: 3, textAlign: 'center' }}>
@@ -98,6 +117,12 @@ function DietTypeSelector({ selected = 'vegetarian', onChange, error }) {
           ))}
         </Grid>
       </RadioGroup>
+      
+      {error && (
+        <FormHelperText error sx={{ mt: 2, fontSize: '0.9rem' }}>
+          {error}
+        </FormHelperText>
+      )}
     </Box>
   );
 }

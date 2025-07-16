@@ -28,7 +28,6 @@ import AllergySelector from '../../components/preferences/AllergySelector';
 
 // Hooks and Context
 import { useUserPreferences } from '../../hooks/useUserPreferences';
-import { useRecipes } from '../../contexts/RecipeContext';
 import { useUser } from '../../contexts/UserContext';
 
 const steps = [
@@ -43,8 +42,7 @@ const steps = [
 
 function PreferencesPage() {
   const navigate = useNavigate();
-  const { setLoading, setError, clearError } = useUserPreferences();
-  const { getRecommendations } = useRecipes();
+  const { setLoading, setError, clearError, preferences: userPreferences } = useUserPreferences();
   const { currentUser, updatePreferences: updateUserPreferences } = useUser();
   
   // Redirect if not authenticated
@@ -55,17 +53,49 @@ function PreferencesPage() {
   }, [currentUser, navigate]);
 
   const [activeStep, setActiveStep] = useState(0);
-  const [preferences, setPreferences] = useState({
-    dietType: 'vegetarian',
-    healthGoals: [],
-    mealType: 'dinner',
-    cookingTime: 'medium',
-    cookingMethod: 'stovetop',
-    numberOfPeople: 1,
-    allergies: [],
+  // Initialize preferences from user context
+  const [preferences, setPreferences] = useState(() => {
+    // Get preferences from user context if available
+    if (userPreferences) {
+      return {
+        dietType: userPreferences.dietType || 'vegetarian',
+        healthGoals: userPreferences.healthGoals || [],
+        mealType: userPreferences.mealType || 'dinner',
+        cookingTime: userPreferences.cookingTime || 'medium',
+        cookingMethod: userPreferences.cookingMethod || 'stovetop',
+        numberOfPeople: userPreferences.numberOfPeople || 1,
+        allergies: userPreferences.allergies || [],
+      };
+    }
+    
+    // Default preferences if user has none
+    return {
+      dietType: 'vegetarian',
+      healthGoals: [],
+      mealType: 'dinner',
+      cookingTime: 'medium',
+      cookingMethod: 'stovetop',
+      numberOfPeople: 1,
+      allergies: [],
+    };
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Update preferences when user preferences change
+  useEffect(() => {
+    if (userPreferences) {
+      setPreferences({
+        dietType: userPreferences.dietType || 'vegetarian',
+        healthGoals: userPreferences.healthGoals || [],
+        mealType: userPreferences.mealType || 'dinner',
+        cookingTime: userPreferences.cookingTime || 'medium',
+        cookingMethod: userPreferences.cookingMethod || 'stovetop',
+        numberOfPeople: userPreferences.numberOfPeople || 1,
+        allergies: userPreferences.allergies || [],
+      });
+    }
+  }, [userPreferences]);
 
   // Clear any existing errors when component mounts and check auth
   useEffect(() => {
@@ -185,26 +215,13 @@ function PreferencesPage() {
         if (!response.ok) {
           throw new Error('Failed to save preferences');
         }
-
-        const savedPreferences = await response.json();
         
         // Update user preferences in context
-        updateUserPreferences(savedPreferences);
+        updateUserPreferences(preferences);
       } catch (fetchError) {
         // If API call fails, still update preferences locally
         console.warn('API call failed, saving preferences locally:', fetchError);
         updateUserPreferences(preferences);
-      }
-
-      // Get personalized recommendations
-      try {
-        await getRecommendations(preferences);
-      } catch (recError) {
-        if (recError.message === 'User not authenticated') {
-          navigate('/login');
-          return;
-        }
-        throw recError;
       }
 
       // Navigate to recipes page

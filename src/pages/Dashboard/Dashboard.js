@@ -31,7 +31,7 @@ import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { user, getDietaryRestrictions, getHealthGoals, getDietType } = useUserPreferences();
+  const { user, getAllergies, getHealthGoals, getDietType } = useUserPreferences();
   useAuthRedirect();
   const { recipes, getRecommendations, findRecipeById } = useRecipes();
   const { addRecipeToCart, error: cartError, clearError } = useCart();
@@ -90,7 +90,7 @@ function Dashboard() {
 
   const orderHistory = user?.orderHistory || [];
   const recentRecipes = recipes.slice(0, 6);
-  const dietaryRestrictions = getDietaryRestrictions();
+  const allergies = getAllergies();
   const healthGoals = getHealthGoals();
   const dietType = getDietType();
 
@@ -333,13 +333,13 @@ function Dashboard() {
                 <Divider sx={{ my: 2 }} />
 
                 {/* Dietary Restrictions */}
-                {dietaryRestrictions.length > 0 && (
+                {allergies.length > 0 && (
                   <Box mb={3}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                       Dietary Restrictions:
                     </Typography>
                     <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                      {dietaryRestrictions.map((restriction) => (
+                      {allergies.map((restriction) => (
                         <Chip
                           key={restriction}
                           label={restriction}

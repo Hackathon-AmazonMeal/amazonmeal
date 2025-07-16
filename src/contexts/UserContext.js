@@ -10,12 +10,13 @@ const MOCK_USERS = [
     username: 'healthyeater',
     email: 'demo@example.com',
     preferences: {
-      dietaryRestrictions: ['VEGETARIAN'],
-      allergies: ['PEANUTS'],
-      dislikedIngredients: ['cilantro', 'olives'],
-      cookingTime: 'QUICK',
-      cuisinePreferences: ['ITALIAN', 'MEXICAN', 'ASIAN'],
-      skillLevel: 'BEGINNER'
+      dietType: 'vegetarian',
+      healthGoals: [],
+      mealType: 'dinner',
+      cookingTime: 'medium',
+      cookingMethod: 'stovetop',
+      numberOfPeople: 1,
+      allergies: [],
     },
     orderHistory: []
   }
@@ -189,6 +190,28 @@ export function UserProvider({ children }) {
     dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
   };
 
+  // Update a specific preference field
+  const updatePreferenceField = (field, value) => {
+    dispatch({ 
+      type: USER_ACTIONS.UPDATE_PREFERENCES, 
+      payload: { [field]: value } 
+    });
+  };
+
+  // Reset preferences to defaults
+  const resetPreferences = () => {
+    const defaultPreferences = {
+      dietType: 'vegetarian',
+      healthGoals: [],
+      mealType: 'dinner',
+      cookingTime: 'medium',
+      cookingMethod: 'stovetop',
+      numberOfPeople: 1,
+      allergies: [],
+    };
+    dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: defaultPreferences });
+  };
+
   const addOrderToHistory = (order) => {
     const orderWithTimestamp = {
       ...order,
@@ -216,10 +239,6 @@ export function UserProvider({ children }) {
     return !state.currentUser || !state.currentUser.preferences;
   };
 
-  const getDietaryRestrictions = () => {
-    return state.currentUser?.preferences?.dietaryRestrictions || [];
-  };
-
   const getAllergies = () => {
     return state.currentUser?.preferences?.allergies || [];
   };
@@ -229,7 +248,7 @@ export function UserProvider({ children }) {
   };
 
   const getDietType = () => {
-    return state.currentUser?.preferences?.dietType || 'balanced';
+    return state.currentUser?.preferences?.dietType || 'vegetarian';
   };
 
   const value = {
@@ -246,14 +265,19 @@ export function UserProvider({ children }) {
     
     // User preferences
     updatePreferences,
+    updatePreferenceField,
+    resetPreferences,
     addOrderToHistory,
     
     // Helper functions
     isNewUser,
-    getDietaryRestrictions,
     getAllergies,
     getHealthGoals,
     getDietType,
+    
+    // Preference getters
+    getPreferences: () => state.currentUser?.preferences || {},
+    getPreference: (key) => state.currentUser?.preferences?.[key],
     
     // Error handling
     setError,
