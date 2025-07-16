@@ -161,7 +161,7 @@ function PreferencesPage() {
       const email = currentUser?.userId || currentUser?.id;
       
       // Save preferences to backend API (mock for now)
-      try {
+  
         const response = await fetch('https://user-ms-iimt.vercel.app/preference', {
           method: 'POST',
           headers: {
@@ -173,47 +173,6 @@ function PreferencesPage() {
             preferences,
           }),
         });
-
-      // Submit preferences directly to external API
-      console.log('🚀 Starting direct external API submission...');
-      console.log('📧 User email:', userEmail);
-      console.log('🍽️ Preferences to submit:', preferences);
-      
-      const externalResult = await preferenceService.submitPreferences(userEmail, preferences);
-      
-      console.log('📥 External API result:', externalResult);
-      
-      if (externalResult.success) {
-        console.log('✅ External preference API call successful:', externalResult.data);
-        
-        // Save preferences locally in context
-        createUser({
-          ...preferences,
-          email: userEmail,
-          externalApiSuccess: true,
-          externalApiData: externalResult.data
-        });
-
-        // Get personalized recommendations
-        try {
-          await getRecommendations(preferences);
-        } catch (recError) {
-          if (recError.message === 'User not authenticated') {
-            navigate('/login');
-            return;
-          }
-          throw recError;
-        }
-
-        console.log('🎉 Preferences successfully submitted to external service!');
-        clearError();
-
-        // Navigate to recipes page
-        navigate('/recipes');
-      } else {
-        throw new Error('External API returned unsuccessful response');
-      }
-
     } catch (error) {
       console.error('❌ Error submitting preferences:', error);
       setError(error.message || 'Failed to submit your preferences to the external service. Please try again.');
