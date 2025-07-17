@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -13,6 +13,7 @@ import {
   Chip,
   Alert,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import {
   Restaurant,
@@ -21,6 +22,7 @@ import {
   TrendingUp,
   AccessTime,
   LocalFireDepartment,
+  Refresh,
 } from '@mui/icons-material';
 
 // Hooks and Context
@@ -28,10 +30,15 @@ import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useRecipes } from '../../contexts/RecipeContext';
 import { useCart } from '../../contexts/CartContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import { useUser } from '../../contexts/UserContext';
+
 
 function Dashboard() {
   const navigate = useNavigate();
   const { user, getAllergies, getHealthGoals, getDietType } = useUserPreferences();
+  const userContext = useUser();
+  const [preferencesLoading, setPreferencesLoading] = useState(false);
+  const [preferencesMessage, setPreferencesMessage] = useState(null);
   useAuthRedirect();
   const { recipes, getRecommendations, findRecipeById } = useRecipes();
   const { addRecipeToCart, error: cartError, clearError } = useCart();
@@ -45,6 +52,85 @@ function Dashboard() {
       });
     }
   }, [user, recipes.length, getRecommendations, navigate]);
+
+  // Function to manually fetch preferences from API
+  const fetchUserPreferences = async () => {
+    if (!user?.email) return;
+    
+    setPreferencesLoading(true);
+    setPreferencesMessage(null);
+    try {
+      const response = await fetch(`https://user-ms-iimt.vercel.app/preference/${user.email}`);
+      if (response.ok) {
+        const apiResponse = await response.json();
+        console.log('API Response in fetchUserPreferences:', apiResponse);
+        
+        // Extract preferences from the correct structure
+        if (apiResponse && apiResponse.success && apiResponse.data && apiResponse.data.preferences) {
+          // Update user preferences with the correct structure
+          userContext.updatePreferences(apiResponse.data.preferences);
+          setPreferencesMessage({ type: 'success', text: 'Preferences successfully fetched!' });
+        } else {
+          console.warn('API response does not have the expected structure:', apiResponse);
+          setPreferencesMessage({ type: 'warning', text: 'Received unexpected data format from API.' });
+        }
+      } else {
+        console.warn('Failed to fetch user preferences from API');
+        setPreferencesMessage({ type: 'error', text: 'Failed to fetch preferences. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+      setPreferencesMessage({ type: 'error', text: `Error: ${error.message}` });
+    } finally {
+      setPreferencesLoading(false);
+    }
+  };
+
+  // Helper function to format preference values
+  const formatPreferenceValue = (value) => {
+    if (value === null || value === undefined) {
+      return 'N/A';
+    }
+    
+    if (Array.isArray(value)) {
+      if (value.length === 0) return 'None';
+      if (value.length === 1) return value[0];
+      return `${value.length} items`;
+    }
+    
+    if (typeof value === 'object') {
+      return 'Object';
+    }
+    
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+    
+    // Truncate long strings
+    const strValue = String(value);
+    return strValue.length > 15 ? strValue.substring(0, 12) + '...' : strValue;
+  };
+
+  // Fetch preferences when component mounts
+  useEffect(() => {
+    if (user?.email) {
+      fetchUserPreferences();
+    }
+    
+    // Debug log to see what preferences are available
+    console.log('User Preferences:', user?.preferences);
+  }, [user?.email]);
+
+  // Clear preferences message after 5 seconds
+  useEffect(() => {
+    if (preferencesMessage) {
+      const timer = setTimeout(() => {
+        setPreferencesMessage(null);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [preferencesMessage]);
 
   const handleRecipeSelect = (recipe) => {
     // Check if we have a full recipe object with ingredients
@@ -309,76 +395,263 @@ function Dashboard() {
 
           {/* Right Column - User Profile */}
           <Grid item xs={12} lg={4}>
-            <Card sx={{ position: 'sticky', top: 24 }}>
+            <Card sx={{ 
+              position: 'sticky', 
+              top: 24,
+              borderRadius: 2,
+              boxShadow: 3
+            }}>
               <CardContent sx={{ p: 3 }}>
-                <Stack direction="row" alignItems="center" spacing={1} mb={3}>
-                  <Settings color="primary" />
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Your Preferences
-                  </Typography>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Settings color="primary" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Your Preferences
+                    </Typography>
+                  </Stack>
+                  <Button 
+                    size="small" 
+                    startIcon={<Refresh />} 
+                    onClick={fetchUserPreferences}
+                    disabled={preferencesLoading}
+                    sx={{ 
+                      fontWeight: 500,
+                      borderRadius: 1,
+                      textTransform: 'none'
+                    }}
+                  >
+                    Refresh
+                  </Button>
                 </Stack>
 
-                {/* Diet Type */}
+                {/* API Preferences */}
                 <Box mb={3}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Diet Type:
-                  </Typography>
-                  <Chip
-                    label={dietType.charAt(0).toUpperCase() + dietType.slice(1)}
-                    color="primary"
-                    variant="outlined"
-                  />
+                  {/* Success/Error Messages */}
+                  {/* {preferencesMessage && (
+                    <Alert 
+                      severity={preferencesMessage.type} 
+                      sx={{ 
+                        mb: 2,
+                        borderRadius: 1,
+                        '& .MuiAlert-message': { fontWeight: 500 }
+                      }}
+                      onClose={() => setPreferencesMessage(null)}
+                    >
+                      {preferencesMessage.text}
+                    </Alert>
+                  )} */}
+                  
+                  {preferencesLoading ? (
+                    <Box display="flex" justifyContent="center" my={2}>
+                      <CircularProgress size={24} />
+                    </Box>
+                  ) : user?.preferences ? (
+                    <Stack spacing={2}>
+                      {/* Diet Type */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Diet Type
+                        </Typography>
+                        {user.preferences.dietType ? (
+                          <Chip
+                            label={user.preferences.dietType}
+                            size="small"
+                            color="primary"
+                            sx={{ fontWeight: 500 }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                        )}
+                      </Box>
+                      
+                      {/* Meal Type */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Meal Type
+                        </Typography>
+                        {user.preferences.mealType ? (
+                          <Chip
+                            label={user.preferences.mealType}
+                            size="small"
+                            color="primary"
+                            sx={{ fontWeight: 500 }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                        )}
+                      </Box>
+                      
+                      {/* Number of People */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Number of People
+                        </Typography>
+                        {user.preferences.numberOfPeople !== undefined ? (
+                          <Chip
+                            label={user.preferences.numberOfPeople}
+                            size="small"
+                            color="primary"
+                            sx={{ fontWeight: 500 }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                        )}
+                      </Box>
+                      
+                      {/* Cooking Time */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Cooking Time
+                        </Typography>
+                        {user.preferences.cookingTime ? (
+                          <Chip
+                            label={user.preferences.cookingTime}
+                            size="small"
+                            color="primary"
+                            sx={{ fontWeight: 500 }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                        )}
+                      </Box>
+                      
+                      {/* Cooking Method */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Cooking Method
+                        </Typography>
+                        {user.preferences.cookingMethod ? (
+                          <Chip
+                            label={user.preferences.cookingMethod}
+                            size="small"
+                            color="primary"
+                            sx={{ fontWeight: 500 }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                        )}
+                      </Box>
+                      
+                      {/* Health Goals */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Health Goals
+                        </Typography>
+                        {Array.isArray(user.preferences.healthGoals) && user.preferences.healthGoals.length > 0 ? (
+                          <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5}>
+                            {user.preferences.healthGoals.map((item, index) => (
+                              <Chip
+                                key={index}
+                                label={item}
+                                size="small"
+                                color="success"
+                                sx={{ fontWeight: 500 }}
+                              />
+                            ))}
+                          </Stack>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">None</Typography>
+                        )}
+                      </Box>
+                      
+                      {/* Allergies */}
+                      <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 1, 
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                          Allergies
+                        </Typography>
+                        {Array.isArray(user.preferences.allergies) && user.preferences.allergies.length > 0 ? (
+                          <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5}>
+                            {user.preferences.allergies.map((item, index) => (
+                              <Chip
+                                key={index}
+                                label={item}
+                                size="small"
+                                color="secondary"
+                                sx={{ fontWeight: 500 }}
+                              />
+                            ))}
+                          </Stack>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">None</Typography>
+                        )}
+                      </Box>
+                    </Stack>
+                  ) : (
+                    <Alert 
+                      severity="info" 
+                      sx={{ 
+                        borderRadius: 1,
+                        '& .MuiAlert-message': { fontWeight: 500 }
+                      }}
+                    >
+                      No preferences found for {user?.email}. Click Refresh to fetch your preferences.
+                    </Alert>
+                  )}
                 </Box>
 
-                <Divider sx={{ my: 2 }} />
-
-                {/* Dietary Restrictions */}
-                {allergies.length > 0 && (
-                  <Box mb={3}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Dietary Restrictions:
-                    </Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                      {allergies.map((restriction) => (
-                        <Chip
-                          key={restriction}
-                          label={restriction}
-                          size="small"
-                          color="secondary"
-                          variant="outlined"
-                        />
-                      ))}
-                    </Stack>
-                  </Box>
-                )}
-
-                {/* Health Goals */}
-                {healthGoals.length > 0 && (
-                  <Box mb={3}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Health Goals:
-                    </Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                      {healthGoals.map((goal) => (
-                        <Chip
-                          key={goal}
-                          label={goal.replace('-', ' ')}
-                          size="small"
-                          color="success"
-                          variant="outlined"
-                        />
-                      ))}
-                    </Stack>
-                  </Box>
-                )}
-
-                <Divider sx={{ my: 2 }} />
+                <Divider sx={{ my: 3 }} />
 
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   fullWidth
                   startIcon={<Settings />}
                   onClick={handleEditPreferences}
+                  sx={{ 
+                    fontWeight: 500,
+                    borderRadius: 1,
+                    textTransform: 'none',
+                    py: 1,
+                    boxShadow: 2
+                  }}
                 >
                   Edit Preferences
                 </Button>

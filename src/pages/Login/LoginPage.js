@@ -12,6 +12,7 @@ import {
   Divider,
   Card,
   CardContent,
+  CircularProgress,
 } from '@mui/material';
 import { Restaurant } from '@mui/icons-material';
 import { useUser } from '../../contexts/UserContext';
@@ -148,7 +149,12 @@ const LoginPage = () => {
               sx={{ mt: 3, mb: 2, py: 1.5 }}
               disabled={loading}
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? (
+                <Box display="flex" alignItems="center">
+                  <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                  Signing In...
+                </Box>
+              ) : 'Sign In'}
             </Button>
           </Box>
 

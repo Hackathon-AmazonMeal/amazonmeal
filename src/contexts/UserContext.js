@@ -52,7 +52,9 @@ function userReducer(state, action) {
       };
     
     case USER_ACTIONS.UPDATE_PREFERENCES:
-      return {
+      console.log('Before update:', state.currentUser?.preferences);
+      console.log('Updating with:', action.payload);
+      const updatedState = {
         ...state,
         currentUser: state.currentUser ? {
           ...state.currentUser,
@@ -62,6 +64,8 @@ function userReducer(state, action) {
           },
         } : null,
       };
+      console.log('After update:', updatedState.currentUser?.preferences);
+      return updatedState;
     
     case USER_ACTIONS.ADD_ORDER_HISTORY:
       return {
@@ -159,8 +163,37 @@ export function UserProvider({ children }) {
       // Find mock user by email (for demo)
       const user = MOCK_USERS.find(u => u.email === email);
       if (user) {
-        dispatch({ type: USER_ACTIONS.SET_USER, payload: user });
-        return user;
+        // Fetch user preferences from the API
+        try {
+          const response = await fetch(`https://user-ms-iimt.vercel.app/preference/${email}`);
+          if (response.ok) {
+            const apiResponse = await response.json();
+            console.log('API Response in signIn:', apiResponse);
+            
+            // Extract preferences from the correct structure
+            if (apiResponse && apiResponse.success && apiResponse.data && apiResponse.data.preferences) {
+              // Use the API response preferences
+              const updatedUser = {
+                ...user,
+                preferences: apiResponse.data.preferences
+              };
+              dispatch({ type: USER_ACTIONS.SET_USER, payload: updatedUser });
+              return updatedUser;
+            } else {
+              console.warn('API response does not have the expected structure:', apiResponse);
+              dispatch({ type: USER_ACTIONS.SET_USER, payload: user });
+              return user;
+            }
+          } else {
+            console.warn('Failed to fetch user preferences from API');
+            dispatch({ type: USER_ACTIONS.SET_USER, payload: user });
+            return user;
+          }
+        } catch (apiError) {
+          console.error('Error fetching user preferences:', apiError);
+          dispatch({ type: USER_ACTIONS.SET_USER, payload: user });
+          return user;
+        }
       }
       throw new Error('Invalid credentials');
     } catch (error) {
@@ -206,6 +239,7 @@ export function UserProvider({ children }) {
 
   // User preference actions - wrapped in useCallback to prevent unnecessary re-renders
   const updatePreferences = useCallback((preferences) => {
+    console.log('Updating preferences:', preferences);
     dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
   } ,[]);
 
