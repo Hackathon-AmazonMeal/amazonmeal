@@ -113,7 +113,7 @@ function isEqual(obj1, obj2) {
 export function UserProvider({ children }) {
   const [state, dispatch] = useReducer(userReducer, initialState);
   const [storedUser, setStoredUser] = useLocalStorage('currentUser', null);
-  
+
   // Flag to prevent initial sync from triggering updates
   const isInitialSync = React.useRef(true);
   
@@ -122,6 +122,8 @@ export function UserProvider({ children }) {
 
   // Load user from localStorage on mount - only run once
   useEffect(() => {
+    dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
+    
     if (storedUser) {
       try {
         const parsedUser = typeof storedUser === 'string' ? JSON.parse(storedUser) : storedUser;
@@ -205,7 +207,29 @@ export function UserProvider({ children }) {
   // User preference actions - wrapped in useCallback to prevent unnecessary re-renders
   const updatePreferences = useCallback((preferences) => {
     dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
-  }, []);
+  } ,[]);
+
+  // Update a specific preference field
+  const updatePreferenceField = (field, value) => {
+    dispatch({ 
+      type: USER_ACTIONS.UPDATE_PREFERENCES, 
+      payload: { [field]: value } 
+    });
+  };
+
+  // Reset preferences to defaults
+  const resetPreferences = () => {
+    const defaultPreferences = {
+      dietType: 'vegetarian',
+      healthGoals: [],
+      mealType: 'dinner',
+      cookingTime: 'medium',
+      cookingMethod: 'stovetop',
+      numberOfPeople: 1,
+      allergies: [],
+    };
+    dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: defaultPreferences });
+  };
 
   const addOrderToHistory = useCallback((order) => {
     const orderWithTimestamp = {
@@ -214,7 +238,7 @@ export function UserProvider({ children }) {
       id: Date.now().toString(),
     };
     dispatch({ type: USER_ACTIONS.ADD_ORDER_HISTORY, payload: orderWithTimestamp });
-  }, []);
+  },[]);
 
   // Error handling actions
   const setError = useCallback((error) => {
@@ -247,7 +271,7 @@ export function UserProvider({ children }) {
   }, [state.currentUser]);
 
   const getDietType = useCallback(() => {
-    return state.currentUser?.preferences?.dietType || 'balanced';
+    return state.currentUser?.preferences?.dietType || 'vegetarian';
   }, [state.currentUser]);
 
   const value = {
