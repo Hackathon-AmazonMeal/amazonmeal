@@ -86,6 +86,7 @@ const Cart = () => {
         customerName: customerInfo.name,
         items: cartItems,
         totalAmount: cartTotal,
+        recipeName: currentRecipe,
       });
 
       if (orderResult.success) {

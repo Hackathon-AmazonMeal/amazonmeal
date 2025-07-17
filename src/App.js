@@ -25,20 +25,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import theme from './styles/theme';
 
 function AppContent() {
-  const { currentUser, isLoading } = useUser();
-
-  if (isLoading) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="100vh"
-      >
-        Loading...
-      </Box>
-    );
-  }
+  const { currentUser} = useUser();
 
   return (
     <Layout>

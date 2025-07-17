@@ -8,7 +8,7 @@ const MOCK_USERS = [
   {
     userId: 'user-1',
     username: 'healthyeater',
-    email: 'demo@example.com',
+    email: 'homeayush79@gmail.com',
     preferences: {
       dietType: 'vegetarian',
       healthGoals: [],

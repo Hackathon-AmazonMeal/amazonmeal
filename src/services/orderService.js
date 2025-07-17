@@ -16,25 +16,48 @@ class OrderService {
    * @param {number} orderData.totalAmount - Total order amount
    * @returns {Promise<Object>} API response
    */
+
+  
+
+
+
   async processOrder(orderData) {
     try {
       // Generate order ID if not provided
       const orderId = orderData.orderId || this.generateOrderId();
       
-      // For multiple items, we'll send the first item as primary product
-      // and include all items in a custom field or description
-      const primaryItem = orderData.items[0];
-      const allItemsDescription = orderData.items
-        .map(item => `${item.name} (${item.quantity} ${item.unit})`)
-        .join(', ');
+        
+      const userPref = await axios.get(`https://user-ms-iimt.vercel.app/preference/${orderData.email}`);
+      const recipeResponse = await axios.post(
+            'https://recipe-generator-model-58mk-git-main-sanjays-projects-5366cb8a.vercel.app/recipes',
+            {
+                dietType: userPref.dietType || "eggetarian",
+                healthGoals: userPref.healthGoals || "[muscle-gain,maintain-weight,diabetes-management]",
+                meal_type: userPref.mealType || "lunch",
+                cookingTime: userPref.cookingTime || "30min",
+                cookingMethod: userPref.cookingMethod || "slow-cook",
+                numberOfPerson: userPref.numberOfPerson || "2",
+                allergies: userPref.allergies || "[soy,shellfish,wheat]"
+            },
+            {
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+        // Take the first recipe
+        const recipe = recipeResponse.data[0];
+            
+      
+      
 
-        console.log("item: ", orderData)
+      console.log("item: ", orderData)
 
       const requestPayload = {
         order_id: orderId,
         email: orderData.email,
         customer_name: orderData.customerName,
-        recipe_image_link: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', // Default recipe image
+        recipe_image_link: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=40', // Default recipe image
+        youtube_link: recipe.youtube, // Default recipe video
+        recipe_text: recipe.procedure,
         products: orderData.items.map((item) => {
           return {
             name: item.name,
