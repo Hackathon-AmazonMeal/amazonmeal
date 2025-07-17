@@ -38,7 +38,7 @@ function RecipeInstructions({ recipe }) {
           color="text.secondary"
           sx={{ mb: 3, lineHeight: 1.6 }}
         >
-          {recipe.description}
+          {recipe.summary || recipe.description}
         </Typography>
 
         {/* Recipe Info */}
@@ -90,7 +90,7 @@ function RecipeInstructions({ recipe }) {
                   Difficulty
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                  {recipe.difficulty}
+                  {recipe.difficulty || 'Medium'}
                 </Typography>
               </Box>
             </Box>
@@ -112,76 +112,82 @@ function RecipeInstructions({ recipe }) {
           </Stack>
         </Box>
 
-        <Divider sx={{ my: 3 }} />
+        {/* Ingredients section removed as per feedback */}
 
-        {/* Nutrition Info */}
-        <Box mb={3}>
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-            Nutrition (per serving)
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={4} sm={2}>
-              <Box textAlign="center">
-                <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
-                  {recipe.nutrition.calories}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Calories
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={4} sm={2}>
-              <Box textAlign="center">
-                <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
-                  {recipe.nutrition.protein}g
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Protein
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={4} sm={2}>
-              <Box textAlign="center">
-                <Typography variant="h6" color="info.main" sx={{ fontWeight: 600 }}>
-                  {recipe.nutrition.carbs}g
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Carbs
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={4} sm={2}>
-              <Box textAlign="center">
-                <Typography variant="h6" color="warning.main" sx={{ fontWeight: 600 }}>
-                  {recipe.nutrition.fat}g
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Fat
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={4} sm={2}>
-              <Box textAlign="center">
-                <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
-                  {recipe.nutrition.fiber}g
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Fiber
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={4} sm={2}>
-              <Box textAlign="center">
-                <Typography variant="h6" color="error.main" sx={{ fontWeight: 600 }}>
-                  {recipe.nutrition.sodium}mg
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Sodium
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
+        {recipe.nutrition && (
+          <>
+            <Divider sx={{ my: 3 }} />
+
+            {/* Nutrition Info */}
+            <Box mb={3}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                Nutrition (per serving)
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={4} sm={2}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
+                      {recipe.nutrition.calories}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Calories
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4} sm={2}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
+                      {recipe.nutrition.protein}g
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Protein
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4} sm={2}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" color="info.main" sx={{ fontWeight: 600 }}>
+                      {recipe.nutrition.carbs}g
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Carbs
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4} sm={2}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" color="warning.main" sx={{ fontWeight: 600 }}>
+                      {recipe.nutrition.fat}g
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Fat
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4} sm={2}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
+                      {recipe.nutrition.fiber}g
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Fiber
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4} sm={2}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" color="error.main" sx={{ fontWeight: 600 }}>
+                      {recipe.nutrition.sodium}mg
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Sodium
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+          </>
+        )}
 
         <Divider sx={{ my: 3 }} />
 
@@ -190,35 +196,43 @@ function RecipeInstructions({ recipe }) {
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             Instructions
           </Typography>
-          <Stack spacing={2}>
-            {recipe.instructions.map((instruction, index) => (
-              <Box key={index} display="flex" gap={2}>
-                <Box
-                  sx={{
-                    minWidth: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    flexShrink: 0,
-                  }}
-                >
-                  {index + 1}
+          {recipe.procedure ? (
+            // Display procedure from API response
+            <Typography variant="body1" sx={{ lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+              {recipe.procedure}
+            </Typography>
+          ) : recipe.instructions ? (
+            // Display instructions from existing data structure
+            <Stack spacing={2}>
+              {recipe.instructions.map((instruction, index) => (
+                <Box key={index} display="flex" gap={2}>
+                  <Box
+                    sx={{
+                      minWidth: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      bgcolor: 'primary.main',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+                  <Typography
+                    variant="body1"
+                    sx={{ lineHeight: 1.6, pt: 0.5 }}
+                  >
+                    {instruction}
+                  </Typography>
                 </Box>
-                <Typography
-                  variant="body1"
-                  sx={{ lineHeight: 1.6, pt: 0.5 }}
-                >
-                  {instruction}
-                </Typography>
-              </Box>
-            ))}
-          </Stack>
+              ))}
+            </Stack>
+          ) : null}
         </Box>
       </CardContent>
     </Card>
