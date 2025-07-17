@@ -52,7 +52,7 @@ function CheckoutSuccess() {
 
   // Ensure customerInfo has default values even if partially provided
   const safeCustomerInfo = {
-    name: customerInfo?.name || 'Ramesh',
+    name: customerInfo?.name || 'Chef Ayush',
     email: customerInfo?.email || 'homeayush79@gmail.com',
     ...customerInfo
   };

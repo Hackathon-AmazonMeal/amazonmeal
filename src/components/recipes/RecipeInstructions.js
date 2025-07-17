@@ -158,7 +158,7 @@ function RecipeInstructions({ recipe }) {
                 <Grid item xs={4} sm={2}>
                   <Box textAlign="center">
                     <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
-                      {recipe.nutrition.calories}
+                      {recipe.nutrition.calories || '500'}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Calories
@@ -168,7 +168,7 @@ function RecipeInstructions({ recipe }) {
                 <Grid item xs={4} sm={2}>
                   <Box textAlign="center">
                     <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
-                      {recipe.nutrition.protein}g
+                      {recipe.nutrition.protein || '10'}g
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Protein
@@ -178,7 +178,7 @@ function RecipeInstructions({ recipe }) {
                 <Grid item xs={4} sm={2}>
                   <Box textAlign="center">
                     <Typography variant="h6" color="info.main" sx={{ fontWeight: 600 }}>
-                      {recipe.nutrition.carbs}g
+                      {recipe.nutrition.carbs || '20'}g
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Carbs
@@ -188,7 +188,7 @@ function RecipeInstructions({ recipe }) {
                 <Grid item xs={4} sm={2}>
                   <Box textAlign="center">
                     <Typography variant="h6" color="warning.main" sx={{ fontWeight: 600 }}>
-                      {recipe.nutrition.fat}g
+                      {recipe.nutrition.fat || '10'}g
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Fat
@@ -198,7 +198,7 @@ function RecipeInstructions({ recipe }) {
                 <Grid item xs={4} sm={2}>
                   <Box textAlign="center">
                     <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
-                      {recipe.nutrition.fiber}g
+                      {recipe.nutrition.fiber || '5'}g
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Fiber
@@ -208,7 +208,7 @@ function RecipeInstructions({ recipe }) {
                 <Grid item xs={4} sm={2}>
                   <Box textAlign="center">
                     <Typography variant="h6" color="error.main" sx={{ fontWeight: 600 }}>
-                      {recipe.nutrition.sodium}mg
+                      {recipe.nutrition.sodium || '10'}mg
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Sodium

@@ -7,7 +7,7 @@ const UserContext = createContext();
 const MOCK_USERS = [
   {
     userId: 'user-1',
-    username: 'healthyeater',
+    username: 'chef Ayush',
     email: 'homeayush79@gmail.com',
     preferences: {
       dietType: 'vegetarian',
