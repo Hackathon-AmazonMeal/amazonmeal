@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { recipeService } from '../services/recipeService';
-import { recommendationService } from '../services/recommendationService';
+import { externalRecipeService } from '../services/externalRecipeService';
 
 const RecipeContext = createContext();
 
@@ -100,23 +100,24 @@ export function RecipeProvider({ children }) {
       dispatch({ type: RECIPE_ACTIONS.CLEAR_ERROR });
     },
 
-    // Get personalized recipe recommendations
+    // Get personalized recipe recommendations from external API
     getRecommendations: async (preferences) => {
       try {
         dispatch({ type: RECIPE_ACTIONS.SET_LOADING, payload: true });
         
-        // Get recommendations from AI service
-        const recommendations = await recommendationService.getPersonalizedRecommendations(preferences);
+        console.log('Getting recipes from external API with preferences:', preferences);
         
-        console.log('Recommendations received:', recommendations);
-        console.log('Recommendations data:', recommendations.data);
+        // Get recipes from external API service
+        const recipes = await externalRecipeService.generateRecipes(preferences);
         
-        dispatch({ type: RECIPE_ACTIONS.SET_RECOMMENDATIONS, payload: recommendations.data });
-        dispatch({ type: RECIPE_ACTIONS.SET_RECIPES, payload: recommendations.data });
+        console.log('External API recipes received:', recipes);
         
-        return recommendations.data;
+        dispatch({ type: RECIPE_ACTIONS.SET_RECOMMENDATIONS, payload: recipes });
+        dispatch({ type: RECIPE_ACTIONS.SET_RECIPES, payload: recipes });
+        
+        return recipes;
       } catch (error) {
-        console.error('Error getting recommendations:', error);
+        console.error('Error getting external API recipes:', error);
         dispatch({ type: RECIPE_ACTIONS.SET_ERROR, payload: error.message });
         throw error;
       }

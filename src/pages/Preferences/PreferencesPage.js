@@ -240,7 +240,7 @@ function PreferencesPage() {
         return (
           <DietTypeSelector
             selected={preferences.dietType}
-            onChange={(value) => updatePreferences('cateogry', value)}
+            onChange={(value) => updatePreferences('dietType', value)}
             error={errors.dietType}
           />
         );
@@ -280,7 +280,7 @@ function PreferencesPage() {
         return (
           <PrepForSelector
             selected={preferences.prepFor}
-            onChange={(value) => updatePreferences('numberOfPeople', value)}
+            onChange={(value) => updatePreferences('prepFor', value)}
             error={errors.prepFor}
           />
         );

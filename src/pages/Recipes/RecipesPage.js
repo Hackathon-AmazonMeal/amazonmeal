@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Box,
   Container,
@@ -25,6 +25,7 @@ import {
 // Hooks and Context
 import { useRecipes } from '../../contexts/RecipeContext';
 import { useCart } from '../../contexts/CartContext';
+import { useUser } from '../../contexts/UserContext';
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 // import { useUserPreferences } from '../../hooks/useUserPreferences'; // Available if needed
 
@@ -44,14 +45,35 @@ function RecipesPage() {
     previousRecipe,
     hasMoreRecipes,
     getRecipeCount,
+    getRecommendations,
   } = useRecipes();
   
   const { addRecipeToCart } = useCart();
+  const { currentUser } = useUser();
   
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const hasCalledAPI = useRef(false);
   
   // Ensure user is authenticated
   useAuthRedirect();
+
+  // Load recipes once when page loads
+  useEffect(() => {
+    const loadRecipes = async () => {
+      if (!hasCalledAPI.current && currentUser?.preferences) {
+        try {
+          hasCalledAPI.current = true;
+          console.log('Loading recipes on page load...');
+          await getRecommendations(currentUser.preferences).finally(() => hasCalledAPI.current = true);
+        } catch (error) {
+          console.error('Failed to load recipes:', error);
+          hasCalledAPI.current = true; // Reset on error to allow retry if needed
+        }
+      }
+    };
+
+    loadRecipes();
+  }, [currentUser, getRecommendations]);
 
   useEffect(() => {
     // Set the first recipe as selected when recipes load
