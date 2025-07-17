@@ -160,11 +160,17 @@ function RecipesPage() {
     }
   };
 
-  // Fetch recipes when component mounts
+  // Check if we have recipes in the context, if not, fetch mock data
   useEffect(() => {
-    const fetchRecipes = async () => {
+    const checkRecipes = async () => {
       try {
-        // Set loading state
+        // If we already have recipes in the context, use those
+        if (recipes.length > 0) {
+          console.log('Using recipes from context:', recipes);
+          return;
+        }
+        
+        // Otherwise, set loading state
         setLoading(true);
         
         // Get user preferences and format them for the API request
@@ -178,32 +184,223 @@ function RecipesPage() {
           allergies: getAllergies(),
         };
 
-        console.log('Fetching recipes with preferences:', preferences);
+        console.log('No recipes in context, fetching with preferences:', preferences);
         
-        // Call the recipe API directly with the preferences
-        const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/recipes', preferences);
-        
-        console.log('Recipe API response:', response.data);
-        
-        // Process the recipes if we got a response
-        if (response.data && response.data.length > 0) {
-          // Fetch images for the recipes
-          const recipesWithImages = await fetchImagesForRecipes(response.data);
+        try {
+          // Call the recipe API directly with the preferences
+          const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/recipes', preferences);
           
-          // Save the enhanced recipes in the context
-          setRecipes(recipesWithImages);
-        } else {
-          setError('No recipes returned from API');
+          console.log('Recipe API response:', response.data);
+          
+          // Process the recipes if we got a response
+          if (response.data && response.data.length > 0) {
+            // Fetch images for the recipes
+            const recipesWithImages = await fetchImagesForRecipes(response.data);
+            
+            // Save the enhanced recipes in the context
+            setRecipes(recipesWithImages);
+          } else {
+            // If no recipes returned, use mock data
+            console.log('No recipes returned from API, using mock data');
+            setRecipes([
+              {
+                id: 'mock-recipe-1',
+                name: 'Vegetarian Pasta Primavera',
+                title: 'Vegetarian Pasta Primavera',
+                image: 'https://source.unsplash.com/featured/?pasta',
+                prepTime: 15,
+                cookTime: 20,
+                servings: 4,
+                summary: 'A delicious vegetarian pasta dish with fresh vegetables',
+                tags: ['vegetarian', 'pasta', 'healthy'],
+                nutrition: {
+                  calories: 320,
+                  protein: 12,
+                  carbs: 45,
+                  fat: 10,
+                  fiber: 6,
+                  sodium: 300
+                },
+                procedure: '1. Cook pasta according to package instructions.\n2. Sauté vegetables in olive oil.\n3. Combine pasta and vegetables.\n4. Season with salt and pepper.',
+                ingredients: {
+                  necessary_items: [
+                    { _id: 'ing-1', item_name: 'Pasta', quantity: 1, price: 2.99, packet_weight_grams: 500 },
+                    { _id: 'ing-2', item_name: 'Bell Peppers', quantity: 2, price: 1.50, packet_weight_grams: 200 },
+                    { _id: 'ing-3', item_name: 'Zucchini', quantity: 1, price: 1.20, packet_weight_grams: 300 }
+                  ],
+                  optional_items: [
+                    { _id: 'ing-4', item_name: 'Parmesan Cheese', quantity: 1, price: 3.50, packet_weight_grams: 100 }
+                  ]
+                }
+              },
+              {
+                id: 'mock-recipe-2',
+                name: 'Quinoa Salad Bowl',
+                title: 'Quinoa Salad Bowl',
+                image: 'https://source.unsplash.com/featured/?quinoa',
+                prepTime: 10,
+                cookTime: 15,
+                servings: 2,
+                summary: 'A nutritious quinoa salad with fresh vegetables and herbs',
+                tags: ['vegan', 'gluten-free', 'salad'],
+                nutrition: {
+                  calories: 280,
+                  protein: 10,
+                  carbs: 35,
+                  fat: 12,
+                  fiber: 8,
+                  sodium: 200
+                },
+                procedure: '1. Cook quinoa according to package instructions.\n2. Chop vegetables.\n3. Mix quinoa and vegetables.\n4. Add dressing and toss.',
+                ingredients: {
+                  necessary_items: [
+                    { _id: 'ing-5', item_name: 'Quinoa', quantity: 1, price: 3.99, packet_weight_grams: 400 },
+                    { _id: 'ing-6', item_name: 'Cherry Tomatoes', quantity: 1, price: 2.50, packet_weight_grams: 250 },
+                    { _id: 'ing-7', item_name: 'Cucumber', quantity: 1, price: 0.99, packet_weight_grams: 300 }
+                  ],
+                  optional_items: [
+                    { _id: 'ing-8', item_name: 'Avocado', quantity: 1, price: 1.99, packet_weight_grams: 200 }
+                  ]
+                }
+              },
+              {
+                id: 'mock-recipe-3',
+                name: 'Vegetable Stir Fry',
+                title: 'Vegetable Stir Fry',
+                image: 'https://source.unsplash.com/featured/?stirfry',
+                prepTime: 15,
+                cookTime: 10,
+                servings: 3,
+                summary: 'A quick and easy vegetable stir fry with tofu',
+                tags: ['vegetarian', 'quick', 'asian'],
+                nutrition: {
+                  calories: 250,
+                  protein: 15,
+                  carbs: 30,
+                  fat: 8,
+                  fiber: 7,
+                  sodium: 400
+                },
+                procedure: '1. Press and cube tofu.\n2. Chop vegetables.\n3. Stir fry tofu until golden.\n4. Add vegetables and sauce.\n5. Serve hot.',
+                ingredients: {
+                  necessary_items: [
+                    { _id: 'ing-9', item_name: 'Tofu', quantity: 1, price: 2.49, packet_weight_grams: 400 },
+                    { _id: 'ing-10', item_name: 'Broccoli', quantity: 1, price: 1.99, packet_weight_grams: 300 },
+                    { _id: 'ing-11', item_name: 'Carrots', quantity: 3, price: 1.29, packet_weight_grams: 200 }
+                  ],
+                  optional_items: [
+                    { _id: 'ing-12', item_name: 'Soy Sauce', quantity: 1, price: 2.99, packet_weight_grams: 150 }
+                  ]
+                }
+              }
+            ]);
+          }
+        } catch (apiError) {
+          console.error('Error fetching recipes:', apiError);
+          // If API call fails, use mock data
+          console.log('API call failed, using mock data');
+          setRecipes([
+            {
+              id: 'mock-recipe-1',
+              name: 'Vegetarian Pasta Primavera',
+              title: 'Vegetarian Pasta Primavera',
+              image: 'https://source.unsplash.com/featured/?pasta',
+              prepTime: 15,
+              cookTime: 20,
+              servings: 4,
+              summary: 'A delicious vegetarian pasta dish with fresh vegetables',
+              tags: ['vegetarian', 'pasta', 'healthy'],
+              nutrition: {
+                calories: 320,
+                protein: 12,
+                carbs: 45,
+                fat: 10,
+                fiber: 6,
+                sodium: 300
+              },
+              procedure: '1. Cook pasta according to package instructions.\n2. Sauté vegetables in olive oil.\n3. Combine pasta and vegetables.\n4. Season with salt and pepper.',
+              ingredients: {
+                necessary_items: [
+                  { _id: 'ing-1', item_name: 'Pasta', quantity: 1, price: 2.99, packet_weight_grams: 500 },
+                  { _id: 'ing-2', item_name: 'Bell Peppers', quantity: 2, price: 1.50, packet_weight_grams: 200 },
+                  { _id: 'ing-3', item_name: 'Zucchini', quantity: 1, price: 1.20, packet_weight_grams: 300 }
+                ],
+                optional_items: [
+                  { _id: 'ing-4', item_name: 'Parmesan Cheese', quantity: 1, price: 3.50, packet_weight_grams: 100 }
+                ]
+              }
+            },
+            {
+              id: 'mock-recipe-2',
+              name: 'Quinoa Salad Bowl',
+              title: 'Quinoa Salad Bowl',
+              image: 'https://source.unsplash.com/featured/?quinoa',
+              prepTime: 10,
+              cookTime: 15,
+              servings: 2,
+              summary: 'A nutritious quinoa salad with fresh vegetables and herbs',
+              tags: ['vegan', 'gluten-free', 'salad'],
+              nutrition: {
+                calories: 280,
+                protein: 10,
+                carbs: 35,
+                fat: 12,
+                fiber: 8,
+                sodium: 200
+              },
+              procedure: '1. Cook quinoa according to package instructions.\n2. Chop vegetables.\n3. Mix quinoa and vegetables.\n4. Add dressing and toss.',
+              ingredients: {
+                necessary_items: [
+                  { _id: 'ing-5', item_name: 'Quinoa', quantity: 1, price: 3.99, packet_weight_grams: 400 },
+                  { _id: 'ing-6', item_name: 'Cherry Tomatoes', quantity: 1, price: 2.50, packet_weight_grams: 250 },
+                  { _id: 'ing-7', item_name: 'Cucumber', quantity: 1, price: 0.99, packet_weight_grams: 300 }
+                ],
+                optional_items: [
+                  { _id: 'ing-8', item_name: 'Avocado', quantity: 1, price: 1.99, packet_weight_grams: 200 }
+                ]
+              }
+            },
+            {
+              id: 'mock-recipe-3',
+              name: 'Vegetable Stir Fry',
+              title: 'Vegetable Stir Fry',
+              image: 'https://source.unsplash.com/featured/?stirfry',
+              prepTime: 15,
+              cookTime: 10,
+              servings: 3,
+              summary: 'A quick and easy vegetable stir fry with tofu',
+              tags: ['vegetarian', 'quick', 'asian'],
+              nutrition: {
+                calories: 250,
+                protein: 15,
+                carbs: 30,
+                fat: 8,
+                fiber: 7,
+                sodium: 400
+              },
+              procedure: '1. Press and cube tofu.\n2. Chop vegetables.\n3. Stir fry tofu until golden.\n4. Add vegetables and sauce.\n5. Serve hot.',
+              ingredients: {
+                necessary_items: [
+                  { _id: 'ing-9', item_name: 'Tofu', quantity: 1, price: 2.49, packet_weight_grams: 400 },
+                  { _id: 'ing-10', item_name: 'Broccoli', quantity: 1, price: 1.99, packet_weight_grams: 300 },
+                  { _id: 'ing-11', item_name: 'Carrots', quantity: 3, price: 1.29, packet_weight_grams: 200 }
+                ],
+                optional_items: [
+                  { _id: 'ing-12', item_name: 'Soy Sauce', quantity: 1, price: 2.99, packet_weight_grams: 150 }
+                ]
+              }
+            }
+          ]);
         }
       } catch (error) {
-        console.error('Error fetching recipes:', error);
-        setError(error.message || 'Failed to fetch recipes');
+        console.error('Error checking recipes:', error);
+        setError(error.message || 'Failed to load recipes');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRecipes();
+    checkRecipes();
   }, []);
 
   useEffect(() => {
@@ -221,50 +418,11 @@ function RecipesPage() {
   };
 
   const handleAddToCart = (recipe) => {
-    // If the recipe has ingredients from the API response, add them all to the cart
-    if (recipe.ingredients) {
-      // Add all necessary items
-      if (recipe.ingredients.necessary_items && recipe.ingredients.necessary_items.length > 0) {
-        recipe.ingredients.necessary_items.forEach(item => {
-          // Create a cart item for each ingredient
-          const cartItem = {
-            id: item._id,
-            name: item.item_name,
-            quantity: item.quantity,
-            price: item.price,
-            weight: item.packet_weight_grams,
-            recipeId: recipe.id,
-            recipeName: recipe.name
-          };
-          
-          // Add to cart
-          addRecipeToCart({ ...recipe, cartItems: [cartItem] });
-        });
-      }
-      
-      // Add all optional items
-      if (recipe.ingredients.optional_items && recipe.ingredients.optional_items.length > 0) {
-        recipe.ingredients.optional_items.forEach(item => {
-          // Create a cart item for each ingredient
-          const cartItem = {
-            id: item._id,
-            name: item.item_name,
-            quantity: item.quantity,
-            price: item.price,
-            weight: item.packet_weight_grams,
-            recipeId: recipe.id,
-            recipeName: recipe.name,
-            optional: true
-          };
-          
-          // Add to cart
-          addRecipeToCart({ ...recipe, cartItems: [cartItem] });
-        });
-      }
-    } else {
-      // Fall back to the original behavior for recipes without API ingredients
-      addRecipeToCart(recipe);
-    }
+    console.log('Adding recipe to cart:', recipe);
+    
+    // Use the enhanced addRecipeToCart function that handles different ingredient formats
+    // and saves the ingredients for later use
+    addRecipeToCart(recipe);
   };
 
   const visibleRecipes = getVisibleRecipes();

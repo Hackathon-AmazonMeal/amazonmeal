@@ -30,6 +30,8 @@ import AllergySelector from '../../components/preferences/AllergySelector';
 import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { useUser } from '../../contexts/UserContext';
 import { useApi } from '../../hooks/useApi';
+import { useRecipes } from '../../contexts/RecipeContext';
+import axios from 'axios';
 
 // Utils
 import { validatePreferences } from '../../utils/validation';
@@ -77,6 +79,7 @@ function PreferencesPage() {
   const { setLoading, setError, clearError, preferences: userPreferences } = useUserPreferences();
   const { currentUser, updatePreferences: updateUserPreferences } = useUser();
   const { post, isLoading: isApiLoading, error: apiError, clearError: clearApiError } = useApi();
+  const { setRecipes, setLoading: setRecipesLoading } = useRecipes();
   
   
   // Redirect if not authenticated
@@ -206,10 +209,86 @@ function PreferencesPage() {
     return stepErrors;
   };
 
+  // Function to fetch images for recipes
+  const fetchImagesForRecipes = async (recipes) => {
+    try {
+      // Extract recipe titles for image fetching
+      const recipeTitles = recipes.map(recipe => recipe.title);
+      
+      // Call the images API
+      const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/images', recipeTitles);
+      
+      console.log('Images API response:', response.data);
+      
+      // Map images to recipes
+      const recipesWithImages = recipes.map((recipe, index) => {
+        // Extract prep and cook times from procedure text
+        const prepTimePattern = /prep.*?(\d+)[-\s]?min/i;
+        const prepMatch = recipe.procedure?.match(prepTimePattern);
+        
+        const cookTimePattern = /cook.*?(\d+)[-\s]?min/i;
+        const cookMatch = recipe.procedure?.match(cookTimePattern);
+        
+        const otherCookingPattern = /(simmer|bake|roast|grill).*?(\d+)[-\s]?min/i;
+        const otherMatch = recipe.procedure?.match(otherCookingPattern);
+        
+        const prepTime = prepMatch ? parseInt(prepMatch[1]) : 15;
+        const cookTime = cookMatch ? parseInt(cookMatch[1]) : (otherMatch ? parseInt(otherMatch[2]) : 25);
+        
+        // Get image URL from response data (which is a dictionary with recipe titles as keys)
+        const imageUrl = response.data[recipe.title] || 
+                        `https://source.unsplash.com/featured/?food,${encodeURIComponent(recipe.title)}`;
+        
+        return {
+          ...recipe,
+          id: `recipe-${index}`, // Add an ID for React keys
+          image: imageUrl,
+          // Add default values for UI compatibility
+          name: recipe.title,
+          prepTime: prepTime,
+          cookTime: cookTime,
+          servings: recipe.ingredients?.necessary_items?.length > 0 ? 
+            Math.ceil(recipe.ingredients.necessary_items.reduce((sum, item) => sum + item.quantity, 0) / 3) : 2,
+          nutrition: {
+            calories: 350,
+            protein: 15,
+            carbs: 40,
+            fat: 12
+          },
+          tags: recipe.summary ? 
+            recipe.summary.split(' ').filter(word => word.length > 7).slice(0, 3) : 
+            ['healthy', 'homemade']
+        };
+      });
+      
+      return recipesWithImages;
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      // Return recipes with placeholder images if image fetch fails
+      return recipes.map((recipe, index) => ({
+        ...recipe,
+        id: `recipe-${index}`,
+        image: `https://source.unsplash.com/featured/?food,${encodeURIComponent(recipe.title)}`,
+        name: recipe.title,
+        prepTime: 15,
+        cookTime: 25,
+        servings: 2,
+        nutrition: {
+          calories: 350,
+          protein: 15,
+          carbs: 40,
+          fat: 12
+        },
+        tags: ['healthy', 'homemade']
+      }));
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
       setLoading(true);
+      setRecipesLoading(true);
       clearError();
 
       // Check if user is still authenticated
@@ -224,7 +303,7 @@ function PreferencesPage() {
       // Get userId from logged in user
       const userId = currentUser?.email || currentUser?.userId;
       
-      // Save preferences to backend API (mock for now)
+      // Save preferences to backend API
       try {
         const pref = JSON.stringify({
             email: userId,
@@ -258,6 +337,36 @@ function PreferencesPage() {
         updateUserPreferences(preferences);
       }
 
+      // Call the recipe API with the preferences
+      try {
+        console.log('Fetching recipes with preferences:', preferences);
+        
+        // Call the recipe API directly with the preferences
+        const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/recipes', {
+          dietType: preferences.dietType,
+          healthGoals: preferences.healthGoals,
+          mealType: preferences.mealType,
+          cookingTime: preferences.cookingTime,
+          cookingMethod: preferences.cookingMethod,
+          prepFor: preferences.numberOfPeople,
+          allergies: preferences.allergies,
+        });
+        
+        console.log('Recipe API response:', response.data);
+        
+        // Process the recipes if we got a response
+        if (response.data && response.data.length > 0) {
+          // Fetch images for the recipes
+          const recipesWithImages = await fetchImagesForRecipes(response.data);
+          
+          // Save the enhanced recipes in the context
+          setRecipes(recipesWithImages);
+        }
+      } catch (apiError) {
+        console.error('Error fetching recipes:', apiError);
+        // If API call fails, we'll show mock data on the recipes page
+      }
+
       // Navigate to recipes page
       navigate('/recipes');
     } catch (error) {
@@ -266,6 +375,7 @@ function PreferencesPage() {
     } finally {
       setIsSubmitting(false);
       setLoading(false);
+      setRecipesLoading(false);
     }
   };
 

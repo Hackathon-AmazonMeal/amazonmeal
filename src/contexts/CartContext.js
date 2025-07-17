@@ -12,6 +12,7 @@ const CART_ACTIONS = {
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
+  SAVE_INGREDIENTS: 'SAVE_INGREDIENTS', // New action type for saving ingredients
 };
 
 // Initial state
@@ -21,6 +22,7 @@ const initialState = {
   totalItems: 0,
   isLoading: false,
   error: null,
+  savedIngredients: [], // New field to store saved ingredients
 };
 
 // Helper function to calculate total items
@@ -108,6 +110,12 @@ function cartReducer(state, action) {
         error: null,
       };
     
+    case CART_ACTIONS.SAVE_INGREDIENTS:
+      return {
+        ...state,
+        savedIngredients: [...state.savedIngredients, action.payload],
+      };
+    
     default:
       return state;
   }
@@ -170,18 +178,34 @@ export function CartProvider({ children }) {
       dispatch({ type: CART_ACTIONS.SET_RECIPE, payload: recipe });
     },
 
+    // Save ingredients from a recipe
+    saveIngredients: (recipe) => {
+      if (!recipe || !recipe.ingredients) {
+        console.error('Invalid recipe or missing ingredients:', recipe);
+        return;
+      }
+
+      // Save the ingredients
+      dispatch({ 
+        type: CART_ACTIONS.SAVE_INGREDIENTS, 
+        payload: {
+          recipeId: recipe.id,
+          recipeName: recipe.name || recipe.title,
+          ingredients: recipe.ingredients
+        }
+      });
+    },
+
+    // Get saved ingredients
+    getSavedIngredients: () => {
+      return state.savedIngredients;
+    },
+
     addRecipeToCart: (recipe) => {
       // Validate recipe object
       if (!recipe || !recipe.id) {
         console.error('Invalid recipe object:', recipe);
         dispatch({ type: CART_ACTIONS.SET_ERROR, payload: 'Invalid recipe data' });
-        return;
-      }
-
-      // Check if recipe has ingredients
-      if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
-        console.error('Recipe missing ingredients array:', recipe);
-        dispatch({ type: CART_ACTIONS.SET_ERROR, payload: 'Recipe ingredients not available' });
         return;
       }
 
@@ -191,23 +215,79 @@ export function CartProvider({ children }) {
       // Set current recipe
       dispatch({ type: CART_ACTIONS.SET_RECIPE, payload: recipe });
       
-      // Add all ingredients from recipe
-      recipe.ingredients.forEach(ingredient => {
-        const cartItem = {
-          id: `${ingredient.name}-${recipe.id}-${Date.now()}`,
-          name: ingredient.name,
-          amount: ingredient.amount,
-          unit: ingredient.unit,
-          category: ingredient.category,
-          quantity: 1,
-          originalAmount: ingredient.amount,
-          originalUnit: ingredient.unit,
-          recipeId: recipe.id,
-          recipeName: recipe.name,
-          price: ingredient.price || 2.50, // Default price if not provided
-        };
-        dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
-      });
+      // Save the ingredients for later use
+      actions.saveIngredients(recipe);
+      
+      // Handle different ingredient formats
+      if (Array.isArray(recipe.ingredients)) {
+        // Handle traditional ingredients array
+        recipe.ingredients.forEach(ingredient => {
+          const cartItem = {
+            id: `${ingredient.name}-${recipe.id}-${Date.now()}`,
+            name: ingredient.name,
+            amount: ingredient.amount,
+            unit: ingredient.unit,
+            category: ingredient.category,
+            quantity: 1,
+            originalAmount: ingredient.amount,
+            originalUnit: ingredient.unit,
+            recipeId: recipe.id,
+            recipeName: recipe.name,
+            price: ingredient.price || 2.50, // Default price if not provided
+          };
+          dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
+        });
+      } else if (recipe.ingredients && (recipe.ingredients.necessary_items || recipe.ingredients.optional_items)) {
+        // Handle API response format with necessary_items and optional_items
+        
+        // Add necessary items to cart
+        if (recipe.ingredients.necessary_items && recipe.ingredients.necessary_items.length > 0) {
+          recipe.ingredients.necessary_items.forEach(item => {
+            const cartItem = {
+              id: item._id || `${item.item_name}-${recipe.id}-${Date.now()}`,
+              name: item.item_name,
+              amount: item.packet_weight_grams,
+              unit: 'g',
+              category: 'necessary',
+              quantity: item.quantity || 1,
+              originalAmount: item.packet_weight_grams,
+              originalUnit: 'g',
+              recipeId: recipe.id,
+              recipeName: recipe.name || recipe.title,
+              price: item.price || 2.50,
+              weight: item.packet_weight_grams
+            };
+            dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
+          });
+        }
+        
+        // Add optional items to cart
+        if (recipe.ingredients.optional_items && recipe.ingredients.optional_items.length > 0) {
+          recipe.ingredients.optional_items.forEach(item => {
+            const cartItem = {
+              id: item._id || `${item.item_name}-${recipe.id}-${Date.now()}`,
+              name: item.item_name,
+              amount: item.packet_weight_grams,
+              unit: 'g',
+              category: 'optional',
+              quantity: item.quantity || 1,
+              originalAmount: item.packet_weight_grams,
+              originalUnit: 'g',
+              recipeId: recipe.id,
+              recipeName: recipe.name || recipe.title,
+              price: item.price || 2.50,
+              weight: item.packet_weight_grams,
+              optional: true
+            };
+            dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: cartItem });
+          });
+        }
+      } else if (recipe.cartItems && Array.isArray(recipe.cartItems)) {
+        // Handle case where cart items are provided directly
+        recipe.cartItems.forEach(item => {
+          dispatch({ type: CART_ACTIONS.ADD_INGREDIENT, payload: item });
+        });
+      }
     },
 
     setLoading: (loading) => {
@@ -264,6 +344,7 @@ export function CartProvider({ children }) {
   const computedValues = {
     cartItems: state.items, // Alias for easier access
     cartTotal: actions.getEstimatedTotal(), // Total cart value
+    savedIngredients: state.savedIngredients, // Expose saved ingredients
   };
 
   const value = {

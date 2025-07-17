@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Box,
   Typography,
@@ -20,6 +21,36 @@ function RecipeInstructions({ recipe }) {
   if (!recipe) {
     return null;
   }
+
+  // Function to parse procedure text into steps
+  const parseSteps = (procedureText) => {
+    if (!procedureText) return [];
+    
+    // Try a different approach - look for step numbers and use them as delimiters
+    const stepPattern = /\d+\.\s/g;
+    const stepMatches = [...procedureText.matchAll(stepPattern)];
+    
+    if (stepMatches.length > 0) {
+      const steps = [];
+      
+      // For each step number found
+      for (let i = 0; i < stepMatches.length; i++) {
+        const currentMatch = stepMatches[i];
+        const currentIndex = currentMatch.index;
+        const nextIndex = (i < stepMatches.length - 1) ? stepMatches[i + 1].index : procedureText.length;
+        
+        // Extract the full step text from current step number to the next step number (or end)
+        const stepText = procedureText.substring(currentIndex, nextIndex).trim();
+        steps.push(stepText);
+      }
+      
+      return steps;
+    }
+    
+    // If no step numbers found, try splitting by newlines
+    const lines = procedureText.split('\n');
+    return lines.filter(line => line.trim());
+  };
 
   return (
     <Card sx={{ mt: 3 }}>
@@ -197,10 +228,36 @@ function RecipeInstructions({ recipe }) {
             Instructions
           </Typography>
           {recipe.procedure ? (
-            // Display procedure from API response
-            <Typography variant="body1" sx={{ lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-              {recipe.procedure}
-            </Typography>
+            // Parse and display procedure as numbered steps
+            <Stack spacing={2}>
+              {parseSteps(recipe.procedure).map((step, index) => (
+                <Box key={index} display="flex" gap={2}>
+                  <Box
+                    sx={{
+                      minWidth: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      bgcolor: 'primary.main',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+                  <Typography
+                    variant="body1"
+                    sx={{ lineHeight: 1.6, pt: 0.5 }}
+                  >
+                    {step.replace(/^\d+\.\s*/, '')} {/* Remove the step number */}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
           ) : recipe.instructions ? (
             // Display instructions from existing data structure
             <Stack spacing={2}>
