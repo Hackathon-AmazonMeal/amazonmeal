@@ -17,12 +17,15 @@ import {
 } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
 import { useUser } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useRecipes } from '../contexts/RecipeContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Delete, ShoppingCart, Person, Email, Add, Remove } from '@mui/icons-material';
 import orderService from '../services/orderService';
 import cartService from '../services/cartService';
 
 const Cart = () => {
+  const location = useLocation()
+
   // Use the SAME properties and methods as CartSidebar for perfect sync
   const { 
     items: cartItems,           // Alias to match existing code
@@ -33,9 +36,13 @@ const Cart = () => {
     isEmpty,                    // Add isEmpty check
     increaseQuantity,           // Add quantity controls
     decreaseQuantity,           // Add quantity controls
-    currentRecipe,              // Add current recipe info
     getCartSummary              // Add cart summary
   } = useCart();
+  
+  // Get recipe information from RecipeContext
+  const { recipes, getCurrentRecipe } = useRecipes();
+  const currentRecipe = getCurrentRecipe();
+  
   const { user } = useUser();
   const navigate = useNavigate();
   
@@ -76,29 +83,57 @@ const Cart = () => {
         return;
       }
 
-      console.log('Processing order with customer info:', customerInfo);
-      console.log('Cart items:', cartItems);
-      console.log('Total amount:', cartTotal);
-
+      // // console.log('Processing order with customer info:', customerInfo);
+      // // console.log('Cart items:', cartItems);
+      // // console.log('Total amount:', cartTotal);
+      // // console.log('Current recipe from context:', currentRecipe);
+      
+      // Get the current recipe from RecipeContext
+      let orderResult;
+      
+      // Log the current state for debugging
+      // // console.log('Current recipe from RecipeContext:', currentRecipe);
+      // // console.log('All recipes in RecipeContext:', recipes);
+      // // console.log('First cart item:', cartItems.length > 0 ? cartItems[0] : 'No items');
+      
+      // Make sure we have a valid recipe
+      if (!currentRecipe || (!currentRecipe.name && !currentRecipe.title)) {
+        // console.warn('No valid recipe found in RecipeContext');
+        
+        // Try to find a recipe based on cart items
+        if (cartItems.length > 0 && cartItems[0].recipeName) {
+          const matchingRecipe = recipes.find(r => 
+            r.name === cartItems[0].recipeName || r.title === cartItems[0].recipeName
+          );
+          
+          if (matchingRecipe) {
+            // // console.log('Found matching recipe in RecipeContext:', matchingRecipe);
+            currentRecipe = matchingRecipe;
+          } else {
+            // console.warn('No matching recipe found in RecipeContext');
+          }
+        }
+      }
+            console.log('(*(*(*')
       // Process order with external API
-      const orderResult = await orderService.processOrder({
+      orderResult = await orderService.processOrder({
         email: customerInfo.email,
         customerName: customerInfo.name,
         items: cartItems,
         totalAmount: cartTotal,
-        recipeName: currentRecipe,
+        recipe: currentRecipe, // Use the recipe from RecipeContext
       });
 
-      if (orderResult.success) {
+      if (orderResult && orderResult.success) {
         
         // setSuccessMessage(`Order ${orderResult.orderId} processed successfully!`);
 
         //Email sent API
         // Process order after successful fulfillment
         try {
-          console.log('Processing order fulfillment for order ID:', orderResult.orderId);
+          // // console.log('Processing order fulfillment for order ID:', orderResult.orderId);
           await cartService.processOrder(orderResult.orderId);
-          console.log('Order fulfillment processing completed successfully');
+          // // console.log('Order fulfillment processing completed successfully');
         } catch (processError) {
           console.error('Failed to process order fulfillment:', processError);
           // Don't fail the entire flow if processing fails

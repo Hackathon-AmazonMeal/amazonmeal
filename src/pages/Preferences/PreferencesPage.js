@@ -218,7 +218,7 @@ function PreferencesPage() {
       // Call the images API
       const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/images', recipeTitles);
       
-      console.log('Images API response:', response.data);
+      // console.log('Images API response:', response.data);
       
       // Map images to recipes
       const recipesWithImages = recipes.map((recipe, index) => {
@@ -298,7 +298,7 @@ function PreferencesPage() {
       }
 
       // Log complete preferences object
-      console.log('Complete Preferences Object:', preferences);
+      // console.log('Complete Preferences Object:', preferences);
       
       // Get userId from logged in user
       const userId = currentUser?.email || currentUser?.userId;
@@ -309,7 +309,7 @@ function PreferencesPage() {
             email: userId,
             preferences: preferences,
           });
-          console.log("preference: ", pref);
+          // console.log("preference: ", pref);
 
         const response = await fetch('https://user-ms-iimt.vercel.app/preference', {
           method: 'POST',
@@ -339,7 +339,7 @@ function PreferencesPage() {
 
       // Call the recipe API with the preferences
       try {
-        console.log('Fetching recipes with preferences:', preferences);
+        // console.log('Fetching recipes with preferences:', preferences);
         
         // Call the recipe API directly with the preferences
         const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/recipes', {
@@ -352,7 +352,7 @@ function PreferencesPage() {
           allergies: preferences.allergies,
         });
         
-        console.log('Recipe API response:', response.data);
+        // console.log('Recipe API response:', response.data);
         
         // Process the recipes if we got a response
         if (response.data && response.data.length > 0) {

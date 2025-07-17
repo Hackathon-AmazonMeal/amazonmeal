@@ -13,7 +13,7 @@ const Profile = () => {
   });
 
   const handleSave = () => {
-    console.log('Saving preferences:', preferences);
+    // console.log('Saving preferences:', preferences);
     // In a real app, this would call an API to update user preferences
   };
 

@@ -52,8 +52,8 @@ function userReducer(state, action) {
       };
     
     case USER_ACTIONS.UPDATE_PREFERENCES:
-      console.log('Before update:', state.currentUser?.preferences);
-      console.log('Updating with:', action.payload);
+      // console.log('Before update:', state.currentUser?.preferences);
+      // console.log('Updating with:', action.payload);
       const updatedState = {
         ...state,
         currentUser: state.currentUser ? {
@@ -64,7 +64,7 @@ function userReducer(state, action) {
           },
         } : null,
       };
-      console.log('After update:', updatedState.currentUser?.preferences);
+      // console.log('After update:', updatedState.currentUser?.preferences);
       return updatedState;
     
     case USER_ACTIONS.ADD_ORDER_HISTORY:
@@ -168,7 +168,7 @@ export function UserProvider({ children }) {
           const response = await fetch(`https://user-ms-iimt.vercel.app/preference/${email}`);
           if (response.ok) {
             const apiResponse = await response.json();
-            console.log('API Response in signIn:', apiResponse);
+            // console.log('API Response in signIn:', apiResponse);
             
             // Extract preferences from the correct structure
             if (apiResponse && apiResponse.success && apiResponse.data && apiResponse.data.preferences) {
@@ -239,7 +239,7 @@ export function UserProvider({ children }) {
 
   // User preference actions - wrapped in useCallback to prevent unnecessary re-renders
   const updatePreferences = useCallback((preferences) => {
-    console.log('Updating preferences:', preferences);
+    // console.log('Updating preferences:', preferences);
     dispatch({ type: USER_ACTIONS.UPDATE_PREFERENCES, payload: preferences });
   } ,[]);
 

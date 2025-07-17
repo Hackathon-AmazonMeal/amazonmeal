@@ -94,9 +94,9 @@ const Cart = () => {
         return;
       }
 
-      console.log('Processing order with customer info:', customerInfo);
-      console.log('Cart items:', orderItems);
-      console.log('Total amount:', estimatedTotal);
+      // console.log('Processing order with customer info:', customerInfo);
+      // console.log('Cart items:', orderItems);
+      // console.log('Total amount:', estimatedTotal);
 
       // Process order with external API
       const orderResult = await orderService.processOrder({

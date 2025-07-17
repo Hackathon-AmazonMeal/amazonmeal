@@ -63,7 +63,7 @@ function Dashboard() {
       const response = await fetch(`https://user-ms-iimt.vercel.app/preference/${user.email}`);
       if (response.ok) {
         const apiResponse = await response.json();
-        console.log('API Response in fetchUserPreferences:', apiResponse);
+        // console.log('API Response in fetchUserPreferences:', apiResponse);
         
         // Extract preferences from the correct structure
         if (apiResponse && apiResponse.success && apiResponse.data && apiResponse.data.preferences) {
@@ -118,7 +118,7 @@ function Dashboard() {
     }
     
     // Debug log to see what preferences are available
-    console.log('User Preferences:', user?.preferences);
+    // console.log('User Preferences:', user?.preferences);
   }, [user?.email]);
 
   // Clear preferences message after 5 seconds

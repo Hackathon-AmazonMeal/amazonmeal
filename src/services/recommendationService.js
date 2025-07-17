@@ -54,19 +54,19 @@ class RecommendationService {
       const allRecipesResponse = await this.recipeService.getAllRecipes();
       let allRecipes = allRecipesResponse.data;
 
-      console.log('All recipes loaded:', allRecipes.length);
+      // console.log('All recipes loaded:', allRecipes.length);
 
       // Filter recipes based on dietary restrictions
       let filteredRecipes = this.filterByDietaryRestrictions(allRecipes, preferences.dietaryRestrictions);
-      console.log('After dietary restrictions filter:', filteredRecipes.length);
+      // console.log('After dietary restrictions filter:', filteredRecipes.length);
 
       // Filter out recipes with allergens
       filteredRecipes = this.filterByAllergies(filteredRecipes, preferences.allergies);
-      console.log('After allergies filter:', filteredRecipes.length);
+      // console.log('After allergies filter:', filteredRecipes.length);
 
       // Score recipes based on health goals and diet type
       const scoredRecipes = this.scoreRecipesByPreferences(filteredRecipes, preferences);
-      console.log('Scored recipes:', scoredRecipes.length);
+      // console.log('Scored recipes:', scoredRecipes.length);
 
       // Sort by score and take top 15
       const topRecipes = scoredRecipes
@@ -74,17 +74,17 @@ class RecommendationService {
         .slice(0, 15)
         .map(item => item.recipe);
 
-      console.log('Top recipes before balancing:', topRecipes.length);
+      // console.log('Top recipes before balancing:', topRecipes.length);
 
       // Ensure we have a good mix of meal types
       const balancedRecommendations = this.balanceMealTypes(topRecipes);
-      console.log('Balanced recommendations:', balancedRecommendations.length);
+      // console.log('Balanced recommendations:', balancedRecommendations.length);
 
       // Validate that all recipes have required fields
       const validRecommendations = balancedRecommendations.filter(recipe => 
         recipe && recipe.id && recipe.name && recipe.ingredients
       );
-      console.log('Valid recommendations:', validRecommendations.length);
+      // console.log('Valid recommendations:', validRecommendations.length);
 
       return createApiResponse(validRecommendations, true, 'Personalized recommendations generated successfully');
     } catch (error) {
@@ -264,7 +264,7 @@ class RecommendationService {
 
   // Balance meal types in recommendations
   balanceMealTypes(recipes) {
-    console.log('Balancing meal types for recipes:', recipes.length);
+    // console.log('Balancing meal types for recipes:', recipes.length);
     
     const mealTypes = ['breakfast', 'lunch', 'dinner'];
     const balanced = [];
@@ -273,7 +273,7 @@ class RecommendationService {
     // Group recipes by meal type
     mealTypes.forEach(mealType => {
       recipesByMealType[mealType] = recipes.filter(recipe => recipe && recipe.mealType === mealType);
-      console.log(`${mealType} recipes:`, recipesByMealType[mealType].length);
+      // console.log(`${mealType} recipes:`, recipesByMealType[mealType].length);
     });
 
     // Try to get 5 of each meal type
@@ -282,22 +282,22 @@ class RecommendationService {
     mealTypes.forEach(mealType => {
       const available = recipesByMealType[mealType];
       const toAdd = Math.min(available.length, targetPerMealType);
-      console.log(`Adding ${toAdd} ${mealType} recipes`);
+      // console.log(`Adding ${toAdd} ${mealType} recipes`);
       balanced.push(...available.slice(0, toAdd));
     });
 
-    console.log('Balanced so far:', balanced.length);
+    // console.log('Balanced so far:', balanced.length);
 
     // If we don't have enough, fill with remaining recipes
     if (balanced.length < 15) {
       const remaining = recipes.filter(recipe => recipe && !balanced.includes(recipe));
       const needed = 15 - balanced.length;
-      console.log(`Adding ${needed} more recipes from remaining ${remaining.length}`);
+      // console.log(`Adding ${needed} more recipes from remaining ${remaining.length}`);
       balanced.push(...remaining.slice(0, needed));
     }
 
     const final = balanced.slice(0, 15);
-    console.log('Final balanced recipes:', final.length);
+    // console.log('Final balanced recipes:', final.length);
     return final;
   }
 

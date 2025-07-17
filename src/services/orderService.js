@@ -6,58 +6,94 @@ const ORDER_PROCESSING_API = 'https://order-processing-backend.vercel.app/orders
  * Service for handling external order processing
  */
 class OrderService {
+  /** */
   /**
-   * Process order with external API
+   * Process order with external API and fetch YouTube video for recipe
    * @param {Object} orderData - Order information
    * @param {string} orderData.orderId - Unique order ID
    * @param {string} orderData.email - Customer email
    * @param {string} orderData.customerName - Customer name
    * @param {Array} orderData.items - Cart items
    * @param {number} orderData.totalAmount - Total order amount
+   * @param {Object} orderData.recipe - Recipe information (optional)
    * @returns {Promise<Object>} API response
    */
-
-  
-
-
-
   async processOrder(orderData) {
     try {
+      // console.log("Processing order with recipe:", orderData.recipe);
       // Generate order ID if not provided
       const orderId = orderData.orderId || this.generateOrderId();
       
-        
-      const userPref = await axios.get(`https://user-ms-iimt.vercel.app/preference/${orderData.email}`);
-      const recipeResponse = await axios.post(
-            'https://recipe-generator-model-58mk-git-main-sanjays-projects-5366cb8a.vercel.app/recipes',
-            {
-                dietType: userPref.dietType || "eggetarian",
-                healthGoals: userPref.healthGoals || "[muscle-gain,maintain-weight,diabetes-management]",
-                meal_type: userPref.mealType || "lunch",
-                cookingTime: userPref.cookingTime || "30min",
-                cookingMethod: userPref.cookingMethod || "slow-cook",
-                numberOfPerson: userPref.numberOfPerson || "2",
-                allergies: userPref.allergies || "[soy,shellfish,wheat]"
-            },
-            {
-                headers: { 'Content-Type': 'application/json' }
-            }
-        );
-        // Take the first recipe
-        const recipe = recipeResponse.data[0];
-            
+      // Get recipe name from orderData - prioritize the recipe object
+      let recipeName;
       
+      // If orderData has recipe information, use that
+      if (orderData.recipe && orderData.recipe.name) {
+        recipeName = orderData.recipe.name;
+      } 
+      // If recipe has title instead of name
+      else if (orderData.recipe && orderData.recipe.title) {
+        recipeName = orderData.recipe.title;
+      }
+      // Otherwise try to extract recipe name from the first item
+      else if (orderData.items && orderData.items.length > 0 && orderData.items[0].recipeName) {
+        recipeName = orderData.items[0].recipeName;
+      }
+      // Last resort fallback
+      else {
+        recipeName = "healthy meal recipe";
+      }
       
+      // // console.log("Fetching YouTube video for recipe:", recipeName);
+      
+      // Call YouTube API with the recipe name
+      const youtube = await axios.post(
+        'https://recipe-generator-model-58mk.vercel.app/youtube',
+        [recipeName],
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+      
+      // // console.log("YouTube API response:", youtube.data);
+      // // console.log("Order data:", orderData);
 
-      console.log("item: ", orderData)
-
+      // Get recipe image if available - prioritize the recipe object
+      let recipeImageLink;
+      console.log("**Order: ", orderData)
+      
+      // If orderData has recipe with image, use that
+      if (orderData.recipe && orderData.recipe.image) {
+        recipeImageLink = orderData.recipe.image;
+        // console.log("Using recipe image from context:", recipeImageLink);
+      }
+      // Otherwise use a default image only as last resort
+      else {
+        recipeImageLink = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+        // console.log("Using default recipe image");
+      }
+      
+      // Get YouTube link from API response - prioritize the API response
+      let youtubeLink;
+      
+      // If YouTube API returned a link for this recipe, use that
+      if (youtube.data && youtube.data[recipeName] && youtube.data[recipeName] != 'No suitable video found') {
+        youtubeLink = youtube.data[recipeName];
+      }
+      // Otherwise use a default link only as last resort
+      else {
+        youtubeLink = "https://www.dailymotion.com/video/x8n3mnb";
+      }
+      
+      // // console.log("Using recipe image:", recipeImageLink);
+      // // console.log("Using YouTube link:", youtubeLink);
+      
       const requestPayload = {
         order_id: orderId,
         email: orderData.email,
         customer_name: orderData.customerName,
-        recipe_image_link: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=40', // Default recipe image
-        youtube_link: recipe.youtube, // Default recipe video
-        recipe_text: recipe.procedure,
+        recipe_image_link: recipeImageLink,
+        youtube_link: youtubeLink,
         products: orderData.items.map((item) => {
           return {
             name: item.name,
@@ -74,7 +110,7 @@ class OrderService {
         timeout: 10000, // 10 second timeout
       });
 
-      console.log('Order processed successfully:', response.data);
+      // // console.log('Order processed successfully:', response.data);
       return {
         success: true,
         data: response.data,

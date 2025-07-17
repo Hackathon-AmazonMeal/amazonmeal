@@ -99,7 +99,7 @@ function RecipesPage() {
       // Call the images API
       const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/images', recipeTitles);
       
-      console.log('Images API response:', response.data);
+      // console.log('Images API response:', response.data);
       
       // Map images to recipes
       const recipesWithImages = recipes.map((recipe, index) => {
@@ -166,7 +166,7 @@ function RecipesPage() {
       try {
         // If we already have recipes in the context, use those
         if (recipes.length > 0) {
-          console.log('Using recipes from context:', recipes);
+          // console.log('Using recipes from context:', recipes);
           return;
         }
         
@@ -184,13 +184,13 @@ function RecipesPage() {
           allergies: getAllergies(),
         };
 
-        console.log('No recipes in context, fetching with preferences:', preferences);
+        // console.log('No recipes in context, fetching with preferences:', preferences);
         
         try {
           // Call the recipe API directly with the preferences
           const response = await axios.post('https://recipe-generator-model-58mk.vercel.app/recipes', preferences);
           
-          console.log('Recipe API response:', response.data);
+          // console.log('Recipe API response:', response.data);
           
           // Process the recipes if we got a response
           if (response.data && response.data.length > 0) {
@@ -201,7 +201,7 @@ function RecipesPage() {
             setRecipes(recipesWithImages);
           } else {
             // If no recipes returned, use mock data
-            console.log('No recipes returned from API, using mock data');
+            // console.log('No recipes returned from API, using mock data');
             setRecipes([
               {
                 id: 'mock-recipe-1',
@@ -298,7 +298,7 @@ function RecipesPage() {
         } catch (apiError) {
           console.error('Error fetching recipes:', apiError);
           // If API call fails, use mock data
-          console.log('API call failed, using mock data');
+          // console.log('API call failed, using mock data');
           setRecipes([
             {
               id: 'mock-recipe-1',
@@ -418,7 +418,7 @@ function RecipesPage() {
   };
 
   const handleAddToCart = (recipe) => {
-    console.log('Adding recipe to cart:', recipe);
+    // console.log('Adding recipe to cart:', recipe);
     
     // Use the enhanced addRecipeToCart function that handles different ingredient formats
     // and saves the ingredients for later use
@@ -428,9 +428,9 @@ function RecipesPage() {
   const visibleRecipes = getVisibleRecipes();
   const currentRecipe = selectedRecipe || getCurrentRecipe();
 
-  console.log('Visible recipes:', visibleRecipes);
-  console.log('Current recipe:', currentRecipe);
-  console.log('All recipes:', recipes);
+  // // console.log('Visible recipes:', visibleRecipes);
+  // // console.log('Current recipe:', currentRecipe);
+  // // console.log('All recipes:', recipes);
 
   if (isLoading) {
     return (

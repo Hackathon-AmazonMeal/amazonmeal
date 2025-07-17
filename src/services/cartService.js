@@ -118,7 +118,7 @@ class CartService {
       }
 
       const result = await response.json();
-      console.log('Order processed successfully:', result);
+      // console.log('Order processed successfully:', result);
       return result;
     } catch (error) {
       console.error('Failed to process order:', error);

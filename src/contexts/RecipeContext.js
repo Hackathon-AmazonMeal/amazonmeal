@@ -27,7 +27,7 @@ const initialState = {
 function recipeReducer(state, action) {
   switch (action.type) {
     case RECIPE_ACTIONS.SET_RECIPES:
-      console.log('Setting recipes:', action.payload);
+      // console.log('Setting recipes:', action.payload);
       return {
         ...state,
         recipes: action.payload,
@@ -108,8 +108,8 @@ export function RecipeProvider({ children }) {
         // Get recommendations from AI service
         const recommendations = await recommendationService.getPersonalizedRecommendations(preferences);
         
-        console.log('Recommendations received:', recommendations);
-        console.log('Recommendations data:', recommendations.data);
+        // console.log('Recommendations received:', recommendations);
+        // console.log('Recommendations data:', recommendations.data);
         
         dispatch({ type: RECIPE_ACTIONS.SET_RECOMMENDATIONS, payload: recommendations.data });
         dispatch({ type: RECIPE_ACTIONS.SET_RECIPES, payload: recommendations.data });

@@ -108,7 +108,7 @@ function Header() {
         </Box>
 
           <Box display="flex" alignItems="center" gap={1}>
-            {/* Dashboard */}
+            {/* Dashboard
             <Button
               startIcon={<Dashboard />}
               onClick={() => handleNavigation('/dashboard')}
@@ -119,7 +119,7 @@ function Header() {
               }}
             >
               Dashboard
-            </Button>
+            </Button> */}
 
             {/* Recipes */}
             <Button

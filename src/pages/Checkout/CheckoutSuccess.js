@@ -26,17 +26,22 @@ import {
 } from '@mui/icons-material';
 import orderService from '../../services/orderService';
 import { cartService } from '../../services/cartService';
+import { useRecipes } from '../../contexts/RecipeContext';
 
 function CheckoutSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Get recipe information from RecipeContext
+  const { recipes, getCurrentRecipe } = useRecipes();
+  const currentRecipeFromContext = getCurrentRecipe();
   
   // Get order data passed from cart with default values
   const orderData = location.state || {};
   const { 
     orderId = `AM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Generate default order ID
     customerInfo = {
-      name: 'Chef Ayush',
+      name: 'Ramesh',
       email: 'homeayush79@gmail.com'
     }, 
     orderTotal = 0, 
@@ -47,7 +52,7 @@ function CheckoutSuccess() {
 
   // Ensure customerInfo has default values even if partially provided
   const safeCustomerInfo = {
-    name: customerInfo?.name || 'Chef Ayush',
+    name: customerInfo?.name || 'Ramesh',
     email: customerInfo?.email || 'homeayush79@gmail.com',
     ...customerInfo
   };
@@ -67,7 +72,7 @@ function CheckoutSuccess() {
   useEffect(() => {
     // Skip API call if it was already made in Cart component or if we've already made a call
     if (externalApiCalled || apiCallMadeRef.current) {
-      console.log('External API already called, skipping duplicate call');
+      // console.log('External API already called, skipping duplicate call');
       return;
     }
 
@@ -98,29 +103,34 @@ function CheckoutSuccess() {
 
       try {
         setApiCallStatus('loading');
+        // Get recipe from context if available, otherwise use the one from location state
+        const recipeToUse = currentRecipeFromContext || orderData.currentRecipe;
+        console.log("**co: ", recipeToUse)
         
+        // Prepare order data with recipe information
         const externalOrderData = {
           orderId: orderId,
           email: safeCustomerInfo.email,
           customerName: safeCustomerInfo.name,
           items: safeItems,
           totalAmount: safeOrderTotal,
+          recipe: recipeToUse // Pass the recipe to orderService
         };
 
-        console.log('Processing order with external API:', externalOrderData);
+        // console.log('Processing order with external API:', externalOrderData);
         
         const result = await orderService.processOrder(externalOrderData);
         
         if (result.success) {
           setApiCallStatus('success');
           setExternalOrderId(result.orderId);
-          console.log('External order processed successfully:', result);
+          // console.log('External order processed successfully:', result);
           
           // Process order after successful fulfillment
           try {
-            console.log('Processing order fulfillment for order ID:', orderId);
+            // console.log('Processing order fulfillment for order ID:', orderId);
             await cartService.processOrder(orderId);
-            console.log('Order fulfillment processing completed successfully');
+            // console.log('Order fulfillment processing completed successfully');
           } catch (processError) {
             console.error('Failed to process order fulfillment:', processError);
             // Don't fail the entire flow if processing fails
@@ -305,14 +315,14 @@ function CheckoutSuccess() {
                 </Box>
                 
                 {/* Show recipe info if available */}
-                {orderData.currentRecipe && (
+                {(currentRecipeFromContext || orderData.currentRecipe) && (
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Restaurant fontSize="small" />
                       Recipe:
                     </Typography>
                     <Typography variant="body1" fontWeight="bold">
-                      {orderData.currentRecipe.name}
+                      {currentRecipeFromContext ? currentRecipeFromContext.name || currentRecipeFromContext.title : orderData.currentRecipe.name}
                     </Typography>
                   </Box>
                 )}
