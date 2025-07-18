@@ -95,7 +95,7 @@ class OrderService {
         customer_name: orderData.customerName,
         recipe_image_link: recipeImageLink,
         youtube_link: youtubeLink,
-        recipe_text: orderData.recipe.instructions.map((step, index) => `${index + 1}. ${step}`).join('\n'),
+        recipe_text: orderData.recipe.procedure.map((step, index) => `${index + 1}. ${step}`).join('\n'),
         products: orderData.items.map((item) => {
           return {
             name: item.name,
