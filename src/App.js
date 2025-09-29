@@ -34,8 +34,8 @@ function AppContent() {
     <Layout>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/home" element={ <ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/login" element={<LoginPage />} />
         
         <Route 

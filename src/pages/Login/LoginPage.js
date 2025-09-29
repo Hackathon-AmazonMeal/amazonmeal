@@ -32,7 +32,7 @@ const LoginPage = () => {
       setError('');
       setLoading(true);
       await signIn(email, password);
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       setError('Invalid email or password');
     }
