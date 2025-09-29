@@ -19,10 +19,10 @@ import {
   Schedule,
   Favorite
 } from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
+import { useUser } from '../contexts/UserContext';
 
 const Dashboard = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useUser();
   const navigate = useNavigate();
   const [todaysMeals, setTodaysMeals] = useState([]);
   const [weeklyStats] = useState({

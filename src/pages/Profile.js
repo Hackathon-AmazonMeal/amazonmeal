@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Typography, Paper, TextField, FormControl, InputLabel, Select, MenuItem, Chip, Box, Button } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { useUser } from '../contexts/UserContext';
 
 const Profile = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useUser();
   const [preferences, setPreferences] = useState(currentUser?.preferences || {
     dietaryRestrictions: [],
     allergies: [],

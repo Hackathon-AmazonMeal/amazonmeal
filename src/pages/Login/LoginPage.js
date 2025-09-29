@@ -80,7 +80,7 @@ const LoginPage = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: 'background.default',
+        bgcolor: '#EAEDED',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -88,13 +88,21 @@ const LoginPage = () => {
       }}
     >
       <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4 }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 4,
+            border: '1px solid #D5D9D9',
+            borderRadius: '8px',
+            backgroundColor: '#FFFFFF'
+          }}
+        >
           {/* Logo */}
           <Box textAlign="center" mb={4}>
             <Restaurant 
               sx={{ 
-                fontSize: 48, 
-                color: 'primary.main', 
+                fontSize: 40, 
+                color: '#FF9900', 
                 mb: 2 
               }} 
             />
@@ -102,17 +110,35 @@ const LoginPage = () => {
               variant="h4"
               component="h1"
               gutterBottom
-              sx={{ fontWeight: 600 }}
+              sx={{ 
+                fontWeight: 400,
+                fontSize: '28px',
+                color: '#0F1111',
+                mb: 1
+              }}
             >
               Welcome Back
             </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Sign in to access your personalized recipes
+            <Typography variant="body1" sx={{ 
+              color: '#565959',
+              fontSize: '14px'
+            }}>
+              Access your personalized recipes
             </Typography>
           </Box>
 
           {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3,
+                backgroundColor: '#F8D7DA',
+                border: '1px solid #F5C6CB',
+                color: '#721C24',
+                borderRadius: '4px',
+                fontSize: '13px'
+              }}
+            >
               {error}
             </Alert>
           )}
@@ -123,12 +149,33 @@ const LoginPage = () => {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Email"
               name="email"
               autoComplete="email"
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: '#0F1111',
+                },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  '& fieldset': {
+                    borderColor: '#888C8C',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#E77600',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#E77600',
+                    borderWidth: 2,
+                  },
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -141,25 +188,56 @@ const LoginPage = () => {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: '#0F1111',
+                },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  '& fieldset': {
+                    borderColor: '#888C8C',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#E77600',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#E77600',
+                    borderWidth: 2,
+                  },
+                },
+              }}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              sx={{ 
+                mt: 3, 
+                mb: 2, 
+                py: 1.5,
+                fontSize: '13px',
+                fontWeight: 400,
+                minHeight: '29px'
+              }}
               disabled={loading}
             >
               {loading ? (
                 <Box display="flex" alignItems="center">
-                  <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                  <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
                   Signing In...
                 </Box>
               ) : 'Sign In'}
             </Button>
           </Box>
 
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" color="text.secondary">
+          <Divider sx={{ my: 3, borderColor: '#D5D9D9' }}>
+            <Typography variant="body2" sx={{ 
+              color: '#565959',
+              fontSize: '12px'
+            }}>
               OR TRY WITHOUT ACCOUNT
             </Typography>
           </Divider>
@@ -167,35 +245,66 @@ const LoginPage = () => {
           {/* Guest Login Button */}
           <Button
             fullWidth
-            variant="contained"
-            color="secondary"
-            sx={{ mb: 3, py: 1.5 }}
+            variant="outlined"
+            sx={{ 
+              mb: 3, 
+              py: 1.5,
+              fontSize: '13px',
+              fontWeight: 400,
+              color: '#0F1111',
+              borderColor: '#D5D9D9',
+              '&:hover': {
+                borderColor: '#879196',
+                backgroundColor: '#F7F8F8',
+              },
+            }}
             onClick={handleGuestLogin}
             disabled={loading}
           >
             Login as Guest
           </Button>
 
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" color="text.secondary">
+          <Divider sx={{ my: 3, borderColor: '#D5D9D9' }}>
+            <Typography variant="body2" sx={{ 
+              color: '#565959',
+              fontSize: '12px'
+            }}>
               OR TRY DEMO
             </Typography>
           </Divider>
 
           {/* Demo Users */}
           <Stack spacing={2}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+            <Typography variant="body2" sx={{ 
+              color: '#565959',
+              fontSize: '12px',
+              textAlign: 'center'
+            }}>
               Try these demo accounts:
             </Typography>
             {demoUsers.map((user, index) => (
-              <Card key={index} variant="outlined">
+              <Card 
+                key={index} 
+                sx={{
+                  border: '1px solid #D5D9D9',
+                  borderRadius: '4px',
+                  boxShadow: 'none'
+                }}
+              >
                 <CardContent sx={{ p: 2 }}>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      <Typography variant="body2" sx={{ 
+                        fontWeight: 400,
+                        fontSize: '13px',
+                        color: '#0F1111'
+                      }}>
                         {user.username}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ 
+                        color: '#565959',
+                        fontSize: '11px'
+                      }}>
                         {user.email}
                       </Typography>
                     </Box>
@@ -203,6 +312,18 @@ const LoginPage = () => {
                       size="small"
                       variant="outlined"
                       onClick={() => handleDemoLogin(user.email)}
+                      sx={{
+                        fontSize: '11px',
+                        fontWeight: 400,
+                        color: '#0F1111',
+                        borderColor: '#D5D9D9',
+                        minHeight: '24px',
+                        px: 2,
+                        '&:hover': {
+                          borderColor: '#879196',
+                          backgroundColor: '#F7F8F8',
+                        },
+                      }}
                     >
                       Use Account
                     </Button>

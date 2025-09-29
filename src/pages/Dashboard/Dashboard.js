@@ -181,19 +181,24 @@ function Dashboard() {
   const dietType = getDietType();
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#EAEDED' }}>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
         {/* Welcome Header */}
-        <Box mb={4}>
+        <Box mb={3}>
           <Typography
             variant="h3"
             component="h1"
             gutterBottom
-            sx={{ fontWeight: 600 }}
+            sx={{ 
+              fontWeight: 400, 
+              fontSize: '28px',
+              color: '#0F1111',
+              mb: 1
+            }}
           >
             Welcome Back!
           </Typography>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h6" sx={{ color: '#565959', fontSize: '14px', fontWeight: 400 }}>
             Here's your personalized recipe dashboard
           </Typography>
         </Box>
@@ -202,52 +207,89 @@ function Dashboard() {
         {cartError && (
           <Alert 
             severity="error" 
-            sx={{ mb: 3 }}
+            sx={{ 
+              mb: 3,
+              borderRadius: '4px',
+              border: '1px solid #F5C6CB',
+              backgroundColor: '#F8D7DA',
+              color: '#721C24',
+              fontSize: '13px'
+            }}
             onClose={clearError}
           >
             {cartError}
           </Alert>
         )}
 
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
           {/* Left Column */}
           <Grid item xs={12} lg={8}>
             {/* Quick Stats */}
-            <Grid container spacing={3} mb={4}>
+            <Grid container spacing={2} mb={3}>
               <Grid item xs={12} sm={4}>
-                <Card>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <Restaurant color="primary" sx={{ fontSize: 40, mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+                <Card sx={{ 
+                  border: '1px solid #D5D9D9',
+                  borderRadius: '8px',
+                  boxShadow: 'none',
+                  '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }
+                }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2 }}>
+                    <Restaurant sx={{ color: '#FF9900', fontSize: 32, mb: 1 }} />
+                    <Typography variant="h4" sx={{ 
+                      fontWeight: 700, 
+                      mb: 0.5,
+                      color: '#0F1111',
+                      fontSize: '24px'
+                    }}>
                       {recipes.length}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
                       Personalized Recipes
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Card>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <History color="success" sx={{ fontSize: 40, mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+                <Card sx={{ 
+                  border: '1px solid #D5D9D9',
+                  borderRadius: '8px',
+                  boxShadow: 'none',
+                  '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }
+                }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2 }}>
+                    <History sx={{ color: '#067D62', fontSize: 32, mb: 1 }} />
+                    <Typography variant="h4" sx={{ 
+                      fontWeight: 700, 
+                      mb: 0.5,
+                      color: '#0F1111',
+                      fontSize: '24px'
+                    }}>
                       {orderHistory.length}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
                       Orders Placed
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Card>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <TrendingUp color="info" sx={{ fontSize: 40, mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+                <Card sx={{ 
+                  border: '1px solid #D5D9D9',
+                  borderRadius: '8px',
+                  boxShadow: 'none',
+                  '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }
+                }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2 }}>
+                    <TrendingUp sx={{ color: '#F79400', fontSize: 32, mb: 1 }} />
+                    <Typography variant="h4" sx={{ 
+                      fontWeight: 700, 
+                      mb: 0.5,
+                      color: '#0F1111',
+                      fontSize: '24px'
+                    }}>
                       {healthGoals.length}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
                       Health Goals
                     </Typography>
                   </CardContent>
@@ -256,20 +298,39 @@ function Dashboard() {
             </Grid>
 
             {/* Recent Recipes */}
-            <Card sx={{ mb: 4 }}>
-              <CardContent sx={{ p: 3 }}>
+            <Card sx={{ 
+              mb: 3,
+              border: '1px solid #D5D9D9',
+              borderRadius: '8px',
+              boxShadow: 'none'
+            }}>
+              <CardContent sx={{ p: 2 }}>
                 <Stack 
                   direction="row" 
                   justifyContent="space-between" 
                   alignItems="center"
-                  mb={3}
+                  mb={2}
                 >
-                  <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 700, 
+                    color: '#0F1111',
+                    fontSize: '18px'
+                  }}>
                     Your Recipe Recommendations
                   </Typography>
                   <Button 
                     variant="outlined" 
                     onClick={handleViewAllRecipes}
+                    sx={{
+                      fontSize: '13px',
+                      fontWeight: 400,
+                      color: '#0F1111',
+                      borderColor: '#D5D9D9',
+                      '&:hover': {
+                        borderColor: '#879196',
+                        backgroundColor: '#F7F8F8',
+                      },
+                    }}
                   >
                     View All
                   </Button>
@@ -282,25 +343,29 @@ function Dashboard() {
                         <Card
                           sx={{
                             cursor: 'pointer',
-                            transition: 'all 0.3s ease',
+                            transition: 'all 0.2s ease',
+                            border: '1px solid #D5D9D9',
+                            borderRadius: '8px',
+                            boxShadow: 'none',
                             '&:hover': {
-                              transform: 'translateY(-2px)',
-                              boxShadow: 3,
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                             },
                           }}
                           onClick={() => handleRecipeSelect(recipe)}
                         >
                           <CardMedia
                             component="img"
-                            height="140"
+                            height="120"
                             image={recipe.image}
                             alt={recipe.name}
                           />
-                          <CardContent sx={{ p: 2 }}>
+                          <CardContent sx={{ p: 1.5 }}>
                             <Typography
                               variant="subtitle1"
                               sx={{
-                                fontWeight: 600,
+                                fontWeight: 400,
+                                fontSize: '14px',
+                                color: '#0F1111',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 display: '-webkit-box',
@@ -313,14 +378,14 @@ function Dashboard() {
                             </Typography>
                             <Stack direction="row" spacing={1} mb={1}>
                               <Box display="flex" alignItems="center" gap={0.5}>
-                                <AccessTime fontSize="small" color="action" />
-                                <Typography variant="caption">
+                                <AccessTime sx={{ fontSize: 14, color: '#565959' }} />
+                                <Typography variant="caption" sx={{ fontSize: '11px', color: '#565959' }}>
                                   {recipe.prepTime + recipe.cookTime}m
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" gap={0.5}>
-                                <LocalFireDepartment fontSize="small" color="action" />
-                                <Typography variant="caption">
+                                <LocalFireDepartment sx={{ fontSize: 14, color: '#565959' }} />
+                                <Typography variant="caption" sx={{ fontSize: '11px', color: '#565959' }}>
                                   {recipe.nutrition.calories} cal
                                 </Typography>
                               </Box>
@@ -331,8 +396,14 @@ function Dashboard() {
                                   key={tag}
                                   label={tag}
                                   size="small"
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.7rem' }}
+                                  sx={{ 
+                                    fontSize: '10px',
+                                    height: '20px',
+                                    backgroundColor: '#F0F2F2',
+                                    color: '#0F1111',
+                                    border: '1px solid #D5D9D9',
+                                    borderRadius: '4px'
+                                  }}
                                 />
                               ))}
                             </Box>
@@ -342,7 +413,16 @@ function Dashboard() {
                     ))}
                   </Grid>
                 ) : (
-                  <Alert severity="info">
+                  <Alert 
+                    severity="info"
+                    sx={{
+                      backgroundColor: '#D1ECF1',
+                      border: '1px solid #B8DAFF',
+                      color: '#0C5460',
+                      borderRadius: '4px',
+                      fontSize: '13px'
+                    }}
+                  >
                     No recipes loaded yet. Your personalized recommendations will appear here.
                   </Alert>
                 )}
@@ -351,37 +431,56 @@ function Dashboard() {
 
             {/* Order History */}
             {orderHistory.length > 0 && (
-              <Card>
-                <CardContent sx={{ p: 3 }}>
-                  <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+              <Card sx={{ 
+                border: '1px solid #D5D9D9',
+                borderRadius: '8px',
+                boxShadow: 'none'
+              }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 700, 
+                    mb: 2,
+                    color: '#0F1111',
+                    fontSize: '18px'
+                  }}>
                     Recent Orders
                   </Typography>
-                  <Stack spacing={2}>
+                  <Stack spacing={1}>
                     {orderHistory.slice(0, 3).map((order) => (
                       <Box
                         key={order.id}
                         sx={{
                           p: 2,
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          borderRadius: 2,
+                          border: '1px solid #D5D9D9',
+                          borderRadius: '4px',
                           cursor: 'pointer',
+                          backgroundColor: '#FFFFFF',
                           '&:hover': {
-                            bgcolor: 'action.hover',
+                            backgroundColor: '#F7F8F8',
                           },
                         }}
                         onClick={() => handleOrderSelect(order)}
                       >
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                            <Typography variant="subtitle1" sx={{ 
+                              fontWeight: 400,
+                              fontSize: '14px',
+                              color: '#0F1111'
+                            }}>
                               {order.recipeName}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {order.totalItems} items • ${order.estimatedTotal?.toFixed(2)}
+                            <Typography variant="body2" sx={{ 
+                              color: '#565959',
+                              fontSize: '12px'
+                            }}>
+                              {order.totalItems} items • <span style={{ color: '#B12704', fontWeight: 700 }}>${order.estimatedTotal?.toFixed(2)}</span>
                             </Typography>
                           </Box>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ 
+                            color: '#565959',
+                            fontSize: '11px'
+                          }}>
                             {new Date(order.timestamp).toLocaleDateString()}
                           </Typography>
                         </Stack>
@@ -398,14 +497,19 @@ function Dashboard() {
             <Card sx={{ 
               position: 'sticky', 
               top: 24,
-              borderRadius: 2,
-              boxShadow: 3
+              border: '1px solid #D5D9D9',
+              borderRadius: '8px',
+              boxShadow: 'none'
             }}>
-              <CardContent sx={{ p: 3 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
+              <CardContent sx={{ p: 2 }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <Settings color="primary" />
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    <Settings sx={{ color: '#FF9900', fontSize: 20 }} />
+                    <Typography variant="h6" sx={{ 
+                      fontWeight: 700,
+                      color: '#0F1111',
+                      fontSize: '16px'
+                    }}>
                       Your Preferences
                     </Typography>
                   </Stack>
@@ -415,9 +519,14 @@ function Dashboard() {
                     onClick={fetchUserPreferences}
                     disabled={preferencesLoading}
                     sx={{ 
-                      fontWeight: 500,
-                      borderRadius: 1,
-                      textTransform: 'none'
+                      fontWeight: 400,
+                      fontSize: '12px',
+                      color: '#0F1111',
+                      borderColor: '#D5D9D9',
+                      textTransform: 'none',
+                      '&:hover': {
+                        backgroundColor: '#F7F8F8',
+                      },
                     }}
                   >
                     Refresh
@@ -425,158 +534,186 @@ function Dashboard() {
                 </Stack>
 
                 {/* API Preferences */}
-                <Box mb={3}>
-                  {/* Success/Error Messages */}
-                  {/* {preferencesMessage && (
-                    <Alert 
-                      severity={preferencesMessage.type} 
-                      sx={{ 
-                        mb: 2,
-                        borderRadius: 1,
-                        '& .MuiAlert-message': { fontWeight: 500 }
-                      }}
-                      onClose={() => setPreferencesMessage(null)}
-                    >
-                      {preferencesMessage.text}
-                    </Alert>
-                  )} */}
-                  
+                <Box mb={2}>
                   {preferencesLoading ? (
                     <Box display="flex" justifyContent="center" my={2}>
-                      <CircularProgress size={24} />
+                      <CircularProgress size={20} />
                     </Box>
                   ) : user?.preferences ? (
-                    <Stack spacing={2}>
+                    <Stack spacing={1.5}>
                       {/* Diet Type */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Diet Type
                         </Typography>
                         {user.preferences.dietType ? (
                           <Chip
                             label={user.preferences.dietType}
                             size="small"
-                            color="primary"
-                            sx={{ fontWeight: 500 }}
+                            sx={{ 
+                              backgroundColor: '#F0F2F2',
+                              color: '#0F1111',
+                              fontSize: '11px',
+                              height: '20px',
+                              border: '1px solid #D5D9D9'
+                            }}
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>Not set</Typography>
                         )}
                       </Box>
                       
                       {/* Meal Type */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Meal Type
                         </Typography>
                         {user.preferences.mealType ? (
                           <Chip
                             label={user.preferences.mealType}
                             size="small"
-                            color="primary"
-                            sx={{ fontWeight: 500 }}
+                            sx={{ 
+                              backgroundColor: '#F0F2F2',
+                              color: '#0F1111',
+                              fontSize: '11px',
+                              height: '20px',
+                              border: '1px solid #D5D9D9'
+                            }}
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>Not set</Typography>
                         )}
                       </Box>
                       
                       {/* Number of People */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Number of People
                         </Typography>
                         {user.preferences.numberOfPeople !== undefined ? (
                           <Chip
                             label={user.preferences.numberOfPeople}
                             size="small"
-                            color="primary"
-                            sx={{ fontWeight: 500 }}
+                            sx={{ 
+                              backgroundColor: '#F0F2F2',
+                              color: '#0F1111',
+                              fontSize: '11px',
+                              height: '20px',
+                              border: '1px solid #D5D9D9'
+                            }}
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>Not set</Typography>
                         )}
                       </Box>
                       
                       {/* Cooking Time */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Cooking Time
                         </Typography>
                         {user.preferences.cookingTime ? (
                           <Chip
                             label={user.preferences.cookingTime}
                             size="small"
-                            color="primary"
-                            sx={{ fontWeight: 500 }}
+                            sx={{ 
+                              backgroundColor: '#F0F2F2',
+                              color: '#0F1111',
+                              fontSize: '11px',
+                              height: '20px',
+                              border: '1px solid #D5D9D9'
+                            }}
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>Not set</Typography>
                         )}
                       </Box>
                       
                       {/* Cooking Method */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Cooking Method
                         </Typography>
                         {user.preferences.cookingMethod ? (
                           <Chip
                             label={user.preferences.cookingMethod}
                             size="small"
-                            color="primary"
-                            sx={{ fontWeight: 500 }}
+                            sx={{ 
+                              backgroundColor: '#F0F2F2',
+                              color: '#0F1111',
+                              fontSize: '11px',
+                              height: '20px',
+                              border: '1px solid #D5D9D9'
+                            }}
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">Not set</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>Not set</Typography>
                         )}
                       </Box>
                       
                       {/* Health Goals */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Health Goals
                         </Typography>
                         {Array.isArray(user.preferences.healthGoals) && user.preferences.healthGoals.length > 0 ? (
@@ -586,26 +723,34 @@ function Dashboard() {
                                 key={index}
                                 label={item}
                                 size="small"
-                                color="success"
-                                sx={{ fontWeight: 500 }}
+                                sx={{ 
+                                  backgroundColor: '#D4EDDA',
+                                  color: '#155724',
+                                  fontSize: '10px',
+                                  height: '18px',
+                                  border: '1px solid #C3E6CB'
+                                }}
                               />
                             ))}
                           </Stack>
                         ) : (
-                          <Typography variant="body2" color="text.secondary">None</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>None</Typography>
                         )}
                       </Box>
                       
                       {/* Allergies */}
                       <Box sx={{ 
                         p: 1.5, 
-                        borderRadius: 1, 
-                        bgcolor: 'background.paper',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        border: '1px solid',
-                        borderColor: 'divider'
+                        borderRadius: '4px', 
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #D5D9D9'
                       }}>
-                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ 
+                          color: '#FF9900', 
+                          fontWeight: 700, 
+                          mb: 0.5,
+                          fontSize: '12px'
+                        }}>
                           Allergies
                         </Typography>
                         {Array.isArray(user.preferences.allergies) && user.preferences.allergies.length > 0 ? (
@@ -615,13 +760,18 @@ function Dashboard() {
                                 key={index}
                                 label={item}
                                 size="small"
-                                color="secondary"
-                                sx={{ fontWeight: 500 }}
+                                sx={{ 
+                                  backgroundColor: '#F8D7DA',
+                                  color: '#721C24',
+                                  fontSize: '10px',
+                                  height: '18px',
+                                  border: '1px solid #F5C6CB'
+                                }}
                               />
                             ))}
                           </Stack>
                         ) : (
-                          <Typography variant="body2" color="text.secondary">None</Typography>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>None</Typography>
                         )}
                       </Box>
                     </Stack>
@@ -629,8 +779,11 @@ function Dashboard() {
                     <Alert 
                       severity="info" 
                       sx={{ 
-                        borderRadius: 1,
-                        '& .MuiAlert-message': { fontWeight: 500 }
+                        backgroundColor: '#D1ECF1',
+                        border: '1px solid #B8DAFF',
+                        color: '#0C5460',
+                        borderRadius: '4px',
+                        fontSize: '12px'
                       }}
                     >
                       No preferences found for {user?.email}. Click Refresh to fetch your preferences.
@@ -638,7 +791,7 @@ function Dashboard() {
                   )}
                 </Box>
 
-                <Divider sx={{ my: 3 }} />
+                <Divider sx={{ my: 2, borderColor: '#D5D9D9' }} />
 
                 <Button
                   variant="contained"
@@ -646,11 +799,11 @@ function Dashboard() {
                   startIcon={<Settings />}
                   onClick={handleEditPreferences}
                   sx={{ 
-                    fontWeight: 500,
-                    borderRadius: 1,
+                    fontWeight: 400,
+                    fontSize: '13px',
                     textTransform: 'none',
                     py: 1,
-                    boxShadow: 2
+                    minHeight: '29px'
                   }}
                 >
                   Edit Preferences

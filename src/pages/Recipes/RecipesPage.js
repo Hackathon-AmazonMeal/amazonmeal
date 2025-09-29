@@ -476,19 +476,28 @@ function RecipesPage() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#EAEDED' }}>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
         {/* Header */}
-        <Box mb={4}>
+        <Box mb={3}>
           <Typography
             variant="h3"
             component="h1"
             gutterBottom
-            sx={{ fontWeight: 600 }}
+            sx={{ 
+              fontWeight: 400,
+              fontSize: '28px',
+              color: '#0F1111',
+              mb: 1
+            }}
           >
             Your Personalized Recipes
           </Typography>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h6" sx={{ 
+            color: '#565959',
+            fontSize: '14px',
+            fontWeight: 400
+          }}>
             {getRecipeCount()} recipes tailored to your preferences
           </Typography>
         </Box>
@@ -503,7 +512,11 @@ function RecipesPage() {
                 alignItems="center"
                 mb={2}
               >
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ 
+                  fontWeight: 700,
+                  fontSize: '18px',
+                  color: '#0F1111'
+                }}>
                   Browse Recipes ({currentRecipeIndex + 1}-{Math.min(currentRecipeIndex + 3, getRecipeCount())} of {getRecipeCount()})
                 </Typography>
 
@@ -511,13 +524,27 @@ function RecipesPage() {
                   <Stack direction="row" spacing={1}>
                     <IconButton
                       onClick={previousRecipe}
-                      sx={{ bgcolor: 'background.paper' }}
+                      sx={{ 
+                        bgcolor: '#FFFFFF',
+                        border: '1px solid #D5D9D9',
+                        borderRadius: '4px',
+                        '&:hover': {
+                          backgroundColor: '#F7F8F8',
+                        },
+                      }}
                     >
                       <ArrowBack />
                     </IconButton>
                     <IconButton
                       onClick={nextRecipe}
-                      sx={{ bgcolor: 'background.paper' }}
+                      sx={{ 
+                        bgcolor: '#FFFFFF',
+                        border: '1px solid #D5D9D9',
+                        borderRadius: '4px',
+                        '&:hover': {
+                          backgroundColor: '#F7F8F8',
+                        },
+                      }}
                     >
                       <ArrowForward />
                     </IconButton>
@@ -533,19 +560,19 @@ function RecipesPage() {
                       sx={{
                         height: '100%',
                         cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        border: selectedRecipe?.id === recipe.id ? 2 : 1,
-                        borderColor: selectedRecipe?.id === recipe.id ? 'primary.main' : 'divider',
+                        transition: 'all 0.2s ease',
+                        border: selectedRecipe?.id === recipe.id ? '2px solid #FF9900' : '1px solid #D5D9D9',
+                        borderRadius: '8px',
+                        boxShadow: 'none',
                         '&:hover': {
-                          transform: 'translateY(-4px)',
-                          boxShadow: 4,
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                         },
                       }}
                       onClick={() => handleRecipeSelect(recipe)}
                     >
                       <CardMedia
                         component="img"
-                        height="200"
+                        height="180"
                         image={recipe.image}
                         alt={recipe.name}
                         sx={{ objectFit: 'cover' }}
@@ -556,33 +583,36 @@ function RecipesPage() {
                           component="h3"
                           gutterBottom
                           sx={{
-                            fontWeight: 600,
+                            fontWeight: 400,
+                            fontSize: '14px',
+                            color: '#0F1111',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
+                            mb: 1,
                           }}
                         >
                           {recipe.name}
                         </Typography>
 
-                        <Stack direction="row" spacing={2} mb={2}>
+                        <Stack direction="row" spacing={1.5} mb={1.5}>
                           <Box display="flex" alignItems="center" gap={0.5}>
-                            <AccessTime fontSize="small" color="action" />
-                            <Typography variant="caption">
+                            <AccessTime sx={{ fontSize: 14, color: '#565959' }} />
+                            <Typography variant="caption" sx={{ fontSize: '11px', color: '#565959' }}>
                               {recipe.prepTime + recipe.cookTime} min
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" gap={0.5}>
-                            <Restaurant fontSize="small" color="action" />
-                            <Typography variant="caption">
+                            <Restaurant sx={{ fontSize: 14, color: '#565959' }} />
+                            <Typography variant="caption" sx={{ fontSize: '11px', color: '#565959' }}>
                               {recipe.servings} servings
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" gap={0.5}>
-                            <LocalFireDepartment fontSize="small" color="action" />
-                            <Typography variant="caption">
+                            <LocalFireDepartment sx={{ fontSize: 14, color: '#565959' }} />
+                            <Typography variant="caption" sx={{ fontSize: '11px', color: '#565959' }}>
                               {recipe.nutrition.calories} cal
                             </Typography>
                           </Box>
@@ -594,8 +624,14 @@ function RecipesPage() {
                               key={tag}
                               label={tag}
                               size="small"
-                              variant="outlined"
-                              sx={{ fontSize: '0.75rem' }}
+                              sx={{ 
+                                fontSize: '10px',
+                                height: '20px',
+                                backgroundColor: '#F0F2F2',
+                                color: '#0F1111',
+                                border: '1px solid #D5D9D9',
+                                borderRadius: '4px'
+                              }}
                             />
                           ))}
                         </Box>
@@ -607,7 +643,12 @@ function RecipesPage() {
                             e.stopPropagation();
                             handleAddToCart(recipe);
                           }}
-                          sx={{ mt: 1 }}
+                          sx={{ 
+                            mt: 1,
+                            fontSize: '13px',
+                            fontWeight: 400,
+                            minHeight: '29px'
+                          }}
                         >
                           Add to Cart
                         </Button>

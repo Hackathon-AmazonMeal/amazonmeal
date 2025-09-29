@@ -455,30 +455,66 @@ function PreferencesPage() {
   const isFirstStep = activeStep === 0;
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#EAEDED', py: 3 }}>
       <Container maxWidth="md">
         {/* Header */}
-        <Box textAlign="center" mb={4}>
+        <Box textAlign="center" mb={3}>
           <Typography
             variant="h3"
             component="h1"
             gutterBottom
-            sx={{ fontWeight: 600, color: 'text.primary' }}
+            sx={{ 
+              fontWeight: 400, 
+              fontSize: '28px',
+              color: '#0F1111',
+              mb: 1
+            }}
           >
             Set Your Preferences
           </Typography>
           <Typography
             variant="h6"
-            color="text.secondary"
-            sx={{ mb: 4, lineHeight: 1.6 }}
+            sx={{ 
+              mb: 3, 
+              lineHeight: 1.6,
+              color: '#565959',
+              fontSize: '14px',
+              fontWeight: 400
+            }}
           >
             Help us personalize your recipe recommendations by sharing your dietary preferences and health goals.
           </Typography>
         </Box>
 
         {/* Stepper */}
-        <Box mb={4}>
-          <Stepper activeStep={activeStep} alternativeLabel>
+        <Box mb={3}>
+          <Stepper 
+            activeStep={activeStep} 
+            alternativeLabel
+            sx={{
+              '& .MuiStepLabel-label': {
+                fontSize: '12px',
+                color: '#565959',
+                '&.Mui-active': {
+                  color: '#FF9900',
+                  fontWeight: 700,
+                },
+                '&.Mui-completed': {
+                  color: '#067D62',
+                  fontWeight: 400,
+                },
+              },
+              '& .MuiStepIcon-root': {
+                color: '#D5D9D9',
+                '&.Mui-active': {
+                  color: '#FF9900',
+                },
+                '&.Mui-completed': {
+                  color: '#067D62',
+                },
+              },
+            }}
+          >
             {STEPS.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
@@ -488,8 +524,13 @@ function PreferencesPage() {
         </Box>
 
         {/* Content Card */}
-        <Card sx={{ mb: 4 }}>
-          <CardContent sx={{ p: 4 }}>
+        <Card sx={{ 
+          mb: 3,
+          border: '1px solid #D5D9D9',
+          borderRadius: '8px',
+          boxShadow: 'none'
+        }}>
+          <CardContent sx={{ p: 3 }}>
             <Fade in={true} key={activeStep}>
               <Box>
                 {renderStepContent(activeStep)}
@@ -500,7 +541,17 @@ function PreferencesPage() {
 
         {/* Error Display */}
         {Object.keys(errors).length > 0 && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 3,
+              backgroundColor: '#F8D7DA',
+              border: '1px solid #F5C6CB',
+              color: '#721C24',
+              borderRadius: '4px',
+              fontSize: '13px'
+            }}
+          >
             {Object.values(errors)[0]}
           </Alert>
         )}
@@ -518,12 +569,29 @@ function PreferencesPage() {
             startIcon={<ArrowBack />}
             variant="outlined"
             size="large"
+            sx={{
+              fontSize: '13px',
+              fontWeight: 400,
+              color: '#0F1111',
+              borderColor: '#D5D9D9',
+              '&:hover': {
+                borderColor: '#879196',
+                backgroundColor: '#F7F8F8',
+              },
+              '&:disabled': {
+                color: '#879196',
+                borderColor: '#D5D9D9',
+              },
+            }}
           >
             Back
           </Button>
 
           <Box textAlign="center">
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ 
+              color: '#565959',
+              fontSize: '12px'
+            }}>
               Step {activeStep + 1} of {STEPS.length}
             </Typography>
           </Box>
@@ -533,14 +601,19 @@ function PreferencesPage() {
             disabled={isSubmitting || isApiLoading}
             endIcon={
               (isSubmitting || isApiLoading) ? (
-                <CircularProgress size={20} />
+                <CircularProgress size={16} />
               ) : isLastStep ? null : (
                 <ArrowForward />
               )
             }
             variant="contained"
             size="large"
-            sx={{ minWidth: 120 }}
+            sx={{ 
+              minWidth: 140,
+              fontSize: '13px',
+              fontWeight: 400,
+              minHeight: '29px'
+            }}
           >
             {isSubmitting
               ? 'Processing...'
@@ -554,10 +627,17 @@ function PreferencesPage() {
         {/* Progress Indicator */}
         {isSubmitting && (
           <Box textAlign="center" mt={3}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
+            <Typography variant="body2" sx={{ 
+              color: '#565959',
+              fontSize: '12px',
+              mb: 0.5
+            }}>
               Generating your personalized recommendations...
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ 
+              color: '#565959',
+              fontSize: '11px'
+            }}>
               This may take a few moments
             </Typography>
           </Box>

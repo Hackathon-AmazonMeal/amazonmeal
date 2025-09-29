@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Card, CardMedia, CardContent, Typography, Chip, Box, CircularProgress } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 const RecipeBrowser = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useUser();
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);

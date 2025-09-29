@@ -10,12 +10,15 @@ import { RecipeProvider } from './contexts/RecipeContext';
 import { CartProvider } from './contexts/CartContext';
 
 // Pages
+import Home from './pages/Home';
+import HomePage from './pages/Home/HomePage';
 import LoginPage from './pages/Login/LoginPage';
 import PreferencesPage from './pages/Preferences/PreferencesPage';
 import RecipesPage from './pages/Recipes/RecipesPage';
 import Dashboard from './pages/Dashboard/Dashboard';
 import CheckoutSuccess from './pages/Checkout/CheckoutSuccess';
 import Cart from './pages/Cart';
+import Fresh from './pages/Fresh';
 
 // Components
 import Layout from './components/layout/Layout';
@@ -31,6 +34,8 @@ function AppContent() {
     <Layout>
       <Routes>
         {/* Public routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
         
         <Route 
@@ -58,6 +63,14 @@ function AppContent() {
           } 
         />
         <Route 
+          path="/fresh" 
+          element={
+            <ProtectedRoute>
+              <Fresh />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
           path="/cart" 
           element={
             <ProtectedRoute>
@@ -79,16 +92,6 @@ function AppContent() {
         {/* Shopping cart page */}
         <Route path="/cart" element={<Cart />} />
         {/* Default route logic */}
-        <Route 
-          path="/" 
-          element={
-            currentUser && currentUser.preferences ? 
-                <Navigate to="/dashboard" replace /> : 
-              <Navigate to="/login" replace />
-          } 
-        />
-        
-        {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

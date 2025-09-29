@@ -13,7 +13,11 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  Snackbar
+  Snackbar,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel
 } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
 import { useUser } from '../contexts/UserContext';
@@ -36,8 +40,41 @@ const Cart = () => {
     isEmpty,                    // Add isEmpty check
     increaseQuantity,           // Add quantity controls
     decreaseQuantity,           // Add quantity controls
-    getCartSummary              // Add cart summary
+    getCartSummary,             // Add cart summary
+    updateItemBrand             // Add brand update function
   } = useCart();
+
+  // Brand constants
+  const BRAND_OPTIONS = {
+    meat: ['Tyson', 'Perdue', 'Organic Valley', 'Local Farm'],
+    dairy: ['Organic Valley', 'Horizon', 'Local Dairy', 'Store Brand'],
+    produce: ['Organic', 'Local Farm', 'Conventional'],
+    default: ['Generic', 'Store Brand', 'Premium']
+  };
+
+  // Available brands for each ingredient type
+  const getBrandOptions = (item) => {
+    if (item.brands && Array.isArray(item.brands) && item.brands.length > 0) {
+      return item.brands;
+    }
+
+    const name = item.name.toLowerCase();
+    if (name.includes('chicken') || name.includes('beef') || name.includes('pork')) {
+      return BRAND_OPTIONS.meat;
+    } else if (name.includes('milk') || name.includes('cheese') || name.includes('yogurt')) {
+      return BRAND_OPTIONS.dairy;
+    } else if (name.includes('tomato') || name.includes('onion') || name.includes('lettuce') || name.includes('carrot') || name.includes('potato')) {
+      return BRAND_OPTIONS.produce;
+    } else {
+      return BRAND_OPTIONS.default;
+    }
+  };
+
+  const handleBrandChange = (itemId, newBrand) => {
+    if (updateItemBrand) {
+      updateItemBrand(itemId, newBrand);
+    }
+  };
   
   // Get recipe information from RecipeContext
   const { recipes, getCurrentRecipe } = useRecipes();
@@ -174,67 +211,102 @@ const Cart = () => {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
+      <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 400, mb: 3 }}>
           Shopping Cart
         </Typography>
         
         {isEmpty() ? (
-          <Box textAlign="center" py={8}>
-            <ShoppingCart sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-            <Typography variant="h5" gutterBottom>
+          <Box textAlign="center" py={8} sx={{ bgcolor: 'background.paper', borderRadius: 1, border: '1px solid #D5D9D9' }}>
+            <ShoppingCart sx={{ fontSize: 64, color: '#879196', mb: 2 }} />
+            <Typography variant="h5" gutterBottom sx={{ color: '#0F1111', fontWeight: 400 }}>
               Your cart is empty
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="#565959">
               Add some ingredients from recipes to get started!
             </Typography>
           </Box>
         ) : (
-          <Paper elevation={2}>
-            <List>
+          <Paper elevation={0} sx={{ border: '1px solid #D5D9D9', borderRadius: 1 }}>
+            <List sx={{ p: 0 }}>
               {cartItems.map((item, index) => (
                 <React.Fragment key={item.id}>
                   <ListItem
-                    sx={{ py: 2 }}
+                    sx={{ 
+                      py: 2, 
+                      px: 3,
+                      borderBottom: index < cartItems.length - 1 ? '1px solid #E6E6E6' : 'none',
+                    }}
                   >
                     <ListItemText
                       primary={
-                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 400, color: '#0F1111', fontSize: '14px' }}>
                           {item.name}
                         </Typography>
                       }
                       secondary={
-                        <Stack spacing={0.5}>
-                          <Typography variant="body2" color="text.secondary">
+                        <Stack spacing={0.5} sx={{ mt: 0.5 }}>
+                          <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
                             {(item.originalAmount * item.quantity).toFixed(1)} {item.originalUnit}
                           </Typography>
-                          <Typography variant="body2" color="primary">
+                          <Typography variant="body2" sx={{ color: '#B12704', fontSize: '14px', fontWeight: 700 }}>
                             ${(item.price * item.quantity).toFixed(2)}
                           </Typography>
                         </Stack>
                       }
                     />
-                    
+                    {/* brand list */}
+                    <FormControl size="small" sx={{ minWidth: 120, mr: 2 }}>
+                      <InputLabel sx={{ fontSize: '12px' }}>Brand</InputLabel>
+                      <Select
+                        value={item.brand || getBrandOptions(item)[0]}
+                        label="Brand"
+                        onChange={(e) => handleBrandChange(item.id, e.target.value)}
+                        sx={{ 
+                          fontSize: '12px',
+                          '& .MuiSelect-select': {
+                            py: 1,
+                          }
+                        }}
+                      >
+                        {getBrandOptions(item).map((brand) => (
+                          <MenuItem key={brand} value={brand} sx={{ fontSize: '12px' }}>
+                            {brand}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     {/* Quantity Controls (same as CartSidebar) */}
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mr: 2 }}>
                       <IconButton
                         size="small"
                         onClick={() => decreaseQuantity(item.id)}
                         disabled={item.quantity <= 1}
+                        sx={{
+                          border: '1px solid #D5D9D9',
+                          borderRadius: '4px',
+                          width: 28,
+                          height: 28,
+                          '&:hover': {
+                            backgroundColor: '#F7F8F8',
+                          },
+                        }}
                       >
                         <Remove fontSize="small" />
                       </IconButton>
                       
                       <Typography
-                        variant="body1"
+                        variant="body2"
                         sx={{
                           minWidth: 32,
                           textAlign: 'center',
-                          fontWeight: 600,
+                          fontWeight: 400,
                           px: 1,
                           py: 0.5,
-                          bgcolor: 'primary.50',
-                          borderRadius: 1,
+                          border: '1px solid #D5D9D9',
+                          borderRadius: '4px',
+                          backgroundColor: '#FFFFFF',
+                          fontSize: '12px',
                         }}
                       >
                         {item.quantity}
@@ -243,6 +315,15 @@ const Cart = () => {
                       <IconButton
                         size="small"
                         onClick={() => increaseQuantity(item.id)}
+                        sx={{
+                          border: '1px solid #D5D9D9',
+                          borderRadius: '4px',
+                          width: 28,
+                          height: 28,
+                          '&:hover': {
+                            backgroundColor: '#F7F8F8',
+                          },
+                        }}
                       >
                         <Add fontSize="small" />
                       </IconButton>
@@ -251,7 +332,12 @@ const Cart = () => {
                     <IconButton 
                       edge="end" 
                       onClick={() => removeIngredient(item.id)}
-                      color="error"
+                      sx={{
+                        color: '#B12704',
+                        '&:hover': {
+                          backgroundColor: 'rgba(177, 39, 4, 0.1)',
+                        },
+                      }}
                     >
                       <Delete />
                     </IconButton>
@@ -261,55 +347,71 @@ const Cart = () => {
               ))}
             </List>
             
-            <Box sx={{ p: 3, bgcolor: 'grey.50' }}>
+            <Box sx={{ p: 3, bgcolor: '#F7F8F8', borderTop: '1px solid #E6E6E6' }}>
               {/* Cart Summary (same as CartSidebar) */}
               <Stack spacing={2} sx={{ mb: 3 }}>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
                     Total Items:
                   </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 400, color: '#0F1111', fontSize: '12px' }}>
                     {totalItems}
                   </Typography>
                 </Stack>
                 
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
                     Unique Items:
                   </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 400, color: '#0F1111', fontSize: '12px' }}>
                     {cartSummary.totalUniqueItems}
                   </Typography>
                 </Stack>
                 
-                <Divider />
+                <Divider sx={{ borderColor: '#D5D9D9' }} />
                 
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="h6">
-                    Estimated Total:
+                  <Typography variant="h6" sx={{ fontSize: '18px', fontWeight: 700, color: '#0F1111' }}>
+                    Subtotal:
                   </Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                  <Typography variant="h6" sx={{ fontSize: '18px', fontWeight: 700, color: '#B12704' }}>
                     ${cartTotal.toFixed(2)}
                   </Typography>
                 </Stack>
               </Stack>
 
               {/* Pricing Notice (same as CartSidebar) */}
-              <Alert severity="info" sx={{ mb: 3 }}>
-                <Typography variant="body2">
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  mb: 3,
+                  backgroundColor: '#D1ECF1',
+                  border: '1px solid #B8DAFF',
+                  '& .MuiAlert-message': {
+                    fontSize: '12px',
+                  }
+                }}
+              >
+                <Typography variant="body2" sx={{ fontSize: '12px' }}>
                   Prices are estimated. Actual prices may vary based on store and availability.
                 </Typography>
               </Alert>
               
               {/* Show customer info that will be used */}
-              <Box sx={{ mb: 2, p: 2, bgcolor: 'info.50', borderRadius: 1, border: '1px solid', borderColor: 'info.200' }}>
-                <Typography variant="body2" color="info.main" gutterBottom>
-                  <Person sx={{ fontSize: 16, mr: 0.5 }} />
-                  Order will be placed for: <strong>{getCustomerInfo().name}</strong>
+              <Box sx={{ 
+                mb: 2, 
+                p: 2, 
+                bgcolor: '#FFFFFF', 
+                borderRadius: '4px', 
+                border: '1px solid #D5D9D9' 
+              }}>
+                <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }} gutterBottom>
+                  <Person sx={{ fontSize: 14, mr: 0.5 }} />
+                  Order will be placed for: <strong style={{ color: '#0F1111' }}>{getCustomerInfo().name}</strong>
                 </Typography>
-                <Typography variant="body2" color="info.main">
-                  <Email sx={{ fontSize: 16, mr: 0.5 }} />
-                  Confirmation email: <strong>{getCustomerInfo().email}</strong>
+                <Typography variant="body2" sx={{ color: '#565959', fontSize: '12px' }}>
+                  <Email sx={{ fontSize: 14, mr: 0.5 }} />
+                  Confirmation email: <strong style={{ color: '#0F1111' }}>{getCustomerInfo().email}</strong>
                 </Typography>
               </Box>
 
@@ -317,8 +419,17 @@ const Cart = () => {
                 <Button
                   variant="outlined"
                   onClick={clearCart}
-                  color="error"
                   disabled={isProcessingOrder}
+                  sx={{
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    color: '#0F1111',
+                    borderColor: '#D5D9D9',
+                    '&:hover': {
+                      borderColor: '#879196',
+                      backgroundColor: '#F7F8F8',
+                    },
+                  }}
                 >
                   Clear Cart
                 </Button>
@@ -326,11 +437,16 @@ const Cart = () => {
                   variant="contained"
                   onClick={handleCheckout}
                   size="large"
-                  sx={{ flex: 1 }}
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    minHeight: '29px',
+                  }}
                   disabled={isEmpty() || isProcessingOrder}
-                  startIcon={isProcessingOrder ? <CircularProgress size={20} /> : null}
+                  startIcon={isProcessingOrder ? <CircularProgress size={16} /> : null}
                 >
-                  {isProcessingOrder ? 'Processing Order...' : `Checkout - $${cartTotal.toFixed(2)}`}
+                  {isProcessingOrder ? 'Processing Order...' : `Proceed to Checkout (${totalItems} items)`}
                 </Button>
               </Box>
             </Box>
