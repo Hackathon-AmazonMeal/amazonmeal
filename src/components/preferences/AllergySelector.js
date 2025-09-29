@@ -132,7 +132,7 @@ function AllergySelector({ selected = [], onChange, error }) {
               <Chip
                 label={allergy.label}
                 onClick={() => handleToggle(allergy.id)}
-                color={selectedAllergies.includes(allergy.id) ? getSeverityColor(allergy.severity) : 'default'}
+                color={selectedAllergies.includes(allergy.id) ? 'primary' : 'default'}
                 variant={selectedAllergies.includes(allergy.id) ? 'filled' : 'outlined'}
                 sx={{
                   width: '100%',
@@ -143,9 +143,12 @@ function AllergySelector({ selected = [], onChange, error }) {
                   fontWeight: 500,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
+                  backgroundColor: selectedAllergies.includes(allergy.id) ? '#1976d2' : 'transparent',
+                  color: selectedAllergies.includes(allergy.id) ? 'white' : 'inherit',
                   '&:hover': {
                     transform: 'translateY(-2px)',
                     boxShadow: 2,
+                    backgroundColor: selectedAllergies.includes(allergy.id) ? '#1565c0' : 'rgba(0, 0, 0, 0.04)',
                   },
                   '& .MuiChip-label': {
                     whiteSpace: 'normal',

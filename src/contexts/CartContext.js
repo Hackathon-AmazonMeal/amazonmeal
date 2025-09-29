@@ -7,6 +7,7 @@ const CART_ACTIONS = {
   ADD_INGREDIENT: 'ADD_INGREDIENT',
   REMOVE_INGREDIENT: 'REMOVE_INGREDIENT',
   UPDATE_QUANTITY: 'UPDATE_QUANTITY',
+  UPDATE_BRAND: 'UPDATE_BRAND',
   CLEAR_CART: 'CLEAR_CART',
   SET_RECIPE: 'SET_RECIPE',
   SET_LOADING: 'SET_LOADING',
@@ -74,6 +75,19 @@ function cartReducer(state, action) {
         ...state,
         items: newItems,
         totalItems: calculateTotalItems(newItems),
+      };
+    }
+    
+    case CART_ACTIONS.UPDATE_BRAND: {
+      const newItems = state.items.map(item =>
+        item.id === action.payload.id
+          ? { ...item, brand: action.payload.brand }
+          : item
+      );
+      
+      return {
+        ...state,
+        items: newItems,
       };
     }
     
@@ -148,6 +162,10 @@ export function CartProvider({ children }) {
 
     updateQuantity: (id, quantity) => {
       dispatch({ type: CART_ACTIONS.UPDATE_QUANTITY, payload: { id, quantity } });
+    },
+
+    updateItemBrand: (id, brand) => {
+      dispatch({ type: CART_ACTIONS.UPDATE_BRAND, payload: { id, brand } });
     },
 
     increaseQuantity: (id) => {
